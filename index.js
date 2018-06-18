@@ -17,7 +17,7 @@ const createRule = (formUUID, type, ruleData, ruleDependencyUUID) =>
         fnName: ruleData.fn.name
     }).on('error', console.log).then((resp) => console.log("CREATED"));
 
-const postAllRules = (ruleFilePath) => {
+const postAllRules = (organisationName, ruleFilePath) => {
     const compiler = webpack({
         entry: {
             rules: ruleFilePath
@@ -47,7 +47,7 @@ const postAllRules = (ruleFilePath) => {
             .post(serverURL("ruleDependency"), {
                 code: rulesContent,
                 hash: stats.hash
-            }).set("ORGANISATION-NAME", "Lokbiradari Prakalp")
+            }).set("ORGANISATION-NAME", organisationName)
             .then((response) => {
                 const registry = rules[Object.keys(rules).find(r => rules[r].registry !== undefined)].registry;
                 registry.getAll()
@@ -59,5 +59,5 @@ const postAllRules = (ruleFilePath) => {
 };
 
 
-postAllRules("./test/additional/Rulez.js");
+// postAllRules("./test/additional/Rulez.js");
 module.exports = {postAllRules, RuleFactory};
