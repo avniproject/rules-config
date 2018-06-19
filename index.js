@@ -34,7 +34,20 @@ const postAllRules = (organisationName, ruleFilePath) => {
                     test: /\.js$/,
                     exclude: /(node_modules)/,
                     use: {
-                        loader: 'babel-loader'
+                        loader: 'babel-loader',
+                        options: {
+                            "presets": [
+                                [
+                                    "env"
+                                ]
+                            ],
+                            "plugins": [
+                                "transform-class-properties",
+                                "transform-export-extensions",
+                                "transform-decorators-legacy",
+                                "transform-es2015-destructuring"
+                            ]
+                        }
                     }
                 }
             ]
