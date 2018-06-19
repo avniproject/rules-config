@@ -219,6 +219,13 @@ class RuleCondition {
         });
     }
 
+    get ageInDays() {
+        return this._addToChain((next, context) => {
+            context.valueToBeChecked = this._contextualTime().diff(moment(this._getIndividual(context).dateOfBirth), 'days');
+            return next(context);
+        });
+    }
+
     get encounterType() {
         return this._addToChain((next, context) => {
             context.valueToBeChecked = context.programEncounter && context.programEncounter.encounterType.name;
@@ -325,7 +332,7 @@ class RuleCondition {
 
     get defined() {
         return this._addToChain((next, context) => {
-            context.matches = _.every([undefined, null], (value) => context.valueToBeChecked !== value);
+            context.matches = _.every([undefined,null], (value) => context.valueToBeChecked !== value);
             return next(context);
         });
     }
