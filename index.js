@@ -2,7 +2,6 @@ const webpack = require('webpack');
 const path = require('path');
 const fs = require('fs');
 const request = require('superagent');
-const RuleFactory = require('./src/rules/additional/Rule');
 
 const serverURL = (path) => `${process.env.SERVER_URL !== undefined ? process.env.SERVER_URL : 'http://localhost:8021'}/${path}`;
 
@@ -73,4 +72,4 @@ const postAllRules = (organisationName, ruleFilePath) => {
 
 
 // postAllRules("./test/additional/Rulez.js");
-module.exports = {postAllRules, RuleFactory};
+module.exports = {postAllRules};
