@@ -3,7 +3,9 @@ const FormElementStatus = require("./model/FormElementStatus");
 const moment = require("moment");
 
 class FormElementsStatusesHelper {
-    static removeSpecialCharsRegex = new RegExp(/[-[\]{}()*+?.,\\^$|#]/g);
+    static get removeSpecialCharsRegex() {
+        return new RegExp(/[-[\]{}()*+?.,\\^$|#]/g);
+    }
 
     static getFormElementsStatuses(handler = {}, entity, formElementGroup, today) {
         if (handler['preFilter'])
