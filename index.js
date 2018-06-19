@@ -54,7 +54,7 @@ const postAllRules = (organisationName, ruleFilePath) => {
     });
     compiler.run((err, stats) => {
         const rules = require('./dist/rules.bundle.js');
-        const rulesContent = String(fs.readFileSync('./dist/rules.bundle.js'));
+        const rulesContent = String(fs.readFileSync(path.resolve(__dirname, 'dist') + '/rules.bundle.js'));
         request
             .post(serverURL("ruleDependency"), {
                 code: rulesContent,
