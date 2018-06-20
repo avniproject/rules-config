@@ -38,7 +38,7 @@ const postAllRules = (organisationName, ruleFilePath) => {
                         options: {
                             "presets": [
                                 [
-                                    "env"
+                                    "react-native-stage-0/decorator-support"
                                 ]
                             ],
                             "plugins": [
