@@ -18,12 +18,13 @@ const createRule = (formUUID, type, ruleData, ruleDependencyUUID) =>
 
 const postAllRules = (organisationName, ruleFilePath) => {
     const compiler = webpack({
+        target: 'web',
         entry: {
             rules: ruleFilePath
         },
         output: {
             filename: '[name].bundle.js',
-            libraryTarget: 'var',
+            libraryTarget: 'umd',
             library: 'rulesConfig',
             path: path.resolve(__dirname, 'dist')
         },
@@ -71,5 +72,5 @@ const postAllRules = (organisationName, ruleFilePath) => {
 };
 
 
-// postAllRules("./test/additional/Rulez.js");
+// postAllRules("","./test/additional/Rulez.js");
 module.exports = {postAllRules};
