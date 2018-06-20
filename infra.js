@@ -23,7 +23,7 @@ const postAllRules = (organisationName, ruleFilePath) => {
         },
         output: {
             filename: '[name].bundle.js',
-            libraryTarget: 'umd',
+            libraryTarget: 'var',
             library: 'rulesConfig',
             path: path.resolve(__dirname, 'dist')
         },
