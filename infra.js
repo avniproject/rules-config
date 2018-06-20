@@ -2,6 +2,7 @@ const webpack = require('webpack');
 const path = require('path');
 const fs = require('fs');
 const request = require('superagent');
+const UglifyJsPlugin = require('uglifyjs-webpack-plugin');
 
 const serverURL = (path) => `${process.env.SERVER_URL !== undefined ? process.env.SERVER_URL : 'http://localhost:8021'}/${path}`;
 
@@ -28,6 +29,21 @@ const postAllRules = (organisationName, ruleFilePath) => {
             library: 'rulesConfig',
             path: path.resolve(__dirname, 'dist')
         },
+        plugins: [
+            new UglifyJsPlugin({
+                test: /\.js$/,
+                exclude: /(node_modules)/,
+                uglifyOptions: {
+                    ecma: 5,
+                    warnings: false,
+                    compress: true,
+                    mangle: true,
+                    keep_fnames: true,
+                    keep_classnames: true,
+                    output: {comments: false, beautify: false}
+                }
+            })
+        ],
         module: {
             rules: [
                 {
