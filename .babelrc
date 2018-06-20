@@ -1,7 +1,7 @@
 {
   "presets": [
     [
-      "react-native-stage-0/decorator-support"
+      "env"
     ]
   ],
   "plugins": [
