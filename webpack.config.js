@@ -9,7 +9,7 @@ const config = {
         rules: "./rules.js"
     },
     output: {
-        filename: 'index.js',
+        filename: 'rules.js',
         libraryTarget: 'umd',
         library: 'rulesConfig',
         path: path.resolve(__dirname, 'exports')
@@ -31,8 +31,7 @@ const config = {
         new CopyWebpackPlugin([
             {from: './infra.js', to: 'infra.js'},
             {from: './package.json', to: 'package.json'},
-            {from: './package-lock.json', to: 'package-lock.json'},
-            {from: './.babelrc', to: '.babelrc'},
+            {from: './package-lock.json', to: 'package-lock.json'}
         ])
     ],
     module: {
