@@ -14,7 +14,7 @@ jobs:
           - v1-dependencies-{{ checksum "package.json" }}
           - v1-dependencies-
 
-      - run: npm install -g webpack
+      - run: sudo npm install -g webpack
 
       - run: npm install
 
