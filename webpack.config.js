@@ -30,6 +30,9 @@ const config = {
         }),
         new CopyWebpackPlugin([
             {from: './infra.js', to: 'infra.js'},
+            {from: './package.json', to: 'package.json'},
+            {from: './package-lock.json', to: 'package-lock.json'},
+            {from: './.babelrc', to: '.babelrc'},
         ])
     ],
     module: {
