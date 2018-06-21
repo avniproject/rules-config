@@ -25,7 +25,7 @@ const postAllRules = (organisationName, ruleFilePath) => {
         },
         output: {
             filename: '[name].bundle.js',
-            libraryTarget: 'umd',
+            libraryTarget: 'var',
             library: 'rulesConfig',
             path: path.resolve(__dirname, 'dist')
         },
@@ -70,8 +70,10 @@ const postAllRules = (organisationName, ruleFilePath) => {
         }
     });
     compiler.run((err, stats) => {
-        const rules = require('./dist/rules.bundle.js');
+        var rulesConfig = undefined;
         const rulesContent = String(fs.readFileSync(path.resolve(__dirname, 'dist') + '/rules.bundle.js'));
+        eval(rulesContent);
+        const rules = rulesConfig;
         request
             .post(serverURL("ruleDependency"), {
                 code: rulesContent,
