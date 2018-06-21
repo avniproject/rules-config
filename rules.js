@@ -1,4 +1,5 @@
 const RuleFactory = require('./src/rules/additional/Rule');
+const RuleRegistry = require('./src/rules/additional/RuleRegistry');
 const FormElementsStatusHelper = require('./src/rules/FormElementsStatusHelper');
 const RuleCondition = require('./src/rules/RuleCondition');
 const AdditionalComplicationsBuilder = require('./src/rules/builder/AdditionalComplicationsBuilder');
@@ -15,5 +16,6 @@ module.exports = {
     VisitScheduleBuilder,
     complicationsBuilder,
     RuleCondition,
-    AdditionalComplicationsBuilder
+    AdditionalComplicationsBuilder,
+    RuleRegistry
 };
