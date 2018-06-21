@@ -1,0 +1,36 @@
+version: 2
+jobs:
+  build:
+    docker:
+      - image: circleci/node:8.5.0
+
+    working_directory: ~/rules-config
+
+    steps:
+      - checkout
+
+      - restore_cache:
+          keys:
+          - v1-dependencies-{{ checksum "package.json" }}
+          - v1-dependencies-
+
+      - run: npm install -g webpack
+
+      - run: npm install
+
+      - save_cache:
+          paths:
+            - node_modules
+          key: v1-dependencies-{{ checksum "package.json" }}
+
+      - run: npm run build
+
+      - run: ./scripts/deploy.sh exports
+
+
+
+workflows:
+  version: 2
+  build_deploy:
+    jobs:
+      - build

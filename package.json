@@ -8,7 +8,8 @@
   },
   "license": "AGPL-3.0",
   "scripts": {
-    "test": "mocha --require babel-register"
+    "test": "mocha --require babel-register",
+    "build": "webpack --config webpack.config.js"
   },
   "dependencies": {
     "superagent": "^3.8.3",
@@ -29,5 +30,7 @@
     "lodash": "^4.17.10",
     "moment": "^2.22.2"
   },
-  "devDependencies": {}
+  "devDependencies": {
+    "copy-webpack-plugin": "^4.5.1"
+  }
 }
