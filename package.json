@@ -11,6 +11,7 @@
     "test": "mocha --require babel-register",
     "build": "webpack --config webpack.config.js"
   },
+  "main": "rules.js",
   "dependencies": {
     "superagent": "^3.8.3",
     "babel-loader": "^7.1.4",
