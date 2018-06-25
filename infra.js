@@ -14,8 +14,10 @@ const createRule = (formUUID, type, ruleData, ruleDependencyUUID) =>
         data: ruleData.metadata,
         uuid: ruleData.uuid,
         name: ruleData.name,
-        fnName: ruleData.fn.name
-    }).on('error', console.log).then((resp) => console.log("CREATED"));
+        fnName: ruleData.fn.name,
+        order: ruleData.order
+    }).on('error', console.log)
+        .then(() => console.log(`Created Rule: ${ruleData.name} ${ruleData.fn.name}`));
 
 const postAllRules = (organisationName, ruleFilePath) => {
     const compiler = webpack({
@@ -80,6 +82,7 @@ const postAllRules = (organisationName, ruleFilePath) => {
                 hash: stats.hash
             }).set("ORGANISATION-NAME", organisationName)
             .then((response) => {
+                console.log(`Created Rule Dependency with UUID: ${response.text}`);
                 const registry = rules[Object.keys(rules).find(r => rules[r].registry !== undefined)].registry;
                 registry.getAll()
                     .forEach(([ruleKey, rulesData]) => {
