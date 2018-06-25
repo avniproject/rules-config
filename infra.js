@@ -15,7 +15,7 @@ const createRule = (formUUID, type, ruleData, ruleDependencyUUID) =>
         uuid: ruleData.uuid,
         name: ruleData.name,
         fnName: ruleData.fn.name,
-        order: ruleData.order
+        executionOrder: ruleData.executionOrder
     }).on('error', console.log)
         .then(() => console.log(`Created Rule: ${ruleData.name} ${ruleData.fn.name}`));
 
