@@ -1,8 +1,8 @@
 const RuleRegistry = require('./RuleRegistry');
 
-const RuleFactory = (formUUID, type) => (uuid, name, order, metadata = {}) => {
+const RuleFactory = (formUUID, type) => (uuid, name, executionOrder, metadata = {}) => {
     return (fn) => {
-        const ruleData = {metadata: metadata, fn: fn, uuid: uuid, name: name, order: order};
+        const ruleData = {metadata: metadata, fn: fn, uuid: uuid, name: name, executionOrder: executionOrder};
         RuleRegistry.add(formUUID, type, ruleData);
         fn.registry = RuleRegistry;
     };
