@@ -20,6 +20,19 @@ class FormElementsStatusesHelper {
         });
     }
 
+    static getFormElementsStatusesWithoutDefaults(handler = {}, entity, formElementGroup, today) {
+        if (handler['preFilter'])
+            handler['preFilter'](entity, formElementGroup, today);
+
+        return formElementGroup.getFormElements().map((formElement) => {
+            let nameWOSpecialChars = formElement.name.replace(FormElementsStatusesHelper.removeSpecialCharsRegex, '');
+            let fnName = _.camelCase(nameWOSpecialChars);
+            return {fe: formElement, fn: handler[fnName]};
+        })
+            .filter(({fe, fn}) => !_.isNil(fn))
+            .map(({fn, fe}) => fn.bind(handler)(entity, fe, today));
+    }
+
     static createStatusBasedOnCodedObservationMatch(programEncounter, formElement, dependentConceptName, dependentConceptValue) {
         let observationValue = programEncounter.getObservationValue(dependentConceptName);
         return new FormElementStatus(formElement.uuid, observationValue === dependentConceptValue);

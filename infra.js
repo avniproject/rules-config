@@ -100,5 +100,4 @@ const postRulesWithoutDependency = (organisationName, rules) => {
     })
 };
 
-// postAllRules("","./test/additional/Rulez.js");
 module.exports = {postAllRules, postRulesWithoutDependency};
