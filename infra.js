@@ -92,6 +92,11 @@ const postAllRules = (organisationName, ruleFilePath) => {
     });
 };
 
+const postRulesWithoutDependency = (organisationName, rules) => {
+    rules.forEach(([ruleKey, rulesData]) => {
+        rulesData.map(ruleData => createRule(ruleKey.formUUID, ruleKey.type, ruleData));
+    })
+};
 
 // postAllRules("","./test/additional/Rulez.js");
-module.exports = {postAllRules};
+module.exports = {postAllRules, postRulesWithoutDependency};
