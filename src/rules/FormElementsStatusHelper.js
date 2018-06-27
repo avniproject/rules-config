@@ -3,17 +3,12 @@ const FormElementStatus = require("./model/FormElementStatus");
 const moment = require("moment");
 
 class FormElementsStatusesHelper {
-    static get removeSpecialCharsRegex() {
-        return new RegExp(/[-[\]{}()*+?.,\\^$|#]/g);
-    }
-
     static getFormElementsStatuses(handler = {}, entity, formElementGroup, today) {
         if (handler['preFilter'])
             handler['preFilter'](entity, formElementGroup, today);
 
         return formElementGroup.getFormElements().map((formElement) => {
-            let nameWOSpecialChars = formElement.name.replace(FormElementsStatusesHelper.removeSpecialCharsRegex, '');
-            let fnName = _.camelCase(nameWOSpecialChars);
+            let fnName = _.camelCase(formElement.name);
             let fn = handler[fnName];
             if (_.isNil(fn)) return new FormElementStatus(formElement.uuid, true);
             return fn.bind(handler)(entity, formElement, today);
@@ -25,8 +20,7 @@ class FormElementsStatusesHelper {
             handler['preFilter'](entity, formElementGroup, today);
 
         return formElementGroup.getFormElements().map((formElement) => {
-            let nameWOSpecialChars = formElement.name.replace(FormElementsStatusesHelper.removeSpecialCharsRegex, '');
-            let fnName = _.camelCase(nameWOSpecialChars);
+            let fnName = _.camelCase(formElement.name);
             return {fe: formElement, fn: handler[fnName]};
         })
             .filter(({fe, fn}) => !_.isNil(fn))
