@@ -219,6 +219,17 @@ class RuleCondition {
         });
     }
 
+    get ageInYears() {
+        return this.age;
+    }
+
+    get ageInMonths() {
+        return this._addToChain((next, context) => {
+            context.valueToBeChecked = this._contextualTime().diff(moment(this._getIndividual(context).dateOfBirth), 'months');
+            return next(context);
+        });
+    }
+
     get ageInDays() {
         return this._addToChain((next, context) => {
             context.valueToBeChecked = this._contextualTime().diff(moment(this._getIndividual(context).dateOfBirth), 'days');
@@ -332,7 +343,7 @@ class RuleCondition {
 
     get defined() {
         return this._addToChain((next, context) => {
-            context.matches = _.every([undefined,null], (value) => context.valueToBeChecked !== value);
+            context.matches = _.every([undefined, null], (value) => context.valueToBeChecked !== value);
             return next(context);
         });
     }
