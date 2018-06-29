@@ -27,7 +27,9 @@ class VisitScheduleBuilder {
 
     getAllUnique(keyPath) {
         const allScheduledVisits = this.getAll();
-        return _.uniqWith(allScheduledVisits, (visitA, visitB) => visitA[keyPath] === visitB[keyPath]);
+        const visitsGroupedByPath = _.groupBy(allScheduledVisits, (v) => v[keyPath]);
+        return _.map(visitsGroupedByPath,
+            (vals) => _.defaults(vals.find(val => !_.isEmpty(val['uuid'])), _.tail(vals)));
     }
 }
 
