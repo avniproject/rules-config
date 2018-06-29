@@ -29,7 +29,14 @@ class VisitScheduleBuilder {
         const allScheduledVisits = this.getAll();
         const visitsGroupedByPath = _.groupBy(allScheduledVisits, (v) => v[keyPath]);
         return _.map(visitsGroupedByPath,
-            (vals) => _.defaults(vals.find(val => !_.isEmpty(val['uuid'])), _.tail(vals)));
+            (vals) => {
+                let defaultVisit = _.tail(vals);
+                const visitToPick = _.defaults(vals.find(val => !_.isEmpty(val['uuid'])), defaultVisit);
+                visitToPick.earliestDate = defaultVisit.earliestDate;
+                visitToPick.maxDate = defaultVisit.maxDate;
+                visitToPick.name = defaultVisit.name;
+                return visitToPick;
+            });
     }
 }
 
