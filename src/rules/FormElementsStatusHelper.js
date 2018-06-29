@@ -11,7 +11,12 @@ class FormElementsStatusesHelper {
             let fnName = _.camelCase(formElement.name);
             let fn = handler[fnName];
             if (_.isNil(fn)) return new FormElementStatus(formElement.uuid, true);
-            return fn.bind(handler)(entity, formElement, today);
+
+            const formElementStatus = fn.bind(handler)(entity, formElement, today);
+            if (_.isNil(formElementStatus)) {
+                throw Error(`FormElement Name: ${fe.name}, UUID: ${fe.uuid}, returned nil`);
+            }
+            return formElementStatus;
         });
     }
 
@@ -22,9 +27,14 @@ class FormElementsStatusesHelper {
         return formElementGroup.getFormElements().map((formElement) => {
             let fnName = _.camelCase(formElement.name);
             return {fe: formElement, fn: handler[fnName]};
-        })
-            .filter(({fe, fn}) => !_.isNil(fn))
-            .map(({fn, fe}) => fn.bind(handler)(entity, fe, today));
+        }).filter(({fe, fn}) => !_.isNil(fn))
+            .map(({fn, fe}) => {
+                const formElementStatus = fn.bind(handler)(entity, fe, today);
+                if (_.isNil(formElementStatus)) {
+                    throw Error(`FormElement Name: ${fe.name}, UUID: ${fe.uuid}, returned nil`);
+                }
+                return formElementStatus;
+            });
     }
 
     static createStatusBasedOnCodedObservationMatch(programEncounter, formElement, dependentConceptName, dependentConceptValue) {
