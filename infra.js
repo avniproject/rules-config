@@ -6,20 +6,22 @@ const UglifyJsPlugin = require('uglifyjs-webpack-plugin');
 
 const serverURL = (path) => `${process.env.SERVER_URL !== undefined ? process.env.SERVER_URL : 'http://localhost:8021'}/${path}`;
 
-const createRule = (organisationName, formUUID, type, ruleData, ruleDependencyUUID) =>
-    request.post(serverURL("rule"), {
-        ruleDependencyUUID: ruleDependencyUUID,
-        formUUID: formUUID,
-        type: type,
-        data: ruleData.metadata,
-        uuid: ruleData.uuid,
-        name: ruleData.name,
-        fnName: ruleData.fn.name,
-        executionOrder: ruleData.executionOrder
-    })
+const createRuleContract = (formUUID, type, ruleData, ruleDependencyUUID) => ({
+    ruleDependencyUUID: ruleDependencyUUID,
+    formUUID: formUUID,
+    type: type,
+    data: ruleData.metadata,
+    uuid: ruleData.uuid,
+    name: ruleData.name,
+    fnName: ruleData.fn.name,
+    executionOrder: ruleData.executionOrder
+});
+
+const createRules = (organisationName, rules) =>
+    request.post(serverURL("rules"), rules)
         .set("ORGANISATION-NAME", organisationName)
         .on('error', console.log)
-        .then(() => console.log(`Created Rule: ${ruleData.name} ${ruleData.fn.name}`));
+        .then(() => rules.forEach(rule => console.log(`Created Rule: ${rule.name} ${rule.fnName}`)));
 
 const postAllRules = (organisationName, ruleFilePath) => {
     const compiler = webpack({
@@ -86,17 +88,21 @@ const postAllRules = (organisationName, ruleFilePath) => {
             .then((response) => {
                 console.log(`Created Rule Dependency with UUID: ${response.text}`);
                 const registry = rules[Object.keys(rules).find(r => rules[r].registry !== undefined)].registry;
-                registry.getAll()
-                    .forEach(([ruleKey, rulesData]) => {
-                        rulesData.map(ruleData => createRule(organisationName, ruleKey.formUUID, ruleKey.type, ruleData, response.text));
-                    })
+                const rulesContracts = registry.getAll()
+                    .reduce((acc, [ruleKey, rulesData]) =>
+                            acc.concat(
+                                rulesData
+                                    .map(ruleData =>
+                                        createRuleContract(ruleKey.formUUID, ruleKey.type, ruleData, response.text))),
+                        []);
+                createRules(organisationName, rulesContracts)
             });
     });
 };
 
 const postRulesWithoutDependency = (organisationName, rules) => {
     rules.forEach(([ruleKey, rulesData]) => {
-        rulesData.map(ruleData => createRule(organisationName, ruleKey.formUUID, ruleKey.type, ruleData));
+        rulesData.map(ruleData => createRules(organisationName, ruleKey.formUUID, ruleKey.type, ruleData));
     })
 };
 
