@@ -11,10 +11,13 @@ class FormElementsStatusesHelper {
             let fnName = _.camelCase(formElement.name);
             let fn = handler[fnName];
             if (_.isNil(fn)) return new FormElementStatus(formElement.uuid, true);
+            if (!_.isFunction(fn)) {
+                throw Error(`FormElement Name: ${formElement.name}, UUID: ${formElement.uuid}, has a non Function variable defined.`);
+            }
 
             const formElementStatus = fn.bind(handler)(entity, formElement, today);
             if (_.isNil(formElementStatus)) {
-                throw Error(`FormElement Name: ${fe.name}, UUID: ${fe.uuid}, returned nil`);
+                throw Error(`FormElement Name: ${formElement.name}, UUID: ${formElement.uuid}, returned nil`);
             }
             return formElementStatus;
         });
@@ -27,7 +30,7 @@ class FormElementsStatusesHelper {
         return formElementGroup.getFormElements().map((formElement) => {
             let fnName = _.camelCase(formElement.name);
             return {fe: formElement, fn: handler[fnName]};
-        }).filter(({fe, fn}) => !_.isNil(fn))
+        }).filter(({fe, fn}) => _.isFunction(fn))
             .map(({fn, fe}) => {
                 const formElementStatus = fn.bind(handler)(entity, fe, today);
                 if (_.isNil(formElementStatus)) {
