@@ -30,7 +30,7 @@ class VisitScheduleBuilder {
         const visitsGroupedByPath = _.groupBy(allScheduledVisits, (v) => v[keyPath]);
         return _.map(visitsGroupedByPath,
             (vals) => {
-                let defaultVisit = _.tail(vals);
+                let defaultVisit = _.last(vals);
                 const visitToPick = _.defaults(vals.find(val => !_.isEmpty(val['uuid'])), defaultVisit);
                 visitToPick.earliestDate = defaultVisit.earliestDate;
                 visitToPick.maxDate = defaultVisit.maxDate;
