@@ -4,7 +4,7 @@ const fs = require('fs');
 const request = require('superagent');
 const UglifyJsPlugin = require('uglifyjs-webpack-plugin');
 
-const serverURL = (path) => `${process.env.SERVER_URL !== undefined ? process.env.SERVER_URL : 'http://localhost:8021'}/${path}`;
+const serverURLGEN = (server_url = 'http://localhost:8021') => (path) => `${process.env.SERVER_URL !== undefined ? process.env.SERVER_URL : server_url}/${path}`;
 
 const createRuleContract = (formUUID, type, ruleData, ruleDependencyUUID) => ({
     ruleDependencyUUID: ruleDependencyUUID,
@@ -17,13 +17,14 @@ const createRuleContract = (formUUID, type, ruleData, ruleDependencyUUID) => ({
     executionOrder: ruleData.executionOrder
 });
 
-const createRules = (organisationName, rules) =>
-    request.post(serverURL("rules"), rules)
+const createRules = (organisationName, server_url, token = "", rules) =>
+    request.post(serverURLGEN(server_url)("rules"), rules)
         .set("ORGANISATION-NAME", organisationName)
+        .set("AUTH-TOKEN", token)
         .on('error', console.log)
         .then(() => rules.forEach(rule => console.log(`Created Rule: ${rule.name} ${rule.fnName}`)));
 
-const postAllRules = (organisationName, ruleFilePath) => {
+const postAllRules = (organisationName, ruleFilePath, server_url = 'http://localhost:8021', token = "") => {
     const compiler = webpack({
         target: 'web',
         entry: {
@@ -80,11 +81,14 @@ const postAllRules = (organisationName, ruleFilePath) => {
         const rulesContent = String(fs.readFileSync(path.resolve(__dirname, 'dist') + '/rules.bundle.js'));
         eval(rulesContent);
         const rules = rulesConfig;
+        const serverURL = serverURLGEN(server_url);
         request
             .post(serverURL("ruleDependency"), {
                 code: rulesContent,
                 hash: stats.hash
-            }).set("ORGANISATION-NAME", organisationName)
+            })
+            .set("ORGANISATION-NAME", organisationName)
+            .set("AUTH-TOKEN", token)
             .then((response) => {
                 console.log(`Created Rule Dependency with UUID: ${response.text}`);
                 const registry = rules[Object.keys(rules).find(r => rules[r].registry !== undefined)].registry;
@@ -95,7 +99,7 @@ const postAllRules = (organisationName, ruleFilePath) => {
                                     .map(ruleData =>
                                         createRuleContract(ruleKey.formUUID, ruleKey.type, ruleData, response.text))),
                         []);
-                createRules(organisationName, rulesContracts)
+                createRules(organisationName, server_url, token, rulesContracts)
             });
     });
 };
