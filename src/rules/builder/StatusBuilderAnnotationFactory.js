@@ -12,7 +12,9 @@ const StatusBuilderAnnotationFactory = function (...argNames) {
         const oldFn = descriptor.value;
         descriptor.value = function (...args) {
             const statusBuilder = new FormElementStatusBuilder(argToContextMapper(args));
-            return oldFn(args, statusBuilder) || statusBuilder.build();
+            //The original method may refer to some of its class's private methods
+            //So bind it to the caller, the instance of the class
+            return oldFn.bind(this)(args, statusBuilder) || statusBuilder.build();
         }
         return descriptor;
     }
