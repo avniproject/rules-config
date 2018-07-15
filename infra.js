@@ -13,7 +13,7 @@ const createRuleContract = (formUUID, type, ruleData, ruleDependencyUUID) => ({
     data: ruleData.metadata,
     uuid: ruleData.uuid,
     name: ruleData.name,
-    fnName: ruleData.fn.name,
+    fnName: ruleData.fnName || ruleData.fn.name,
     executionOrder: ruleData.executionOrder
 });
 
