@@ -1,4 +1,3 @@
-
 class GetObsValueByConceptName {
     constructor(conceptName) {
         this.strategy = 'valueInEncounter';
