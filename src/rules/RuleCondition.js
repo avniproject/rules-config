@@ -214,7 +214,7 @@ class RuleCondition {
 
     get age() {
         return this._addToChain((next, context) => {
-            context.valueToBeChecked = this._contextualTime().diff(moment(this._getIndividual(context).dateOfBirth), 'years');
+            context.valueToBeChecked = this._contextualTime(context).diff(moment(this._getIndividual(context).dateOfBirth), 'years');
             return next(context);
         });
     }
@@ -225,14 +225,14 @@ class RuleCondition {
 
     get ageInMonths() {
         return this._addToChain((next, context) => {
-            context.valueToBeChecked = this._contextualTime().diff(moment(this._getIndividual(context).dateOfBirth), 'months');
+            context.valueToBeChecked = this._contextualTime(context).diff(moment(this._getIndividual(context).dateOfBirth), 'months');
             return next(context);
         });
     }
 
     get ageInDays() {
         return this._addToChain((next, context) => {
-            context.valueToBeChecked = this._contextualTime().diff(moment(this._getIndividual(context).dateOfBirth), 'days');
+            context.valueToBeChecked = this._contextualTime(context).diff(moment(this._getIndividual(context).dateOfBirth), 'days');
             return next(context);
         });
     }
