@@ -55,9 +55,11 @@ class RuleCondition {
     }
 
     _contextualTime(context) {
-        return moment(_.get(context, 'programEncounter.encounterDateTime')
-            || _.get(context, 'programEnrolment.enrolmentDateTime')
-            || new Date());
+        return moment(_.get(context, 'programEncounter.encounterDateTime') || _.get(context, 'programEnrolment.enrolmentDateTime') || this._throwError('context does not have reference datetime'));
+    }
+
+    _throwError(message) {
+        throw new Error(message);
     }
 
     get is() {
