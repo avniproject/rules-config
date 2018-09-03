@@ -26,8 +26,15 @@ class FormElementsStatusesHelper {
     static getFormElementsStatusesWithoutDefaults(handler = {}, entity, formElementGroup, today) {
         if (handler['preFilter'])
             handler['preFilter'](entity, formElementGroup, today);
+        const fnName = _.camelCase(formElementGroup.name);
+        const formElementGroupVisibilityFn = handler[fnName];
+        let baseFormElementGroupVisibility = [];
+        if (_.isFunction(formElementGroupVisibilityFn)) {
+            baseFormElementGroupVisibility = formElementGroupVisibilityFn
+                .bind(handler)(entity, formElementGroup, today);
+        }
 
-        return formElementGroup.getFormElements().map((formElement) => {
+        let formElementStatuses = formElementGroup.getFormElements().map((formElement) => {
             let fnName = _.camelCase(formElement.name);
             return {fe: formElement, fn: handler[fnName]};
         }).filter(({fe, fn}) => _.isFunction(fn))
@@ -38,6 +45,7 @@ class FormElementsStatusesHelper {
                 }
                 return formElementStatus;
             });
+        return baseFormElementGroupVisibility.concat(formElementStatuses);
     }
 
     static createStatusBasedOnCodedObservationMatch(programEncounter, formElement, dependentConceptName, dependentConceptValue) {
