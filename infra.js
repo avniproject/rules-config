@@ -17,14 +17,14 @@ const createRuleContract = (formUUID, type, ruleData, ruleDependencyUUID) => ({
     executionOrder: ruleData.executionOrder
 });
 
-const createRules = (organisationName, server_url, token = "", rules) =>
+const createRules = (userName, server_url, token = "", rules) =>
     request.post(serverURLGEN(server_url)("rules"), rules)
-        .set("ORGANISATION-NAME", organisationName)
+        .set("USER-NAME", userName)
         .set("AUTH-TOKEN", token)
         .on('error', console.log)
         .then(() => rules.forEach(rule => console.log(`Created Rule: ${rule.name} ${rule.fnName}`)));
 
-const postAllRules = (organisationName, ruleFilePath, server_url = 'http://localhost:8021', token = "") => {
+const postAllRules = (userName, ruleFilePath, server_url = 'http://localhost:8021', token = "") => {
     const compiler = webpack({
         target: 'web',
         entry: {
@@ -87,7 +87,7 @@ const postAllRules = (organisationName, ruleFilePath, server_url = 'http://local
                 code: rulesContent,
                 hash: stats.hash
             })
-            .set("ORGANISATION-NAME", organisationName)
+            .set("USER-NAME", userName)
             .set("AUTH-TOKEN", token)
             .then((response) => {
                 console.log(`Created Rule Dependency with UUID: ${response.text}`);
@@ -99,14 +99,14 @@ const postAllRules = (organisationName, ruleFilePath, server_url = 'http://local
                                     .map(ruleData =>
                                         createRuleContract(ruleKey.formUUID, ruleKey.type, ruleData, response.text))),
                         []);
-                createRules(organisationName, server_url, token, rulesContracts)
+                createRules(userName, server_url, token, rulesContracts)
             });
     });
 };
 
-const postRulesWithoutDependency = (organisationName, rules) => {
+const postRulesWithoutDependency = (userName, rules) => {
     rules.forEach(([ruleKey, rulesData]) => {
-        rulesData.map(ruleData => createRules(organisationName, ruleKey.formUUID, ruleKey.type, ruleData));
+        rulesData.map(ruleData => createRules(userName, ruleKey.formUUID, ruleKey.type, ruleData));
     })
 };
 
