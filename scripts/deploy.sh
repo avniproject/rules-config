@@ -18,6 +18,7 @@ then
 fi
 
 # make a directory to put the gp-pages branch
+rm -rf build
 mkdir build
 cd build
 # now lets setup a new repo so we can update the gh-pages branch
