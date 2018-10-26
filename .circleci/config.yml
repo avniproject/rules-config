@@ -2,30 +2,33 @@ version: 2
 jobs:
   build:
     docker:
-      - image: circleci/node:8.5.0
+    - image: circleci/node:8.5.0
 
     working_directory: ~/rules-config
 
     steps:
-      - checkout
+    - add_ssh_keys:
+        fingerprints:
+        - "31:0d:e0:15:81:15:76:2d:31:69:88:b3:20:01:ac:a8"
+    - checkout
 
-      - restore_cache:
-          keys:
-          - v1-dependencies-{{ checksum "package.json" }}
-          - v1-dependencies-
+    - restore_cache:
+        keys:
+        - v1-dependencies-{{ checksum "package.json" }}
+        - v1-dependencies-
 
-      - run: sudo npm install -g webpack
+    - run: sudo npm install -g webpack
 
-      - run: npm install
+    - run: npm install
 
-      - save_cache:
-          paths:
-            - node_modules
-          key: v1-dependencies-{{ checksum "package.json" }}
+    - save_cache:
+        paths:
+        - node_modules
+        key: v1-dependencies-{{ checksum "package.json" }}
 
-      - run: npm run build
+    - run: npm run build
 
-      - run: ./scripts/deploy.sh exports
+    - run: ./scripts/deploy.sh exports
 
 
 
@@ -33,4 +36,4 @@ workflows:
   version: 2
   build_deploy:
     jobs:
-      - build
+    - build
