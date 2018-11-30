@@ -1,5 +1,4 @@
 const RuleFactory = require('./src/rules/additional/Rule');
-const RuleableTypes = require('./src/rules/additional/RuleableTypes');
 const RuleRegistry = require('./src/rules/additional/RuleRegistry');
 const FormElementsStatusHelper = require('./src/rules/FormElementsStatusHelper');
 const RuleCondition = require('./src/rules/RuleCondition');
@@ -13,7 +12,6 @@ const FormElementStatus = require('./src/rules/model/FormElementStatus');
 
 module.exports = {
     FormElementStatusBuilder,
-    RuleableTypes,
     RuleFactory,
     FormElementStatus,
     FormElementsStatusHelper,
