@@ -1,5 +1,11 @@
-const RuleFactory = require('./src/rules/additional/Rule');
+const {
+    RuleFactory,
+    FormElementRules,
+    DecisionRules,
+    ProgramRules,
+} = require('./src/rules/additional/Rule');
 const RuleRegistry = require('./src/rules/additional/RuleRegistry');
+const { Ruleable, RuleType } = require('./src/rules/additional/constants');
 const FormElementsStatusHelper = require('./src/rules/FormElementsStatusHelper');
 const RuleCondition = require('./src/rules/RuleCondition');
 const AdditionalComplicationsBuilder = require('./src/rules/builder/AdditionalComplicationsBuilder');
@@ -13,6 +19,11 @@ const FormElementStatus = require('./src/rules/model/FormElementStatus');
 module.exports = {
     FormElementStatusBuilder,
     RuleFactory,
+    FormElementRules,
+    DecisionRules,
+    ProgramRules,
+    Ruleable,
+    RuleType,
     FormElementStatus,
     FormElementsStatusHelper,
     VisitScheduleBuilder,

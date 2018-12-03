@@ -3,13 +3,16 @@ const path = require('path');
 const fs = require('fs');
 const request = require('superagent');
 const UglifyJsPlugin = require('uglifyjs-webpack-plugin');
+const { Ruleable } = require('./rules');
 
-const serverURLGEN = (server_url = 'http://localhost:8021') => (path) => `${process.env.SERVER_URL !== undefined ? process.env.SERVER_URL : server_url}/${path}`;
+const serverURLGEN = (server_url = 'http://localhost:8021') =>
+    (path) => `${process.env.SERVER_URL !== undefined ? process.env.SERVER_URL : server_url}/${path}`;
 
-const createRuleContract = (formUUID, type, ruleData, ruleDependencyUUID) => ({
+const createRuleContract = (ruleMeta, ruleData, ruleDependencyUUID) => ({
     ruleDependencyUUID: ruleDependencyUUID,
-    formUUID: formUUID,
-    type: type,
+    type: ruleMeta.type,
+    entityUUID: ruleMeta.entityUUID,
+    entityType: ruleMeta.entityType,
     data: ruleData.metadata,
     uuid: ruleData.uuid,
     name: ruleData.name,
@@ -93,11 +96,11 @@ const postAllRules = (userName, ruleFilePath, server_url = 'http://localhost:802
                 console.log(`Created Rule Dependency with UUID: ${response.text}`);
                 const registry = rules[Object.keys(rules).find(r => rules[r].registry !== undefined)].registry;
                 const rulesContracts = registry.getAll()
-                    .reduce((acc, [ruleKey, rulesData]) =>
+                    .reduce((acc, [ruleMeta, rulesData]) =>
                             acc.concat(
                                 rulesData
                                     .map(ruleData =>
-                                        createRuleContract(ruleKey.formUUID, ruleKey.type, ruleData, response.text))),
+                                        createRuleContract(ruleMeta, ruleData, response.text))),
                         []);
                 createRules(userName, server_url, token, rulesContracts)
             });
