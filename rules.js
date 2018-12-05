@@ -1,8 +1,8 @@
 const {
     RuleFactory,
-    FormElementRules,
-    DecisionRules,
-    ProgramRules,
+    FormElementRule,
+    DecisionRule,
+    ProgramRule,
 } = require('./src/rules/additional/Rule');
 const RuleRegistry = require('./src/rules/additional/RuleRegistry');
 const { Ruleable, RuleType } = require('./src/rules/additional/constants');
@@ -19,9 +19,9 @@ const FormElementStatus = require('./src/rules/model/FormElementStatus');
 module.exports = {
     FormElementStatusBuilder,
     RuleFactory,
-    FormElementRules,
-    DecisionRules,
-    ProgramRules,
+    FormElementRule,
+    DecisionRule,
+    ProgramRule,
     Ruleable,
     RuleType,
     FormElementStatus,

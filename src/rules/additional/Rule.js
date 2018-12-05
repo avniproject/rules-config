@@ -30,24 +30,24 @@ const WrappedRuleDecorator = (ruleType, ruleProperties, entityUUID, entityType=R
         customFnName: ruleProperties.customFnName
     });
 
-const FormElementRules = (ruleProps) =>
+const FormElementRule = (ruleProps) =>
     WrappedRuleDecorator(RuleType.ViewFilter, ruleProps, ruleProps.formUUID);
 
-const DecisionRules = (ruleProps) =>
+const DecisionRule = (ruleProps) =>
     WrappedRuleDecorator(RuleType.Decision, ruleProps, ruleProps.formUUID);
 
 // VisitScheduleRules
 // ChecklistRules
 // ValidationRules
 
-const ProgramRules = (ruleProps) =>
+const ProgramRule = (ruleProps) =>
     WrappedRuleDecorator(RuleType.EnrolmentSummary, ruleProps, ruleProps.programUUID,
         Ruleable.Program);
 
 
 module.exports = {
     RuleFactory,
-    FormElementRules,
-    DecisionRules,
-    ProgramRules,
+    FormElementRule,
+    DecisionRule,
+    ProgramRule,
 };
