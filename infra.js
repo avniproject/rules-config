@@ -103,6 +103,10 @@ const postAllRules = (userName, ruleFilePath, server_url = 'http://localhost:802
                                         createRuleContract(ruleMeta, ruleData, response.text))),
                         []);
                 createRules(userName, server_url, token, rulesContracts)
+            })
+            .catch((err) => {
+                const info = (err && err.response && err.response.text) || err;
+                console.log(`Rule Dependency creation failed: ${info}`);
             });
     });
 };
