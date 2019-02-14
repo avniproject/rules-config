@@ -79,6 +79,8 @@ const postAllRules = (userName, ruleFilePath, server_url = 'http://localhost:802
             ]
         }
     });
+    return new Promise((resolve, reject)=> {
+
     compiler.run((err, stats) => {
         var rulesConfig = undefined;
         const rulesContent = String(fs.readFileSync(path.resolve(__dirname, 'dist') + '/rules.bundle.js'));
@@ -103,11 +105,14 @@ const postAllRules = (userName, ruleFilePath, server_url = 'http://localhost:802
                                         createRuleContract(ruleMeta, ruleData, response.text))),
                         []);
                 createRules(userName, server_url, token, rulesContracts)
+                resolve(response);
             })
             .catch((err) => {
                 const info = (err && err.response && err.response.text) || err;
                 console.log(`Rule Dependency creation failed: ${info}`);
+                reject(err);
             });
+    });
     });
 };
 
