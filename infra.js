@@ -103,8 +103,7 @@ const postAllRules = (userName, ruleFilePath, server_url = 'http://localhost:802
                                         .map(ruleData =>
                                             createRuleContract(ruleMeta, ruleData, response.text))),
                             []);
-                    createRules(userName, server_url, token, rulesContracts)
-                    resolve(response);
+                    return createRules(userName, server_url, token, rulesContracts).then(resolve);
                 })
                 .catch((err) => {
                     const info = (err && err.response && err.response.text) || err;
