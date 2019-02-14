@@ -79,35 +79,39 @@ const postAllRules = (userName, ruleFilePath, server_url = 'http://localhost:802
             ]
         }
     });
-    compiler.run((err, stats) => {
-        var rulesConfig = undefined;
-        const rulesContent = String(fs.readFileSync(path.resolve(__dirname, 'dist') + '/rules.bundle.js'));
-        eval(rulesContent);
-        const rules = rulesConfig;
-        const serverURL = serverURLGEN(server_url);
-        request
-            .post(serverURL("ruleDependency"), {
-                code: rulesContent,
-                hash: stats.hash
-            })
-            .set("USER-NAME", userName)
-            .set("AUTH-TOKEN", token)
-            .then((response) => {
-                console.log(`Created Rule Dependency with UUID: ${response.text}`);
-                const registry = rules[Object.keys(rules).find(r => rules[r].registry !== undefined)].registry;
-                const rulesContracts = registry.getAll()
-                    .reduce((acc, [ruleMeta, rulesData]) =>
-                            acc.concat(
-                                rulesData
-                                    .map(ruleData =>
-                                        createRuleContract(ruleMeta, ruleData, response.text))),
-                        []);
-                createRules(userName, server_url, token, rulesContracts)
-            })
-            .catch((err) => {
-                const info = (err && err.response && err.response.text) || err;
-                console.log(`Rule Dependency creation failed: ${info}`);
-            });
+    return new Promise((resolve, reject) => {
+        compiler.run((err, stats) => {
+            var rulesConfig = undefined;
+            const rulesContent = String(fs.readFileSync(path.resolve(__dirname, 'dist') + '/rules.bundle.js'));
+            eval(rulesContent);
+            const rules = rulesConfig;
+            const serverURL = serverURLGEN(server_url);
+            request
+                .post(serverURL("ruleDependency"), {
+                    code: rulesContent,
+                    hash: stats.hash
+                })
+                .set("USER-NAME", userName)
+                .set("AUTH-TOKEN", token)
+                .then((response) => {
+                    console.log(`Created Rule Dependency with UUID: ${response.text}`);
+                    const registry = rules[Object.keys(rules).find(r => rules[r].registry !== undefined)].registry;
+                    const rulesContracts = registry.getAll()
+                        .reduce((acc, [ruleMeta, rulesData]) =>
+                                acc.concat(
+                                    rulesData
+                                        .map(ruleData =>
+                                            createRuleContract(ruleMeta, ruleData, response.text))),
+                            []);
+                    createRules(userName, server_url, token, rulesContracts)
+                    resolve(response);
+                })
+                .catch((err) => {
+                    const info = (err && err.response && err.response.text) || err;
+                    console.log(`Rule Dependency creation failed: ${info}`);
+                    reject(err);
+                });
+        });
     });
 };
 
