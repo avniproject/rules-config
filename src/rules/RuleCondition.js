@@ -41,7 +41,10 @@ class RuleCondition {
     }
 
     _getIndividual(context) {
-        return context.individual || _.get(context, 'programEncounter.individual') || this._getEnrolment(context).individual;
+        return context.individual
+            || _.get(context, 'programEncounter.individual')
+            || _.get(context, 'encounter.individual')
+            || this._getEnrolment(context).individual;
     }
 
     _containsAnswerConceptName(conceptName, context) {
@@ -56,6 +59,7 @@ class RuleCondition {
 
     _contextualTime(context) {
         return moment(_.get(context, 'programEncounter.encounterDateTime') ||
+            _.get(context, 'encounter.encounterDateTime') ||
             _.get(context, 'programEnrolment.enrolmentDateTime') ||
             _.get(context, 'programEncounter.programEnrolment.enrolmentDateTime') ||
             _.get(context, 'individual.registrationDate') ||
@@ -268,7 +272,8 @@ class RuleCondition {
 
     valueInEncounter(conceptName) {
         return this._addToChain((next, context) => {
-            const obs = context.programEncounter && context.programEncounter.findObservation(conceptName);
+            const obs = (context.programEncounter && context.programEncounter.findObservation(conceptName))
+                || (context.encounter && context.encounter.findObservation(conceptName));
             context.obsToBeChecked = obs;
             context.valueToBeChecked = obs && obs.getValue();
             return next(context);
