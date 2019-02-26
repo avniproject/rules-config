@@ -307,6 +307,15 @@ class RuleCondition {
         });
     }
 
+    valueInChecklistItem(conceptName){
+        return this._addToChain((next, context) => {
+            const obs = context.checklistItem.findObservation(conceptName);
+            context.obsToBeChecked = obs;
+            context.valueToBeChecked = obs && obs.value;
+            return next(context);
+        });
+    }
+
     containsAnswerConceptName(conceptName) {
         return this._addToChain((next, context) => {
             if (!this._hasCodedObs(context)) {
