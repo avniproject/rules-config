@@ -3,7 +3,6 @@ const path = require('path');
 const fs = require('fs');
 const request = require('superagent');
 const UglifyJsPlugin = require('uglifyjs-webpack-plugin');
-const { Ruleable } = require('./rules');
 
 const serverURLGEN = (server_url = 'http://localhost:8021') =>
     (path) => `${process.env.SERVER_URL !== undefined ? process.env.SERVER_URL : server_url}/${path}`;
