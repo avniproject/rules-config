@@ -1,6 +1,7 @@
 const RuleCondition = require("../RuleCondition");
 const FormElementStatus = require("../model/FormElementStatus");
 const _ = require("lodash");
+const lib = require('../lib');
 
 class FormElementStatusBuilder {
 
@@ -18,7 +19,13 @@ class FormElementStatusBuilder {
     skipAnswers(...answers) {
         let answerSkipRule = {
             rule: new RuleCondition(this.context),
-            answers: _.map(answers, (answer) => _.isString(answer) ? this.context.formElement.getAnswerWithConceptName(answer) : answer)
+            answers: _.reject(_.map(answers, (answer) => {
+                const answerToSkip = _.isString(answer) ? this.context.formElement.getAnswerWithConceptName(answer) : answer;
+                if (answerToSkip) {
+                    return answerToSkip;
+                }
+                lib.log(`RuleDefinitionError: ConceptAnswer'${answer}' not found in Concept'${this.context.formElement.concept.name}'`);
+            }), _.isNil)
         };
         this.answerSkipRules.push(answerSkipRule);
         return answerSkipRule.rule;
