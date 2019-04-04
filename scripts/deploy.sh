@@ -10,6 +10,8 @@ pwd
 remote=$(git config remote.origin.url)
 
 siteSource="$1"
+author="$(git --no-pager show -s --format='%an <%ae>' HEAD)"
+commit="$(git rev-parse --short=12 HEAD)"
 
 if [ ! -d "$siteSource" ]
 then
@@ -44,7 +46,7 @@ cp -a "../${siteSource}/." .
 # stage any changes and new files
 git add -A
 # now commit, ignoring branch gh-pages doesn't seem to work, so trying skip
-git commit --allow-empty -m "Build [ci skip]"
+git commit --allow-empty -m "Build [ci skip] Triggered by $commit" --author="$author"
 # and push, but send any output to /dev/null to hide anything sensitive
 git push --force --quiet origin build > /dev/null 2>&1
 
