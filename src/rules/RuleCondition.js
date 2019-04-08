@@ -347,6 +347,19 @@ class RuleCondition {
         });
     }
 
+    containsAnswerConceptNameOtherThan(conceptName) {
+        return this._addToChain((next, context) => {
+            if (!this._hasCodedObs(context)) {
+                context.matches = false;
+                return next(context);
+            }
+
+            context.matches = this._containsAnswerConceptNameOtherThan(conceptName, context);
+            return next(context);
+        });
+    }
+
+
     equals(value) {
         return this._addToChain((next, context) => {
             context.matches = context.valueToBeChecked === value;
