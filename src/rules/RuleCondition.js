@@ -53,6 +53,13 @@ class RuleCondition {
         return context.obsToBeChecked.getValueWrapper().hasValue(answerUuid);
     }
 
+    _containsAnswerConceptNameOtherThan(conceptName, context) {
+        const conceptAnswers = _.filter(context.obsToBeChecked.concept.getAnswers(),
+            (conceptAnswer)  => conceptAnswer.concept.name !== conceptName);
+        return _.some(conceptAnswers,  (conceptAnswer) => context.obsToBeChecked.getValueWrapper()
+            .hasValue(conceptAnswer.concept.uuid));
+    }
+
     _hasCodedObs(context) {
         return context.obsToBeChecked && context.obsToBeChecked.concept.isCodedConcept();
     }
