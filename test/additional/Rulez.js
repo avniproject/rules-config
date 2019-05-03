@@ -1,4 +1,4 @@
-const RuleFactory = require('../../src/rules/additional/Rule');
+import {RuleFactory} from "../../src/rules/additional/Rule"
 
 const RandomProgramEncounterDecision = RuleFactory("e1472f56-c057-4aea-9f46-0decd9d068fe", "decision");
 
