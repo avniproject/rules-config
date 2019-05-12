@@ -3,6 +3,7 @@ const {
     FormElementRule,
     DecisionRule,
     ProgramRule,
+    WorkListUpdationRule
 } = require('./src/rules/additional/Rule');
 const RuleRegistry = require('./src/rules/additional/RuleRegistry');
 const { Ruleable, RuleType } = require('./src/rules/additional/constants');
@@ -23,6 +24,7 @@ module.exports = {
     FormElementRule,
     DecisionRule,
     ProgramRule,
+    WorkListUpdationRule,
     Ruleable,
     RuleType,
     FormElementStatus,

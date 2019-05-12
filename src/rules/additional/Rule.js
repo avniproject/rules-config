@@ -44,10 +44,13 @@ const ProgramRule = (ruleProps) =>
     WrappedRuleDecorator(RuleType.EnrolmentSummary, ruleProps, ruleProps.programUUID,
         Ruleable.Program);
 
+const WorkListUpdationRule = (ruleProps) =>
+    WrappedRuleDecorator(RuleType.WorkListUpdation, ruleProps, null, Ruleable.None);
 
 module.exports = {
     RuleFactory,
     FormElementRule,
     DecisionRule,
     ProgramRule,
+    WorkListUpdationRule,
 };

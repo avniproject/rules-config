@@ -1,7 +1,8 @@
 
 const Ruleable = {
     Form: 'Form',
-    Program: 'Program'
+    Program: 'Program',
+    None: 'None',
 };
 
 const RuleType = {
@@ -11,6 +12,7 @@ const RuleType = {
     Checklists: "Checklists",
     Validation: "Validation",
     EnrolmentSummary: "EnrolmentSummary",
+    WorkListUpdation: "WorkListUpdation",
 };
 
 module.exports = { Ruleable, RuleType };
