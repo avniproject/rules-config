@@ -9,5 +9,8 @@ module.exports = {
     },
     get calculations() {
         return ruleServiceLibraryInterfaceForSharingModules.motherCalculations;
+    },
+    get models() {
+        return ruleServiceLibraryInterfaceForSharingModules.models;
     }
 };

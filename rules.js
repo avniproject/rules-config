@@ -17,6 +17,7 @@ const StatusBuilderAnnotationFactory = require('./src/rules/builder/StatusBuilde
 const VisitScheduleBuilder = require('./src/rules/builder/VisitScheduleBuilder');
 const FormElementStatus = require('./src/rules/model/FormElementStatus');
 const WithName = require('./src/rules/builder/WithName');
+const lib = require('./src/rules/lib');
 
 module.exports = {
     FormElementStatusBuilder,
@@ -36,5 +37,6 @@ module.exports = {
     StatusBuilderAnnotationFactory,
     WithName,
     RuleRegistry,
-    SkipLogic
+    SkipLogic,
+    lib,
 };
