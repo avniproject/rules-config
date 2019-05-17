@@ -1,4 +1,5 @@
-module.exports = {
+module.exports = () => ({
+
     /* Until we find a good way to share modules during rule evaluation, we use globals */
     /* ruleServiceLibraryInterfaceForSharingModules is globally available */
     get log() {
@@ -13,4 +14,4 @@ module.exports = {
     get models() {
         return ruleServiceLibraryInterfaceForSharingModules.models;
     }
-};
+});
