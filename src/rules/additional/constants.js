@@ -13,6 +13,7 @@ const RuleType = {
     Validation: "Validation",
     EnrolmentSummary: "EnrolmentSummary",
     WorkListUpdation: "WorkListUpdation",
+    EnrolmentEligibilityCheck: "EnrolmentEligibilityCheck",
 };
 
 module.exports = { Ruleable, RuleType };
