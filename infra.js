@@ -10,8 +10,7 @@ const serverURLGEN = (server_url = 'http://localhost:8021') =>
 const createRuleContract = (ruleMeta, ruleData, ruleDependencyUUID) => ({
     ruleDependencyUUID: ruleDependencyUUID,
     type: ruleMeta.type,
-    entityUUID: ruleMeta.entityUUID,
-    entityType: ruleMeta.entityType,
+    entity: {uuid: ruleMeta.entityUUID, type: ruleMeta.entityType},
     data: ruleData.metadata,
     uuid: ruleData.uuid,
     name: ruleData.name,
