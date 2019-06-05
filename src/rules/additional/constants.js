@@ -2,6 +2,7 @@
 const Ruleable = {
     Form: 'Form',
     Program: 'Program',
+    EncounterType: 'EncounterType',
     None: 'None',
 };
 
@@ -14,6 +15,7 @@ const RuleType = {
     EnrolmentSummary: "EnrolmentSummary",
     WorkListUpdation: "WorkListUpdation",
     EnrolmentEligibilityCheck: "EnrolmentEligibilityCheck",
+    EncounterEligibilityCheck: "EncounterEligibilityCheck",
 };
 
 module.exports = { Ruleable, RuleType };

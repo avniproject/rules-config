@@ -50,6 +50,9 @@ const WorkListUpdationRule = (ruleProps) =>
 const EnrolmentEligibilityCheck = (ruleProps) =>
     WrappedRuleDecorator(RuleType.EnrolmentEligibilityCheck, ruleProps, ruleProps.programUUID, Ruleable.Program);
 
+const EncounterEligibilityCheck = (ruleProps) =>
+    WrappedRuleDecorator(RuleType.EncounterEligibilityCheck, ruleProps, ruleProps.encounterTypeUUID, Ruleable.EncounterType);
+
 module.exports = {
     RuleFactory,
     FormElementRule,
@@ -57,4 +60,5 @@ module.exports = {
     ProgramRule,
     WorkListUpdationRule,
     EnrolmentEligibilityCheck,
+    EncounterEligibilityCheck,
 };
