@@ -24,7 +24,7 @@ class FormElementStatusBuilder {
                 if (answerToSkip) {
                     return answerToSkip;
                 }
-                lib.log(`[RulesConfig][Warn] Can't Skip Answer '${answer}' in '${this.context.formElement.concept.name}'. Answer is either voided or not found.`);
+                lib().log(`[RulesConfig][Warn] Can't Skip Answer '${answer}' in '${this.context.formElement.concept.name}'. Answer is either voided or not found.`);
             }), _.isNil)
         };
         this.answerSkipRules.push(answerSkipRule);
