@@ -10,10 +10,20 @@ class FormElementStatusBuilder {
         this.visibilityRule = new RuleCondition(context);
         this.answerSkipRules = [];
         this.valueRule = new RuleCondition(context);
+        this.validationErrorRules = []
     }
 
     show() {
         return this.visibilityRule;
+    }
+
+    validationError(errorMessage) {
+        let validationErrorRule = {
+            rule: new RuleCondition(Object.assign({}, this.context)),
+            errorMessage: errorMessage
+        };
+        this.validationErrorRules.push(validationErrorRule);
+        return validationErrorRule.rule;
     }
 
     skipAnswers(...answers) {
@@ -37,8 +47,11 @@ class FormElementStatusBuilder {
     }
 
     build() {
+        const validationErrors = this.validationErrorRules.filter(e => e.rule.matches()).map(({errorMessage}) => errorMessage);
+        const validations = this.visibilityRule.matches() ? validationErrors : [];
         const answersToSkip = _.reduce(this.answerSkipRules, (acc, ruleItem) => ruleItem.rule.matches() ? _.concat(acc, ruleItem.answers) : acc, []);
-        return new FormElementStatus(this.context.formElement.uuid, this.visibilityRule.matches(), this.valueRule.matches() ? this._value : null, answersToSkip);
+        return new FormElementStatus(this.context.formElement.uuid, this.visibilityRule.matches(),
+            this.valueRule.matches() ? this._value : null, answersToSkip, validations);
     }
 }
 
