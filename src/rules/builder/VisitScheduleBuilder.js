@@ -1,5 +1,6 @@
 const RuleCondition = require("../RuleCondition");
 const _ = require("lodash");
+const moment = require('moment');
 
 class VisitScheduleBuilder {
     constructor(context) {
@@ -25,7 +26,7 @@ class VisitScheduleBuilder {
         this.scheduledVisits = this.scheduledVisits.filter((sv) => keyList.indexOf(_.get(sv, `data.${key}`)) < 0);
     }
 
-    getAllUnique(keyPath) {
+    _getAllUniqueVisits(keyPath) {
         const allScheduledVisits = this.getAll();
         const visitsGroupedByPath = _.groupBy(allScheduledVisits, (v) => v[keyPath]);
         return _.map(visitsGroupedByPath,
@@ -38,6 +39,26 @@ class VisitScheduleBuilder {
                 return visitToPick;
             });
     }
+
+    getAllUnique(keyPath, avoidExistingVisits = false) {
+        let allUniqueVisits = this._getAllUniqueVisits(keyPath);
+        let programEnrolment = _.get(this.context, "programEnrolment") || _.get(this.context, "programEncounter.programEnrolment");
+        const allScheduledEncounters = programEnrolment.encounters.filter(encounter => encounter.earliestVisitDateTime);
+
+        const visitExistsInEnrolment = (visit) => {
+            return allScheduledEncounters.find(
+                programEncounter =>
+                    moment(programEncounter.earliestVisitDateTime).isSame(moment(visit.earliestDate), 'day')
+                    && programEncounter.encounterType.name === visit.encounterType
+            );
+        };
+
+        if (avoidExistingVisits) {
+            return allUniqueVisits.filter((visit) => !visitExistsInEnrolment(visit));
+        }
+
+        return allUniqueVisits;
+    };
 }
 
 module.exports = VisitScheduleBuilder;
