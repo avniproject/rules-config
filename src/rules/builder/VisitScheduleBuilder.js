@@ -48,8 +48,7 @@ class VisitScheduleBuilder {
         const visitExistsInEnrolment = (visit) => {
             return allScheduledEncounters.find(
                 programEncounter =>
-                    moment(programEncounter.earliestVisitDateTime).isSame(moment(visit.earliestDate), 'day')
-                    && programEncounter.encounterType.name === visit.encounterType
+                    moment(programEncounter.earliestVisitDateTime).isSame(moment(visit.earliestDate), 'day') && programEncounter.encounterType.name === visit.encounterType
             );
         };
 
