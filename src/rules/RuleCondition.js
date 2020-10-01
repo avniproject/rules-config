@@ -291,7 +291,7 @@ class RuleCondition {
         return this._addToChain((next, context) => {
             const obs = context.existingDecisions.find((decision) => decision.name === conceptName);
             context.obsToBeChecked = obs;
-            context.valueToBeChecked = obs && obs.value;
+            context.valueToBeChecked = obs && obs.getValue();
             return next(context);
         });
     }
@@ -300,7 +300,7 @@ class RuleCondition {
         return this._addToChain((next, context) => {
             const obs = this._getIndividual(context).findObservation(conceptName);
             context.obsToBeChecked = obs;
-            context.valueToBeChecked = obs && obs.value;
+            context.valueToBeChecked = obs && obs.getValue();
             return next(context);
         });
     }
@@ -318,7 +318,7 @@ class RuleCondition {
         return this._addToChain((next, context) => {
             const obs = context.checklistItem.findObservation(conceptName);
             context.obsToBeChecked = obs;
-            context.valueToBeChecked = obs && obs.value;
+            context.valueToBeChecked = obs && obs.getValue();
             return next(context);
         });
     }
