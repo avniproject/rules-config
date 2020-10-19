@@ -40,11 +40,19 @@ class RuleCondition {
         return _.get(context, "programEnrolment") || _.get(context, "programEncounter.programEnrolment");
     }
 
+    _getIndividualOrEnrolment(context) {
+        return this._getEnrolment(context) || this._getIndividual(context);
+    }
+
     _getIndividual(context) {
         return context.individual
             || _.get(context, 'programEncounter.individual')
             || _.get(context, 'encounter.individual')
             || this._getEnrolment(context).individual;
+    }
+
+    _getEncounter(context) {
+        return context.encounter || context.programEncounter;
     }
 
     _containsAnswerConceptName(conceptName, context) {
@@ -138,8 +146,8 @@ class RuleCondition {
 
     latestValueInAllEncounters(conceptName) {
         return this._addToChain((next, context) => {
-            const enrolment = this._getEnrolment(context);
-            const obs = enrolment.findLatestObservationFromEncounters(conceptName, context.programEncounter);
+            const obs = this._getIndividualOrEnrolment(context)
+                .findLatestObservationFromEncounters(conceptName, this._getEncounter(context));
             context.obsToBeChecked = obs;
             context.valueToBeChecked = obs && obs.getValue();
             return next(context);
@@ -158,7 +166,8 @@ class RuleCondition {
 
     latestValueInPreviousEncounters(conceptName) {
         return this._addToChain((next, context) => {
-            const obs = this._getEnrolment(context).findLatestObservationFromPreviousEncounters(conceptName, context.programEncounter);
+            const obs = this._getIndividualOrEnrolment(context)
+                .findLatestObservationFromPreviousEncounters(conceptName, this._getEncounter(context));
             context.obsToBeChecked = obs;
             context.valueToBeChecked = obs && obs.getValue();
             return next(context);
@@ -167,8 +176,8 @@ class RuleCondition {
 
     valueInLastEncounter(conceptName, encounterTypes) {
         return this._addToChain((next, context) => {
-            const lastEncounter = this._getEnrolment(context)
-                .findLastEncounterOfType(context.programEncounter, encounterTypes);
+            const lastEncounter = this._getIndividualOrEnrolment(context)
+                .findLastEncounterOfType(this._getEncounter(context), encounterTypes);
             const obs = _.defaultTo(lastEncounter, {findObservation: _.noop}).findObservation(conceptName);
             context.obsToBeChecked = obs;
             context.valueToBeChecked = obs && obs.getValue();
@@ -256,7 +265,8 @@ class RuleCondition {
 
     get encounterType() {
         return this._addToChain((next, context) => {
-            context.valueToBeChecked = context.programEncounter && context.programEncounter.encounterType.name;
+            const encounter = this._getEncounter(context);
+            context.valueToBeChecked = encounter && encounter.encounterType.name;
             return next(context);
         });
 
@@ -264,7 +274,8 @@ class RuleCondition {
 
     get encounterMonth() {
         return this._addToChain((next, context) => {
-            context.valueToBeChecked = moment(context.programEncounter.encounterDateTime).month() + 1;
+            const encounter = this._getEncounter(context);
+            context.valueToBeChecked = moment(encounter.encounterDateTime).month() + 1;
             return next(context);
         });
     }
@@ -279,8 +290,8 @@ class RuleCondition {
 
     valueInEncounter(conceptName) {
         return this._addToChain((next, context) => {
-            const obs = (context.programEncounter && context.programEncounter.findObservation(conceptName))
-                || (context.encounter && context.encounter.findObservation(conceptName));
+            const encounter = this._getEncounter(context);
+            const obs = encounter.findObservation(conceptName);
             context.obsToBeChecked = obs;
             context.valueToBeChecked = obs && obs.getValue();
             return next(context);
@@ -307,7 +318,8 @@ class RuleCondition {
 
     valueInCancelEncounter(conceptName) {
         return this._addToChain((next, context) => {
-            const obs = context.programEncounter.findCancelEncounterObservation(conceptName);
+            const encounter = this._getEncounter(context);
+            const obs = encounter.findCancelEncounterObservation(conceptName);
             context.obsToBeChecked = obs;
             context.valueToBeChecked = obs && obs.getValue();
             return next(context);

@@ -43,7 +43,9 @@ class VisitScheduleBuilder {
     getAllUnique(keyPath, avoidExistingVisits = false) {
         let allUniqueVisits = this._getAllUniqueVisits(keyPath);
         let programEnrolment = _.get(this.context, "programEnrolment") || _.get(this.context, "programEncounter.programEnrolment");
-        const allScheduledEncounters = programEnrolment.encounters.filter(encounter => encounter.earliestVisitDateTime);
+        let individual = _.get(this.context, "individual") || _.get(this.context, "encounter.individual");
+        const encounters = _.isNil(programEnrolment) ? individual.encounters : programEnrolment.encounters;
+        const allScheduledEncounters = encounters.filter(encounter => encounter.earliestVisitDateTime);
 
         const visitExistsInEnrolment = (visit) => {
             return allScheduledEncounters.find(
