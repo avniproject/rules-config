@@ -9,6 +9,7 @@ class FormElementStatusBuilder {
         this.context = context;
         this.visibilityRule = new RuleCondition(context);
         this.answerSkipRules = [];
+        this.answersToShow = [];
         this.valueRule = new RuleCondition(context);
         this.validationErrorRules = []
     }
@@ -41,6 +42,17 @@ class FormElementStatusBuilder {
         return answerSkipRule.rule;
     }
 
+    showAnswers(...answers) {
+        let answerShowRule = {
+            rule: new RuleCondition(this.context),
+            answers: _.map(answers, (answer) => {
+              return answer;
+            })
+        };
+        this.answersToShow.push(answerShowRule);
+        return answerShowRule.rule;
+    }
+
     value(value) {
         this._value = value;
         return this.valueRule;
@@ -50,8 +62,14 @@ class FormElementStatusBuilder {
         const validationErrors = this.validationErrorRules.filter(e => e.rule.matches()).map(({errorMessage}) => errorMessage);
         const validations = this.visibilityRule.matches() ? validationErrors : [];
         const answersToSkip = _.reduce(this.answerSkipRules, (acc, ruleItem) => ruleItem.rule.matches() ? _.concat(acc, ruleItem.answers) : acc, []);
+        const answersToShow = _.reduce(this.answersToShow, (acc, ruleItem) => ruleItem.rule.matches() ? _.concat(acc, ruleItem.answers) : acc, []);
+
+        if (answersToSkip.length > 0 && answersToShow.length > 0) {
+            throw Error(`Rule for FormElement '${this.context.formElement.name}' uses both skipAnswers and showAnswers.`);
+        }
+
         return new FormElementStatus(this.context.formElement.uuid, this.visibilityRule.matches(),
-            this.valueRule.matches() ? this._value : null, answersToSkip, validations);
+            this.valueRule.matches() ? this._value : null, answersToSkip, validations, answersToShow);
     }
 }
 
