@@ -291,7 +291,7 @@ class RuleCondition {
     valueInEncounter(conceptName) {
         return this._addToChain((next, context) => {
             const encounter = this._getEncounter(context);
-            const obs = encounter.findObservation(conceptName);
+            const obs = encounter && encounter.findObservation(conceptName);
             context.obsToBeChecked = obs;
             context.valueToBeChecked = obs && obs.getValue();
             return next(context);
