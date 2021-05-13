@@ -12,3 +12,4 @@ export WithName from './src/rules/builder/WithName';
 export lib from './src/rules/lib';
 export * from './src/rules/additional/Rule';
 export * from './src/rules/additional/constants';
+export * from './src/rules/utils';
