@@ -238,6 +238,24 @@ class RuleCondition {
         })
     }
 
+    get lowestAddressLevelType() {
+        return this.addressType;
+    }
+
+    get lowestAddressLevel() {
+        return this._addToChain((next, context) => {
+            context.valueToBeChecked = this._getIndividual(context).lowestAddressLevel.name;
+            return next(context);
+        })
+    }
+
+    get gender() {
+        return this._addToChain((next, context) => {
+            context.valueToBeChecked = this._getIndividual(context).gender.name;
+            return next(context);
+        })
+    }
+
     get age() {
         return this._addToChain((next, context) => {
             context.valueToBeChecked = this._contextualTime(context).diff(moment(this._getIndividual(context).dateOfBirth), 'years');
@@ -252,6 +270,13 @@ class RuleCondition {
     get ageInMonths() {
         return this._addToChain((next, context) => {
             context.valueToBeChecked = this._contextualTime(context).diff(moment(this._getIndividual(context).dateOfBirth), 'months');
+            return next(context);
+        });
+    }
+
+    get ageInWeeks() {
+        return this._addToChain((next, context) => {
+            context.valueToBeChecked = this._contextualTime(context).diff(moment(this._getIndividual(context).dateOfBirth), "weeks");
             return next(context);
         });
     }

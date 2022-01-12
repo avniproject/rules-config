@@ -42,16 +42,12 @@ const config = {
                 use: {
                     loader: 'babel-loader',
                     options: {
-                        "presets": [
-                            [
-                                "env"
-                            ]
-                        ],
+                        "presets": ['@babel/preset-env'],
                         "plugins": [
-                            "transform-class-properties",
-                            "transform-export-extensions",
-                            "transform-decorators-legacy",
-                            "transform-es2015-destructuring"
+                            "@babel/plugin-proposal-class-properties",
+                            "@babel/plugin-syntax-export-extensions",
+                            ["@babel/plugin-proposal-decorators", { "legacy" : true }],
+                            "@babel/plugin-transform-destructuring"
                         ]
                     }
                 }
