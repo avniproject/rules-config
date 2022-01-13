@@ -1,6 +1,6 @@
-const RuleCondition = require("../RuleCondition");
-const _ = require("lodash");
-const moment = require('moment');
+import RuleCondition from "../RuleCondition";
+import _ from "lodash";
+import moment from 'moment';
 
 class VisitScheduleBuilder {
     constructor(context) {
@@ -62,4 +62,4 @@ class VisitScheduleBuilder {
     };
 }
 
-module.exports = VisitScheduleBuilder;
+export default VisitScheduleBuilder;

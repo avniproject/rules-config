@@ -1,6 +1,6 @@
-const _ = require("lodash");
-const FormElementStatus = require("./model/FormElementStatus");
-const moment = require("moment");
+import _ from "lodash";
+import FormElementStatus from "./model/FormElementStatus";
+import moment from "moment";
 
 class FormElementsStatusesHelper {
     static getFormElementsStatuses(handler = {}, entity, formElementGroup, today) {
@@ -62,4 +62,4 @@ class FormElementsStatusesHelper {
     }
 }
 
-module.exports = FormElementsStatusesHelper;
+export default FormElementsStatusesHelper;

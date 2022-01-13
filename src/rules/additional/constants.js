@@ -18,4 +18,4 @@ const RuleType = {
     EncounterEligibilityCheck: "EncounterEligibilityCheck",
 };
 
-module.exports = { Ruleable, RuleType };
+export { Ruleable, RuleType };

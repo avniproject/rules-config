@@ -1,5 +1,5 @@
-const {isDefined, defaultTo} = require("../utils");
-const { Ruleable } = require('./constants');
+import {isDefined, defaultTo} from "../utils";
+import { Ruleable } from './constants';
 
 class RuleRegistry {
     constructor() {
@@ -31,5 +31,5 @@ class RuleRegistry {
         return defaultTo(Array.from(this.rules.entries()).map(([k, v]) => [this._unKey(k), v]), []);
     }
 }
-
-module.exports = new RuleRegistry();
+const ruleRegistry = new RuleRegistry();
+export default ruleRegistry;

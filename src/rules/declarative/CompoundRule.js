@@ -1,5 +1,6 @@
 import {assertTrue} from "./Util";
 import _ from "lodash";
+import Rule from "./Rule";
 
 class CompoundRule {
     static conjunctions = {
@@ -22,6 +23,11 @@ class CompoundRule {
         assertTrue(_.includes(conjunctions, conjunction), `Conjunction must be one of the ${conjunctions}`);
         this.conjunction = conjunction;
         return this;
+    }
+
+    withEmptyRule() {
+        const rule = new Rule();
+        this.rules.push(rule);
     }
 
     getJSCode() {

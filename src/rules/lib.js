@@ -1,4 +1,4 @@
-module.exports = () => ({
+export default () => ({
 
     /* Until we find a good way to share modules during rule evaluation, we use globals */
     /* ruleServiceLibraryInterfaceForSharingModules is globally available */

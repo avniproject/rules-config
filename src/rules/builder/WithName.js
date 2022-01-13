@@ -9,4 +9,4 @@ const WithName = (newName) => (target, oldName, descriptor) => {
     return descriptor;
 };
 
-module.exports = WithName;
+export default WithName;

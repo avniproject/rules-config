@@ -1,4 +1,4 @@
-const FormElementStatusBuilder = require('./FormElementStatusBuilder');
+import FormElementStatusBuilder from './FormElementStatusBuilder';
 
 const StatusBuilderAnnotationFactory = function (...argNames) {
     const argToContextMapper = (args) => {
@@ -20,4 +20,4 @@ const StatusBuilderAnnotationFactory = function (...argNames) {
     }
 };
 
-module.exports = StatusBuilderAnnotationFactory;
+export default StatusBuilderAnnotationFactory;

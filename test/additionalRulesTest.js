@@ -1,6 +1,6 @@
-const {assert} = require("chai");
-require('./additional/Rulez');
-const RuleRegistry = require('../src/rules/additional/RuleRegistry');
+import {assert} from "chai";
+import {rule1Brah, rule2Brah} from './additional/Rulez';
+import RuleRegistry from '../src/rules/additional/RuleRegistry';
 
 describe('Additional Rules Test', () => {
     it('should get all additional rules for a given program, entity type and type of rule', function () {

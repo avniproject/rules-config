@@ -1,7 +1,7 @@
-const RuleCondition = require("../RuleCondition");
-const FormElementStatus = require("../model/FormElementStatus");
-const _ = require("lodash");
-const lib = require('../lib');
+import RuleCondition from "../RuleCondition";
+import FormElementStatus from "../model/FormElementStatus";
+import _ from "lodash";
+import lib from '../lib';
 
 class FormElementStatusBuilder {
 
@@ -73,4 +73,4 @@ class FormElementStatusBuilder {
     }
 }
 
-module.exports = FormElementStatusBuilder;
+export default FormElementStatusBuilder;

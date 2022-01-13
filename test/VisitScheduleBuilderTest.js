@@ -1,5 +1,5 @@
-const {assert, expect} = require("chai");
-const VisitScheduleBuilder = require("../src/rules/builder/VisitScheduleBuilder");
+import {assert, expect} from "chai";
+import VisitScheduleBuilder from "../src/rules/builder/VisitScheduleBuilder";
 
 const monthlyVisit = {
     name: 'Monthly Visit',

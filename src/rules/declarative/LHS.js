@@ -76,6 +76,10 @@ class LHS {
         return this;
     }
 
+    isScopeRequired() {
+        return !_.isNil(this.type) && this.type === LHS.types.Concept;
+    }
+
     build() {
         return this;
     }

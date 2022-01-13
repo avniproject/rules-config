@@ -1,4 +1,4 @@
-const FormRuleChainLink = require("./RuleChainLink");
+import FormRuleChainLink from "./RuleChainLink";
 
 class FormRuleChain {
     constructor() {
@@ -32,4 +32,4 @@ class FormRuleChain {
     }
 }
 
-module.exports = FormRuleChain;
+export default FormRuleChain;

@@ -42,7 +42,7 @@ class Rule {
     }
 
     isRhsRequired() {
-        return !_.includes(Rule.operatorsWithNoRHS, this.operator);
+        return !_.isNil(this.operator) && !_.includes(Rule.operatorsWithNoRHS, this.operator);
     }
 
     getJSCode() {

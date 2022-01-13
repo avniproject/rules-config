@@ -18,4 +18,4 @@ class FormRuleChainLink {
     }
 }
 
-module.exports = FormRuleChainLink;
+export default FormRuleChainLink;

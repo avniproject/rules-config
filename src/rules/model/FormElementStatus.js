@@ -28,4 +28,4 @@ class FormElementStatus {
     }
 }
 
-module.exports = FormElementStatus;
+export default FormElementStatus;

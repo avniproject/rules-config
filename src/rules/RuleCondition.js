@@ -1,6 +1,6 @@
-const FormRuleChain = require("./RuleChain");
-const _ = require("lodash");
-const moment = require("moment");
+import FormRuleChain from "./RuleChain";
+import _ from "lodash";
+import moment from "moment";
 
 class RuleCondition {
 
@@ -494,4 +494,4 @@ class RuleCondition {
     }
 }
 
-module.exports = RuleCondition;
+export default RuleCondition;

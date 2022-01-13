@@ -1,5 +1,5 @@
-const _ = require("lodash");
-const RuleCondition = require("../RuleCondition");
+import _ from "lodash";
+import RuleCondition from "../RuleCondition";
 
 class AdditionalComplicationBuilder {
 
@@ -30,4 +30,4 @@ class AdditionalComplicationBuilder {
     }
 }
 
-module.exports = AdditionalComplicationBuilder;
+export default AdditionalComplicationBuilder;

@@ -19,4 +19,4 @@ const processServiceCallResults = (results, callback) => {
     }
 };
 
-module.exports = {isDefined, defaultTo, processServiceCallResults};
+export {isDefined, defaultTo, processServiceCallResults};

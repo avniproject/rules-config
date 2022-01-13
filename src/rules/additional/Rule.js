@@ -1,5 +1,5 @@
-const RuleRegistry = require('./RuleRegistry');
-const { Ruleable, RuleType } = require('./constants');
+import { Ruleable, RuleType } from './constants';
+import RuleRegistry from "./RuleRegistry";
 
 const RuleFactory = (formUUID, type) => (uuid, name, executionOrder, metadata = {}, customFnName) => {
     return (fn) => {
@@ -53,7 +53,7 @@ const EnrolmentEligibilityCheck = (ruleProps) =>
 const EncounterEligibilityCheck = (ruleProps) =>
     WrappedRuleDecorator(RuleType.EncounterEligibilityCheck, ruleProps, ruleProps.encounterTypeUUID, Ruleable.EncounterType);
 
-module.exports = {
+export {
     RuleFactory,
     FormElementRule,
     DecisionRule,
