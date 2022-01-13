@@ -13,6 +13,7 @@
   },
   "main": "rules.js",
   "dependencies": {
+    "@quasar/babel-preset-app": "^2.0.1",
     "babel-preset-env": "^1.7.0",
     "babel-register": "^6.26.0",
     "chai": "^4.1.2",
