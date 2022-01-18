@@ -1,5 +1,5 @@
 import _ from 'lodash';
-import Action from "./Action";
+import {Condition, Rule, Action, CompoundRule} from "./index";
 
 class DeclarativeRule {
     static conjunctionToBooleanOperator = {
@@ -12,14 +12,31 @@ class DeclarativeRule {
         this.actions = [];
     }
 
-    withCondition(condition) {
-        this.conditions.push(condition);
+    getInitialState() {
+        const rule = new Rule();
+        const compoundRule = new CompoundRule();
+        compoundRule.addRule(rule);
+        const condition = new Condition();
+        condition.setCompoundRule(compoundRule);
+        this.addCondition(condition);
+        const action = new Action();
+        this.addAction(action);
         return this;
     }
 
-    withAction(action) {
+    addCondition(condition) {
+        this.conditions.push(condition);
+    }
+
+    addAction(action) {
         this.actions.push(action);
-        return this;
+    }
+
+    clone() {
+        const declarativeRule = new DeclarativeRule();
+        declarativeRule.conditions = _.map(this.conditions, condition => condition.clone());
+        declarativeRule.actions = _.map(this.actions, action => action.clone());
+        return declarativeRule;
     }
 
     getViewFilterRule(entityName) {

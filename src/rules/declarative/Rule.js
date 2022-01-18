@@ -24,21 +24,18 @@ class Rule {
         this.rhs = new RHS();
     }
 
-    withLHS(lhs) {
+    setLHS(lhs) {
         this.lhs = lhs;
-        return this;
     }
 
-    withRHS(rhs) {
+    setRHS(rhs) {
         this.rhs = rhs;
-        return this;
     }
 
-    withOperator(operator) {
+    setOperator(operator) {
         const operators = _.values(Rule.operators);
         assertTrue(_.includes(operators, operator), `Operator must be one of the ${operators}`);
         this.operator = operator;
-        return this;
     }
 
     isRhsRequired() {
@@ -50,6 +47,13 @@ class Rule {
         return this.isRhsRequired() ? `${lhsAndOperator}(${this.rhs.getJSCode()})` : lhsAndOperator;
     }
 
+    clone() {
+        const rule = new Rule();
+        rule.lhs = this.lhs.clone();
+        rule.operator = this.operator;
+        rule.rhs = this.rhs.clone();
+        return rule;
+    }
 }
 
 export default Rule;

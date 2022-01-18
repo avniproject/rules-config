@@ -13,6 +13,8 @@ class LHS {
         'Concept': 'concept',
     };
 
+    static numericRHSValueTypes = ['ageInDays', 'ageInWeeks', 'ageInMonths', 'ageInYears'];
+
     static scopes = {
         'EntireEnrolment': 'entireEnrolment',
         'LatestInAllVisits': 'latestInAllVisits',
@@ -46,42 +48,37 @@ class LHS {
     constructor() {
     }
 
-    withType(type) {
+    setType(type) {
         const types = _.values(LHS.types);
         assertTrue(_.includes(types, type), `Types must be one of the ${types}`);
         this.type = type;
-        return this;
     }
 
-    withConceptName(conceptName) {
+    setConceptName(conceptName) {
         this.conceptName = conceptName;
-        return this;
     }
 
-    withConceptUuid(conceptUuid) {
+    setConceptUuid(conceptUuid) {
         this.conceptUuid = conceptUuid;
-        return this;
     }
 
-    withEncounterTypes(encounterTypes) {
+    setConceptDataType(conceptDataType) {
+        this.conceptDataType = conceptDataType;
+    }
+
+    setEncounterTypes(encounterTypes) {
         this.encounterTypes = encounterTypes;
-        return this;
     }
 
-    withScope(scope) {
+    setScope(scope) {
         const scopes = _.values(LHS.scopes);
         assertTrue(_.includes(scopes, scope), `Scopes must be one of the ${scopes}`);
         assertTrue(!_.isNil(this.conceptName), `Scope cannot be set without concept`);
         this.scope = scope;
-        return this;
     }
 
     isScopeRequired() {
         return !_.isNil(this.type) && this.type === LHS.types.Concept;
-    }
-
-    build() {
-        return this;
     }
 
     getJSCode() {
@@ -91,6 +88,17 @@ class LHS {
         } else {
             return this.type;
         }
+    }
+
+    clone() {
+        const lhs = new LHS();
+        lhs.type = this.type;
+        lhs.conceptName = this.conceptName;
+        lhs.conceptUuid = this.conceptUuid;
+        lhs.conceptDataType = this.conceptDataType;
+        lhs.scope = this.scope;
+        lhs.encounterTypes = this.encounterTypes;
+        return lhs;
     }
 }
 

@@ -9,34 +9,53 @@ import RHS from '../../src/rules/declarative/RHS'
 import _ from 'lodash';
 
 function getRule1() {
-    const lhs = new LHS().withType(LHS.types.Concept).withConceptName('Demo').withScope(LHS.scopes.ThisEncounter);
-    const rhs = new RHS().withType(RHS.types.AnswerConcept).withAnswerConceptNames('a', 'b');
-    return new Rule().withLHS(lhs)
-        .withOperator(Rule.operators.ContainsAnyAnswerConceptName)
-        .withRHS(rhs);
+    const lhs = new LHS();
+    lhs.setType(LHS.types.Concept);
+    lhs.setConceptName("Demo");
+    lhs.setScope(LHS.scopes.ThisEncounter);
+    const rhs = new RHS();
+    rhs.setType(RHS.types.AnswerConcept);
+    rhs.setAnswerConceptNames('a', 'b');
+    const rule = new Rule();
+    rule.setLHS(lhs);
+    rule.setOperator(Rule.operators.ContainsAnyAnswerConceptName);
+    rule.setRHS(rhs);
+    return rule;
 }
 
 function getRule2() {
-    const lhs = new LHS().withType(LHS.types.Concept).withConceptName("Numeric").withScope(LHS.scopes.EntireEnrolment);
-    const rhs = new RHS().withType(RHS.types.Value).withValue(2);
-    return new Rule().withLHS(lhs)
-        .withOperator(Rule.operators.Equals)
-        .withRHS(rhs);
+    const lhs = new LHS();
+    lhs.setType(LHS.types.Concept);
+    lhs.setConceptName("Numeric");
+    lhs.setScope(LHS.scopes.EntireEnrolment);
+    const rhs = new RHS();
+    rhs.setType(RHS.types.Value);
+    rhs.setValue(2);
+    const rule = new Rule();
+    rule.setLHS(lhs);
+    rule.setOperator(Rule.operators.Equals);
+    rule.setRHS(rhs);
+    return rule;
 }
 
 function getRuleCondition() {
     const rule = getRule1();
-    const compoundRule = new CompoundRule()
-        .addRule(rule);
-    return new Condition().withCompoundRule(compoundRule);
+    const compoundRule = new CompoundRule();
+    compoundRule.addRule(rule);
+    const condition = new Condition();
+    condition.setCompoundRule(compoundRule);
+    return condition;
 }
 
 describe('Declarative Rule tests', () => {
     it('should create a proper json', function () {
         const NameIsTestRuleJSON = '{"conditions":[{"compoundRule":{"rules":[{"lhs":{"type":"concept","conceptName":"Demo","scope":"thisEncounter"},"rhs":{"type":"answerConcept","answerConceptNames":["a","b"]},"operator":"containsAnyAnswerConceptName"}]}}],"actions":[{"actionType":"showFormElement"}]}';
         const condition = getRuleCondition();
-        const action = new Action().withActionType(Action.actionTypes.ShowFormElement);
-        const declarativeRule = new DeclarativeRule().withCondition(condition).withAction(action);
+        const action = new Action();
+        action.setActionType(Action.actionTypes.ShowFormElement);
+        const declarativeRule = new DeclarativeRule();
+        declarativeRule.addCondition(condition);
+        declarativeRule.addAction(action);
         const jsonString = JSON.stringify(declarativeRule);
         assert.deepEqual(NameIsTestRuleJSON, jsonString, jsonString);
     });
@@ -46,17 +65,25 @@ describe('Declarative Rule tests', () => {
 
     it('should be able to set multiple actions for one rule condition', function () {
         const condition = getRuleCondition();
-        const action1 = new Action().withActionType(Action.actionTypes.ShowFormElement);
-        const action2 = new Action().withActionType(Action.actionTypes.HideFormElement);
-        const declarativeRule = new DeclarativeRule().withCondition(condition).withAction(action1).withAction(action2);
+        const action1 = new Action();
+        action1.setActionType(Action.actionTypes.ShowFormElement);
+        const action2 = new Action();
+        action2.setActionType(Action.actionTypes.HideFormElement);
+        const declarativeRule = new DeclarativeRule();
+        declarativeRule.addCondition(condition);
+        declarativeRule.addAction(action1);
+        declarativeRule.addAction(action2);
         assert.equal(_.size(declarativeRule.conditions), 1);
         assert.equal(_.size(declarativeRule.actions), 2);
     });
     it('should convert json to javascript rule with proper condition', function () {
         const condition = getRuleCondition();
         const jsCondition = 'new imports.rulesConfig.RuleCondition({encounter, formElement}).when.valueInEncounter("Demo").containsAnyAnswerConceptName("a","b").matches()';
-        const action = new Action().withActionType(Action.actionTypes.ShowFormElement);
-        const declarativeRule = new DeclarativeRule().withCondition(condition).withAction(action);
+        const action = new Action();
+        action.setActionType(Action.actionTypes.ShowFormElement);
+        const declarativeRule = new DeclarativeRule();
+        declarativeRule.addCondition(condition);
+        declarativeRule.addAction(action);
         const js = declarativeRule.getViewFilterRule('encounter');
         expect(js).to.contain(jsCondition, jsCondition);
     });
@@ -65,13 +92,17 @@ describe('Declarative Rule tests', () => {
         const rule2 = getRule2();
         const jsCondition1 = 'valueInEncounter("Demo").containsAnyAnswerConceptName("a","b")';
         const jsCondition2 = 'valueInEntireEnrolment("Numeric").equals(2)';
-        const compoundRule = new CompoundRule()
-            .withConjunction(CompoundRule.conjunctions.And)
-            .addRule(rule1)
-            .addRule(rule2);
-        const condition = new Condition().withCompoundRule(compoundRule);
-        const action1 = new Action().withActionType(Action.actionTypes.HideFormElement);
-        const declarativeRule = new DeclarativeRule().withCondition(condition).withAction(action1);
+        const compoundRule = new CompoundRule();
+        compoundRule.addRule(rule1);
+        compoundRule.setConjunction(CompoundRule.conjunctions.And);
+        compoundRule.addRule(rule2);
+        const condition = new Condition();
+        condition.setCompoundRule(compoundRule);
+        const action1 = new Action();
+        action1.setActionType(Action.actionTypes.HideFormElement);
+        const declarativeRule = new DeclarativeRule();
+        declarativeRule.addCondition(condition);
+        declarativeRule.addAction(action1);
         const js = declarativeRule.getViewFilterRule('encounter');
         expect(js).to.contain(jsCondition1, jsCondition1);
         expect(js).to.contain(jsCondition2, jsCondition2);
@@ -79,12 +110,23 @@ describe('Declarative Rule tests', () => {
     it('should support multiple conditions', function () {
         const rule1 = getRule1();
         const rule2 = getRule2();
-        const condition1 = new Condition().withConjunction(Condition.conjunctions.And).withCompoundRule(new CompoundRule().addRule(rule1));
-        const condition2 = new Condition().withCompoundRule(new CompoundRule().addRule(rule2));
+        const condition1 = new Condition();
+        condition1.setConjunction(Condition.conjunctions.And);
+        const cr1 = new CompoundRule();
+        cr1.addRule(rule1);
+        const cr2 = new CompoundRule();
+        cr2.addRule(rule2);
+        condition1.setCompoundRule(cr1);
+        const condition2 = new Condition();
+        condition2.setCompoundRule(cr2);
         const condition1JS = 'new imports.rulesConfig.RuleCondition({encounter, formElement}).when.valueInEncounter("Demo").containsAnyAnswerConceptName("a","b").matches()';
         const condition2JS = 'new imports.rulesConfig.RuleCondition({encounter, formElement}).when.valueInEntireEnrolment("Numeric").equals(2).matches()';
-        const action = new Action().withActionType(Action.actionTypes.HideFormElement);
-        const declarativeRule = new DeclarativeRule().withCondition(condition1).withCondition(condition2).withAction(action);
+        const action = new Action();
+        action.setActionType(Action.actionTypes.HideFormElement);
+        const declarativeRule = new DeclarativeRule();
+        declarativeRule.addCondition(condition1);
+        declarativeRule.addCondition(condition2);
+        declarativeRule.addAction(action);
         const js = declarativeRule.getViewFilterRule('encounter');
         expect(js).to.contain(condition1JS, condition1JS);
         expect(js).to.contain(condition2JS, condition2JS);

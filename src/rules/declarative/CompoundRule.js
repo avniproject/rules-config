@@ -10,22 +10,20 @@ class CompoundRule {
 
     constructor(conjunction) {
         this.conjunction = conjunction;
-        this.rules = []
+        this.rules = [];
     }
 
     addRule(rule) {
         this.rules.push(rule);
-        return this;
     }
 
-    withConjunction(conjunction) {
+    setConjunction(conjunction) {
         const conjunctions = _.values(CompoundRule.conjunctions);
         assertTrue(_.includes(conjunctions, conjunction), `Conjunction must be one of the ${conjunctions}`);
         this.conjunction = conjunction;
-        return this;
     }
 
-    withEmptyRule() {
+    addEmptyRule() {
         const rule = new Rule();
         this.rules.push(rule);
     }
@@ -34,6 +32,12 @@ class CompoundRule {
         return _.map(this.rules, rule => rule.getJSCode()).join(`.${this.conjunction}.`).concat('.matches()');
     }
 
+    clone() {
+        const compoundRule = new CompoundRule();
+        compoundRule.conjunction = this.conjunction;
+        compoundRule.rules = _.map(this.rules, rule => rule.clone());
+        return compoundRule;
+    }
 }
 
 export default CompoundRule;

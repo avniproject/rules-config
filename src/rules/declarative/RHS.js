@@ -10,31 +10,23 @@ class RHS {
     constructor() {
     }
 
-    withType(type) {
+    setType(type) {
         const types = _.values(RHS.types);
         assertTrue(_.includes(types, type), `Types must be one of the ${types}`);
         this.type = type;
-        return this;
     }
 
-    withAnswerConceptNames(...answerConceptNames) {
+    setAnswerConceptNames(...answerConceptNames) {
         this.answerConceptNames = answerConceptNames;
-        return this;
     }
 
-    withAnswerConceptUuids(answerConceptUuids) {
+    setAnswerConceptUuids(answerConceptUuids) {
         this.answerConceptUuids = answerConceptUuids;
-        return this;
     }
 
-    withValue(value) {
+    setValue(value) {
         assertTrue(this.type === RHS.types.Value, `Type must be ${RHS.types.Value}`);
         this.value = value;
-        return this;
-    }
-
-    build() {
-        return this;
     }
 
     getJSCode() {
@@ -43,6 +35,15 @@ class RHS {
         } else {
             return this.value || '';
         }
+    }
+
+    clone() {
+        const rhs = new RHS();
+        rhs.type = this.type;
+        rhs.value = this.value;
+        rhs.answerConceptNames = this.answerConceptNames;
+        rhs.answerConceptUuids = this.answerConceptUuids;
+        return rhs;
     }
 }
 

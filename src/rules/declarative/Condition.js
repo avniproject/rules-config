@@ -12,20 +12,25 @@ class Condition {
         this.compoundRule = new CompoundRule();
     }
 
-    withConjunction(conjunction) {
+    setConjunction(conjunction) {
         const conjunctions = _.values(Condition.conjunctions);
         assertTrue(_.includes(conjunctions, conjunction), `Conjunction must be one of the ${conjunctions}`);
         this.conjunction = conjunction;
-        return this;
     }
 
-    withCompoundRule(compoundRule) {
+    setCompoundRule(compoundRule) {
         this.compoundRule = compoundRule;
-        return this;
     }
 
     getJSCode() {
         return this.compoundRule.getJSCode();
+    }
+
+    clone() {
+        const condition = new Condition();
+        condition.compoundRule = this.compoundRule.clone();
+        condition.conjunction = this.conjunction;
+        return condition;
     }
 
 }
