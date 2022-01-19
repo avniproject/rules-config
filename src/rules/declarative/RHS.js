@@ -10,6 +10,15 @@ class RHS {
     constructor() {
     }
 
+    static fromResource(json) {
+        const rhs = new RHS();
+        rhs.type = json.type;
+        rhs.value = json.value;
+        rhs.answerConceptNames = json.answerConceptNames;
+        rhs.answerConceptUuids = json.answerConceptUuids;
+        return rhs;
+    }
+
     setType(type) {
         const types = _.values(RHS.types);
         assertTrue(_.includes(types, type), `Types must be one of the ${types}`);
@@ -30,11 +39,27 @@ class RHS {
     }
 
     getJSCode() {
-        if (this.type === RHS.types.AnswerConcept) {
-            return _.map(this.answerConceptNames, ac => `"${ac}"`).toString();
-        } else {
-            return this.value || '';
+        switch (this.type) {
+            case RHS.types.AnswerConcept :
+                return this.getJSConceptAnswerNames();
+            case RHS.types.Value :
+                return this.getJSValue();
+            default:
+                return '';
         }
+    }
+
+    getJSValue() {
+        return typeof this.value === 'number' ? this.value : `"${this.value}"`;
+    }
+
+    getJSConceptAnswerNames() {
+        return _.map(this.answerConceptNames, ac => `"${ac}"`).toString();
+    }
+
+    getRuleSummary() {
+        const value = this.value ? this.getJSValue() : this.getJSConceptAnswerNames();
+        return `${_.lowerCase(this.type)} ${value}`
     }
 
     clone() {

@@ -24,6 +24,14 @@ class Rule {
         this.rhs = new RHS();
     }
 
+    static fromResource(json) {
+        const rule = new Rule();
+        rule.operator = json.operator;
+        rule.lhs = LHS.fromResource(json.lhs);
+        rule.rhs = RHS.fromResource(json.rhs);
+        return rule;
+    }
+
     setLHS(lhs) {
         this.lhs = lhs;
     }
@@ -45,6 +53,10 @@ class Rule {
     getJSCode() {
         const lhsAndOperator = `when.${this.lhs.getJSCode()}.${this.operator}`;
         return this.isRhsRequired() ? `${lhsAndOperator}(${this.rhs.getJSCode()})` : lhsAndOperator;
+    }
+
+    getRuleSummary() {
+        return `${this.lhs.getRuleSummary()} ${_.lowerCase(this.operator)} ${this.rhs.getRuleSummary()}`
     }
 
     clone() {

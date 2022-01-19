@@ -1,6 +1,7 @@
 import _ from "lodash";
 import {assertTrue} from "./Util";
 import CompoundRule from './CompoundRule';
+import {Rule} from "./index";
 
 class Condition {
     static conjunctions = {
@@ -10,6 +11,13 @@ class Condition {
 
     constructor() {
         this.compoundRule = new CompoundRule();
+    }
+
+    static fromResource(json) {
+        const condition = new Condition();
+        condition.conjunction = json.conjunction;
+        condition.compoundRule = CompoundRule.fromResource(json.compoundRule);
+        return condition;
     }
 
     setConjunction(conjunction) {
@@ -31,6 +39,14 @@ class Condition {
         condition.compoundRule = this.compoundRule.clone();
         condition.conjunction = this.conjunction;
         return condition;
+    }
+
+    getInitialCondition() {
+        const rule = new Rule();
+        const compoundRule = new CompoundRule();
+        compoundRule.addRule(rule);
+        this.setCompoundRule(compoundRule);
+        return this;
     }
 
 }

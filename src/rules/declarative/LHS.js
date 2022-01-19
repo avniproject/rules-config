@@ -48,6 +48,17 @@ class LHS {
     constructor() {
     }
 
+    static fromResource(json) {
+        const lhs = new LHS();
+        lhs.type = json.type;
+        lhs.conceptName = json.conceptName;
+        lhs.conceptUuid = json.conceptUuid;
+        lhs.conceptDataType = json.conceptDataType;
+        lhs.scope = json.scope;
+        lhs.encounterTypes = json.encounterTypes;
+        return lhs;
+    }
+
     setType(type) {
         const types = _.values(LHS.types);
         assertTrue(_.includes(types, type), `Types must be one of the ${types}`);
@@ -88,6 +99,11 @@ class LHS {
         } else {
             return this.type;
         }
+    }
+
+    getRuleSummary() {
+        const conceptRelated = _.isEmpty(this.conceptName) ? '' : ` ${this.conceptName} in ${_.lowerCase(this.scope)}`;
+        return `If ${_.lowerCase(this.type)}${conceptRelated}`
     }
 
     clone() {

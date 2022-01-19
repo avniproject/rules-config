@@ -13,6 +13,13 @@ class CompoundRule {
         this.rules = [];
     }
 
+    static fromResource(json) {
+        const compoundRule = new CompoundRule();
+        compoundRule.conjunction = json.conjunction;
+        compoundRule.rules = _.map(json.rules, rule => Rule.fromResource(rule));
+        return compoundRule;
+    }
+
     addRule(rule) {
         this.rules.push(rule);
     }
@@ -30,6 +37,10 @@ class CompoundRule {
 
     getJSCode() {
         return _.map(this.rules, rule => rule.getJSCode()).join(`.${this.conjunction}.`).concat('.matches()');
+    }
+
+    getRuleSummary() {
+        return _.map(this.rules, rule => rule.getRuleSummary()).join(` ${_.upperCase(this.conjunction)} `);
     }
 
     clone() {
