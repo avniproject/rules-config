@@ -5,5 +5,6 @@ import DeclarativeRule from "./DeclarativeRule";
 import LHS from "./LHS";
 import RHS from "./RHS";
 import Rule from "./Rule";
+import DeclarativeRuleHolder from "./DeclarativeRuleHolder";
 
-export {Action, CompoundRule, Condition, DeclarativeRule, LHS, RHS, Rule}
+export {Action, CompoundRule, Condition, DeclarativeRule, LHS, RHS, Rule, DeclarativeRuleHolder}

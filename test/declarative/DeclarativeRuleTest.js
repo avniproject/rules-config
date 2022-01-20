@@ -84,8 +84,8 @@ describe('Declarative Rule tests', () => {
         const declarativeRule = new DeclarativeRule();
         declarativeRule.addCondition(condition);
         declarativeRule.addAction(action);
-        const js = declarativeRule.getViewFilterRule('encounter');
-        expect(js).to.contain(jsCondition, jsCondition);
+        const {ruleConditions} = declarativeRule.getViewFilterRuleConditions('encounter');
+        expect(ruleConditions).to.contain(jsCondition, jsCondition);
     });
     it('should support multiple rules for one condition', function () {
         const rule1 = getRule1();
@@ -103,9 +103,9 @@ describe('Declarative Rule tests', () => {
         const declarativeRule = new DeclarativeRule();
         declarativeRule.addCondition(condition);
         declarativeRule.addAction(action1);
-        const js = declarativeRule.getViewFilterRule('encounter');
-        expect(js).to.contain(jsCondition1, jsCondition1);
-        expect(js).to.contain(jsCondition2, jsCondition2);
+        const {ruleConditions} = declarativeRule.getViewFilterRuleConditions('encounter');
+        expect(ruleConditions).to.contain(jsCondition1, jsCondition1);
+        expect(ruleConditions).to.contain(jsCondition2, jsCondition2);
     });
     it('should support multiple conditions', function () {
         const rule1 = getRule1();
@@ -127,8 +127,8 @@ describe('Declarative Rule tests', () => {
         declarativeRule.addCondition(condition1);
         declarativeRule.addCondition(condition2);
         declarativeRule.addAction(action);
-        const js = declarativeRule.getViewFilterRule('encounter');
-        expect(js).to.contain(condition1JS, condition1JS);
-        expect(js).to.contain(condition2JS, condition2JS);
+        const {ruleConditions} = declarativeRule.getViewFilterRuleConditions('encounter');
+        expect(ruleConditions).to.contain(condition1JS, condition1JS);
+        expect(ruleConditions).to.contain(condition2JS, condition2JS);
     });
 });

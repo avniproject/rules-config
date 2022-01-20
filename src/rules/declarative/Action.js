@@ -60,7 +60,7 @@ class Action {
         return action;
     }
 
-    getSummary() {
+    getRuleSummary() {
         switch (this.actionType) {
             case Action.actionTypes.ShowFormElement:
             case Action.actionTypes.HideFormElement:
