@@ -20,12 +20,12 @@ class DeclarativeRuleHolder {
         this.declarativeRules = declarativeRules;
     }
 
-    static fromResource(resources) {
+    static fromResource(declarativeRuleResources) {
         const declarativeRuleHolder = new DeclarativeRuleHolder();
-        if (_.isEmpty(resources)) {
+        if (_.isEmpty(declarativeRuleResources)) {
             declarativeRuleHolder.declarativeRules.push(DeclarativeRule.getInitialState());
         } else {
-            declarativeRuleHolder.declarativeRules = _.map(resources.declarativeRules, r => DeclarativeRule.fromResource(r))
+            declarativeRuleHolder.declarativeRules = _.map(declarativeRuleResources, r => DeclarativeRule.fromResource(r))
         }
         return declarativeRuleHolder;
     }
@@ -84,6 +84,22 @@ class DeclarativeRuleHolder {
 
     getDeclarativeRuleAtIndex(index) {
         return this.declarativeRules[index];
+    }
+
+    validate() {
+        if (!this.isEmpty()) {
+            _.forEach(this.declarativeRules, dr => dr.validate())
+        }
+    }
+
+    validateAndGetError() {
+        let errorMessage;
+        try {
+            this.validate()
+        } catch (e) {
+            errorMessage = e.message;
+        }
+        return errorMessage;
     }
 }
 

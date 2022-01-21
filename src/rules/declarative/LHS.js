@@ -116,6 +116,14 @@ class LHS {
         lhs.encounterTypes = this.encounterTypes;
         return lhs;
     }
+
+    validate() {
+        assertTrue(!_.isNil(this.type), "Type cannot be empty");
+        if (_.isEqual(this.type, LHS.types.Concept)) {
+            assertTrue(!_.isNil(this.conceptName), "Concept cannot be empty");
+            assertTrue(!_.isNil(this.scope), "Scope cannot be empty");
+        }
+    }
 }
 
 export default LHS;

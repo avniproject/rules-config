@@ -49,6 +49,10 @@ class CompoundRule {
         compoundRule.rules = _.map(this.rules, rule => rule.clone());
         return compoundRule;
     }
+
+    validate() {
+        _.forEach(this.rules, rule => rule.validate());
+    }
 }
 
 export default CompoundRule;

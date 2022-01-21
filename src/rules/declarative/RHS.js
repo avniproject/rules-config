@@ -70,6 +70,14 @@ class RHS {
         rhs.answerConceptUuids = this.answerConceptUuids;
         return rhs;
     }
+
+    validate() {
+        assertTrue(!_.isNil(this.type), "Type cannot be empty");
+        if (_.isEqual(this.type, RHS.types.Value))
+            assertTrue(!_.isNil(this.value), "Value cannot be empty");
+        if (_.isEqual(this.type, RHS.types.AnswerConcept))
+            assertTrue(!_.isEmpty(this.answerConceptNames), "Concept answers cannot be empty");
+    }
 }
 
 export default RHS;

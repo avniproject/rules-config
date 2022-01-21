@@ -74,6 +74,16 @@ class Action {
         }
     }
 
+    validate() {
+        assertTrue(!_.isNil(this.actionType), "Type in Action cannot be empty");
+        if (_.isEqual(this.actionType, Action.actionTypes.Value))
+            assertTrue(!_.isNil(this.value), "Value in Action cannot be empty");
+        if (_.isEqual(this.actionType, Action.actionTypes.ValidationError))
+            assertTrue(!_.isNil(this.validationError), "Validation error in Action cannot be empty");
+        if (_.isEqual(this.actionType, Action.actionTypes.SkipAnswers))
+            assertTrue(!_.isNil(this.answersToSkip), "Concept answers in Action cannot be empty");
+    }
+
 }
 
 export default Action;

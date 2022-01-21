@@ -49,6 +49,10 @@ class Condition {
         return this;
     }
 
+    validate() {
+        this.compoundRule.validate();
+    }
+
 }
 
 export default Condition;

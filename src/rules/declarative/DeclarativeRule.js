@@ -49,6 +49,15 @@ class DeclarativeRule {
             .value();
     }
 
+    validate() {
+        _.forEach(this.conditions, condition => condition.validate());
+        const actions = this.actions;
+        if (_.size(this.actions) > 1) {
+            actions.pop() //another action is auto assigned when last one is filled.
+        }
+        _.forEach(actions, action => action.validate());
+    }
+
     getRuleSummary() {
         const actionSummary = _.map(_.reject(this.actions, action => _.isEmpty(action.actionType)),
             action => action.getRuleSummary());

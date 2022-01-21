@@ -50,6 +50,12 @@ class Rule {
         return !_.isNil(this.operator) && !_.includes(Rule.operatorsWithNoRHS, this.operator);
     }
 
+    getRhsValueType() {
+        const {type, conceptDataType} = this.lhs;
+        const isNumeric = _.includes(LHS.numericRHSValueTypes, type) || _.includes(['Numeric', 'Id'], conceptDataType);
+        return isNumeric ? 'number' : 'text';
+    }
+
     getJSCode() {
         const lhsAndOperator = `when.${this.lhs.getJSCode()}.${this.operator}`;
         return this.isRhsRequired() ? `${lhsAndOperator}(${this.rhs.getJSCode()})` : lhsAndOperator;
@@ -65,6 +71,12 @@ class Rule {
         rule.operator = this.operator;
         rule.rhs = this.rhs.clone();
         return rule;
+    }
+
+    validate() {
+        assertTrue(!_.isNil(this.operator), "Operator cannot be empty");
+        this.rhs.validate();
+        this.isRhsRequired() && this.rhs.validate();
     }
 }
 
