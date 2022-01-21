@@ -4,20 +4,26 @@ import LHS from './LHS';
 import RHS from './RHS';
 
 class Rule {
-    static operators = {
+    static codedOperators = {
         'ContainsAnyAnswerConceptName': 'containsAnyAnswerConceptName',
         'ContainsAnswerConceptNameOtherThan': 'containsAnswerConceptNameOtherThan',
         'ContainsAnswerConceptName': 'containsAnswerConceptName',
+    };
+
+    static numericOperators = {
         'Equals': 'equals',
         'LessThan': 'lessThan',
         'LessThanOrEqualTo': 'lessThanOrEqualTo',
         'GreaterThan': 'greaterThan',
         'GreaterThanOrEqualTo': 'greaterThanOrEqualTo',
+    };
+
+    static noRHSOperators = {
         'NotDefined': 'notDefined',
         'Defined': 'defined'
     };
 
-    static operatorsWithNoRHS = ['notDefined', 'defined'];
+    static operators = {...Rule.codedOperators, ...Rule.numericOperators, ...Rule.noRHSOperators};
 
     constructor() {
         this.lhs = new LHS();
@@ -40,6 +46,26 @@ class Rule {
         this.rhs = rhs;
     }
 
+    getApplicableOperators() {
+        if (this.lhs.isCodedConcept()) {
+            return {...Rule.codedOperators, ...Rule.noRHSOperators};
+        }
+        if (this.lhs.isNumeric()) {
+            return {...Rule.numericOperators, ...Rule.noRHSOperators};
+        } else {
+            const equals = _.pickBy(Rule.numericOperators, (v, k) => v === Rule.numericOperators.Equals);
+            return {...equals, ...Rule.noRHSOperators}
+        }
+    }
+
+    getApplicableRHSTypes() {
+        if (this.lhs.isCodedConcept()) {
+            return {'AnswerConcept': RHS.types.AnswerConcept};
+        } else {
+            return {'Value': RHS.types.Value};
+        }
+    }
+
     setOperator(operator) {
         const operators = _.values(Rule.operators);
         assertTrue(_.includes(operators, operator), `Operator must be one of the ${operators}`);
@@ -47,13 +73,11 @@ class Rule {
     }
 
     isRhsRequired() {
-        return !_.isNil(this.operator) && !_.includes(Rule.operatorsWithNoRHS, this.operator);
+        return !_.includes(_.values(Rule.noRHSOperators), this.operator);
     }
 
     getRhsValueType() {
-        const {type, conceptDataType} = this.lhs;
-        const isNumeric = _.includes(LHS.numericRHSValueTypes, type) || _.includes(['Numeric', 'Id'], conceptDataType);
-        return isNumeric ? 'number' : 'text';
+        return this.lhs.isNumeric() ? 'number' : 'text';
     }
 
     getJSCode() {
@@ -74,8 +98,8 @@ class Rule {
     }
 
     validate() {
+        this.lhs.validate();
         assertTrue(!_.isNil(this.operator), "Operator cannot be empty");
-        this.rhs.validate();
         this.isRhsRequired() && this.rhs.validate();
     }
 }

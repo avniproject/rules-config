@@ -2,18 +2,24 @@ import _ from 'lodash';
 import {assertTrue} from "./Util";
 
 class LHS {
-    static types = {
+    static numericTypes = {
         'AgeInDays': 'ageInDays',
         'AgeInWeeks': 'ageInWeeks',
         'AgeInMonths': 'ageInMonths',
         'AgeInYears': 'ageInYears',
+    };
+
+    static otherTypes = {
         'LowestAddressLevelType': 'lowestAddressLevelType',
         'LowestAddressLevel': 'lowestAddressLevel',
+    };
+
+    static types = {
+        ...LHS.numericTypes,
+        ...LHS.otherTypes,
         'Gender': 'gender',
         'Concept': 'concept',
     };
-
-    static numericRHSValueTypes = ['ageInDays', 'ageInWeeks', 'ageInMonths', 'ageInYears'];
 
     static scopes = {
         'EntireEnrolment': 'entireEnrolment',
@@ -90,6 +96,26 @@ class LHS {
 
     isScopeRequired() {
         return !_.isNil(this.type) && this.type === LHS.types.Concept;
+    }
+
+    isNumeric() {
+        return _.includes(_.values(LHS.numericTypes), this.type) || _.includes(['Numeric', 'Id'], this.conceptDataType)
+    }
+
+    isOther() {
+        return _.includes(_.values(LHS.otherTypes), this.type);
+    }
+
+    isGender() {
+        return LHS.types.Gender === this.type;
+    }
+
+    isConcept() {
+        return LHS.types.Concept === this.type
+    }
+
+    isCodedConcept() {
+        return this.isConcept() && this.conceptDataType === 'Coded';
     }
 
     getJSCode() {

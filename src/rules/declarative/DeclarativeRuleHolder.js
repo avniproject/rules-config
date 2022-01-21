@@ -6,6 +6,7 @@ const getViewFilterRuleTemplate = (entityName) =>
 ({params, imports}) => {
   const ${entityName} = params.entity;
   const formElement = params.formElement;
+  const _ = imports.lodash;
   let visibility = true;
   let value = null;
   let answersToSkip = [];

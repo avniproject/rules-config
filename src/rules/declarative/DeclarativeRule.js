@@ -1,6 +1,14 @@
 import _ from 'lodash';
 import {Condition, Rule, Action, CompoundRule} from "./index";
 
+const constructSkipAnsCondition = (condition, ...answers) =>
+`if(${condition}) {
+    _.forEach([${answers}], (answer) => {
+        const answerToSkip = formElement.getAnswerWithConceptName(answer);
+        if (answerToSkip) answersToSkip.push(answerToSkip);
+    });
+};\n  `;
+
 class DeclarativeRule {
     static conjunctionToBooleanOperator = {
         'and': '&&',
@@ -99,7 +107,7 @@ class DeclarativeRule {
                     otherConditions += constructOtherCondition(visibilityCondition, `value = ${action.getJsValue()};`);
                     break;
                 case actionTypes.SkipAnswers:
-                    otherConditions += constructOtherCondition(visibilityCondition, `answersToSkip.push(${action.getJsAnswersToSkip()});`);
+                    otherConditions += constructSkipAnsCondition(visibilityCondition, action.getJsAnswersToSkip());
                     break;
                 case actionTypes.ValidationError:
                     otherConditions += constructOtherCondition(visibilityCondition, `validationErrors.push("${action.validationError}");`);

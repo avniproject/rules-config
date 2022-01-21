@@ -7,6 +7,12 @@ class RHS {
         'Value': 'value',
     };
 
+    static genderOptions = [
+        {value: 'Male', label: 'Male'},
+        {value: 'Female', label: 'Female'},
+        {value: 'Other', label: 'Other'},
+    ];
+
     constructor() {
     }
 

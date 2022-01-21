@@ -2,12 +2,16 @@ import {assertTrue} from "./Util";
 import _ from "lodash";
 
 class Action {
-    static actionTypes = {
+    static formElementActionTypes = {
         'ShowFormElement': 'showFormElement',
         'HideFormElement': 'hideFormElement',
         'Value': 'value',
         'SkipAnswers': 'skipAnswers',
         'ValidationError': 'validationError',
+    };
+
+    static actionTypes = {
+        ...Action.formElementActionTypes
     };
 
     constructor() {
