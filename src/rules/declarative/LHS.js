@@ -21,6 +21,63 @@ class LHS {
         'Concept': 'concept',
     };
 
+    static noPersonTypes = {
+        ...LHS.otherTypes,
+        'Concept': 'concept',
+    };
+
+    static formTypeToScopeMap = {
+        IndividualProfile: {'ThisRegistration': 'thisRegistration', 'ThisDecisions': 'thisDecisions',},
+        IndividualEncounterCancellation: {
+            'ThisRegistration': 'thisRegistration',
+            'ThisEncounter': 'thisEncounter',
+            'LatestInAllVisits': 'latestInAllVisits',
+            'LatestInPreviousVisits': 'latestInPreviousVisits',
+            'LastVisit': 'lastVisit',
+            'ThisCancelEncounter': 'thisCancelEncounter',
+            'ThisDecisions': 'thisDecisions',
+        },
+        Encounter: {
+            'ThisRegistration': 'thisRegistration',
+            'ThisEncounter': 'thisEncounter',
+            'LatestInAllVisits': 'latestInAllVisits',
+            'LatestInPreviousVisits': 'latestInPreviousVisits',
+            'LastVisit': 'lastVisit',
+            'ThisDecisions': 'thisDecisions',
+        },
+        ProgramEnrolment: {
+            'ThisEnrolment': 'thisEnrolment',
+            'ThisRegistration': 'thisRegistration',
+            'EntireEnrolment': 'entireEnrolment',
+            'ThisDecisions': 'thisDecisions',
+        },
+        ProgramExit: {
+            'ThisExit': 'thisExit', 'ThisEnrolment': 'thisEnrolment',
+            'ThisRegistration': 'thisRegistration',
+            'EntireEnrolment': 'entireEnrolment',
+            'ThisDecisions': 'thisDecisions',
+        },
+        ProgramEncounter: {
+            'LatestInEntireEnrolment': 'latestInEntireEnrolment',
+            'LatestInAllVisits': 'latestInAllVisits',
+            'ThisDecisions': 'thisDecisions',
+        },
+        ProgramEncounterCancellation: {
+            'ThisRegistration': 'thisRegistration',
+            'ThisEncounter': 'thisEncounter',
+            'LatestInEntireEnrolment': 'latestInEntireEnrolment',
+            'LatestInAllVisits': 'latestInAllVisits',
+            'LatestInPreviousVisits': 'latestInPreviousVisits',
+            'LastVisit': 'lastVisit',
+            'ThisCancelEncounter': 'thisCancelEncounter',
+            'ThisDecisions': 'thisDecisions',
+        },
+        ChecklistItem: {
+            'ThisChecklistItem': 'thisChecklistItem',
+            'ThisDecisions': 'thisDecisions',
+        },
+    };
+
     static scopes = {
         'EntireEnrolment': 'entireEnrolment',
         'LatestInAllVisits': 'latestInAllVisits',
@@ -63,6 +120,15 @@ class LHS {
         lhs.scope = json.scope;
         lhs.encounterTypes = json.encounterTypes;
         return lhs;
+    }
+
+    static getTypesBySubjectType(isPerson) {
+        return isPerson ? LHS.types : LHS.noPersonTypes;
+    }
+
+    static getScopeByFormType(formType) {
+        const formTypeScopes = LHS.formTypeToScopeMap[formType];
+        return _.isEmpty(formTypeScopes) ? LHS.scopes : formTypeScopes;
     }
 
     setType(type) {

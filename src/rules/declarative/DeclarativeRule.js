@@ -43,6 +43,10 @@ class DeclarativeRule {
         this.actions.push(action);
     }
 
+    containActionType(type) {
+        return _.some(this.actions, ({actionType}) => actionType === type);
+    }
+
     clone() {
         const declarativeRule = new DeclarativeRule();
         declarativeRule.conditions = _.map(this.conditions, condition => condition.clone());

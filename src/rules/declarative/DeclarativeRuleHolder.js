@@ -1,5 +1,5 @@
 import _ from 'lodash';
-import {DeclarativeRule} from "./index";
+import {Action, DeclarativeRule} from "./index";
 
 const getViewFilterRuleTemplate = (entityName) =>
     `'use strict';
@@ -101,6 +101,14 @@ class DeclarativeRuleHolder {
             errorMessage = e.message;
         }
         return errorMessage;
+    }
+
+    getApplicableViewFilterActions() {
+        const viewFilterTypes = Action.formElementActionTypes;
+        const showFE = viewFilterTypes.ShowFormElement;
+        const hideFE = viewFilterTypes.HideFormElement;
+        const isVisibilityDefined = _.some(this.declarativeRules, dr => dr.containActionType(showFE) || dr.containActionType(hideFE));
+        return isVisibilityDefined ? _.omitBy(viewFilterTypes, (v, k) => _.includes([showFE, hideFE], v)) : viewFilterTypes;
     }
 }
 
