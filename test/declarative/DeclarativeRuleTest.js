@@ -12,10 +12,12 @@ function getRule1() {
     const lhs = new LHS();
     lhs.setType(LHS.types.Concept);
     lhs.setConceptName("Demo");
+    lhs.setConceptUuid("Demo");
     lhs.setScope(LHS.scopes.ThisEncounter);
     const rhs = new RHS();
     rhs.setType(RHS.types.AnswerConcept);
     rhs.setAnswerConceptNames('a', 'b');
+    rhs.setAnswerConceptUuids('a', 'b');
     const rule = new Rule();
     rule.setLHS(lhs);
     rule.setOperator(Rule.operators.ContainsAnyAnswerConceptName);
@@ -27,6 +29,7 @@ function getRule2() {
     const lhs = new LHS();
     lhs.setType(LHS.types.Concept);
     lhs.setConceptName("Numeric");
+    lhs.setConceptUuid("Numeric");
     lhs.setScope(LHS.scopes.EntireEnrolment);
     const rhs = new RHS();
     rhs.setType(RHS.types.Value);
@@ -49,7 +52,7 @@ function getRuleCondition() {
 
 describe('Declarative Rule tests', () => {
     it('should create a proper json', function () {
-        const NameIsTestRuleJSON = '{"conditions":[{"compoundRule":{"rules":[{"lhs":{"type":"concept","conceptName":"Demo","scope":"thisEncounter"},"rhs":{"type":"answerConcept","answerConceptNames":["a","b"]},"operator":"containsAnyAnswerConceptName"}]}}],"actions":[{"actionType":"showFormElement"}]}';
+        const NameIsTestRuleJSON = '{"conditions":[{"compoundRule":{"rules":[{"lhs":{"type":"concept","conceptName":"Demo","conceptUuid":"Demo","scope":"thisEncounter"},"rhs":{"type":"answerConcept","answerConceptNames":["a","b"],"answerConceptUuids":["a","b"]},"operator":"containsAnyAnswerConceptName"}]}}],"actions":[{"actionType":"showFormElement"}]}';
         const condition = getRuleCondition();
         const action = new Action();
         action.setActionType(Action.actionTypes.ShowFormElement);
@@ -84,7 +87,7 @@ describe('Declarative Rule tests', () => {
         const declarativeRule = new DeclarativeRule();
         declarativeRule.addCondition(condition);
         declarativeRule.addAction(action);
-        const {ruleConditions} = declarativeRule.getViewFilterRuleConditions('encounter');
+        const {ruleConditions} = declarativeRule.getRuleConditions('encounter');
         expect(ruleConditions).to.contain(jsCondition, jsCondition);
     });
     it('should support multiple rules for one condition', function () {
@@ -103,7 +106,7 @@ describe('Declarative Rule tests', () => {
         const declarativeRule = new DeclarativeRule();
         declarativeRule.addCondition(condition);
         declarativeRule.addAction(action1);
-        const {ruleConditions} = declarativeRule.getViewFilterRuleConditions('encounter');
+        const {ruleConditions} = declarativeRule.getRuleConditions('encounter');
         expect(ruleConditions).to.contain(jsCondition1, jsCondition1);
         expect(ruleConditions).to.contain(jsCondition2, jsCondition2);
     });
@@ -127,7 +130,7 @@ describe('Declarative Rule tests', () => {
         declarativeRule.addCondition(condition1);
         declarativeRule.addCondition(condition2);
         declarativeRule.addAction(action);
-        const {ruleConditions} = declarativeRule.getViewFilterRuleConditions('encounter');
+        const {ruleConditions} = declarativeRule.getRuleConditions('encounter');
         expect(ruleConditions).to.contain(condition1JS, condition1JS);
         expect(ruleConditions).to.contain(condition2JS, condition2JS);
     });

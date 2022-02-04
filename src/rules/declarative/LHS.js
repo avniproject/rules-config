@@ -187,7 +187,7 @@ class LHS {
     getJSCode() {
         if (this.scope) {
             const functionMap = LHS.scopeToRuleFunctionMap;
-            return `${functionMap[this.scope]}("${this.conceptName}")`;
+            return `${functionMap[this.scope]}("${this.conceptUuid}")`;
         } else {
             return this.type;
         }

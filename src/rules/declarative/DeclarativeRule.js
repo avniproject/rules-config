@@ -4,7 +4,7 @@ import {Condition, Rule, Action, CompoundRule} from "./index";
 const constructSkipAnsCondition = (condition, ...answers) =>
 `if(${condition}) {
     _.forEach([${answers}], (answer) => {
-        const answerToSkip = formElement.getAnswerWithConceptName(answer);
+        const answerToSkip = formElement.getAnswerWithConceptUuid(answer);
         if (answerToSkip) answersToSkip.push(answerToSkip);
     });
 };\n  `;
@@ -84,7 +84,7 @@ class DeclarativeRule {
         return {actionSummary, ruleSummary, conjunctions};
     }
 
-    getViewFilterRuleConditions(entityName, conditionAppender = '') {
+    getRuleConditions(entityName, conditionAppender = '') {
         const baseRuleCondition = `new imports.rulesConfig.RuleCondition({${entityName}, formElement}).$RULE_CONDITION`;
         const constructOtherCondition = (condition, action) => `if(${condition}) ${action} \n  `;
         let ruleConditions = '';
@@ -102,16 +102,18 @@ class DeclarativeRule {
             const visibilityCondition = visibilityConditions.join(' ');
             switch (action.actionType) {
                 case actionTypes.ShowFormElement:
+                case actionTypes.ShowFormElementGroup:
                     otherConditions += `visibility = ${visibilityCondition};\n  `;
                     break;
                 case actionTypes.HideFormElement:
+                case actionTypes.HideFormElementGroup:
                     otherConditions += `visibility = !(${visibilityCondition});\n  `;
                     break;
                 case actionTypes.Value:
                     otherConditions += constructOtherCondition(visibilityCondition, `value = ${action.getJsValue()};`);
                     break;
                 case actionTypes.SkipAnswers:
-                    otherConditions += constructSkipAnsCondition(visibilityCondition, action.getJsAnswersToSkip());
+                    otherConditions += constructSkipAnsCondition(visibilityCondition, action.getJsAnswerUUIDsToSkip());
                     break;
                 case actionTypes.ValidationError:
                     otherConditions += constructOtherCondition(visibilityCondition, `validationErrors.push("${action.validationError}");`);

@@ -35,7 +35,7 @@ class RHS {
         this.answerConceptNames = answerConceptNames;
     }
 
-    setAnswerConceptUuids(answerConceptUuids) {
+    setAnswerConceptUuids(...answerConceptUuids) {
         this.answerConceptUuids = answerConceptUuids;
     }
 
@@ -47,7 +47,7 @@ class RHS {
     getJSCode() {
         switch (this.type) {
             case RHS.types.AnswerConcept :
-                return this.getJSConceptAnswerNames();
+                return this.getJSConceptAnswerUUIDs();
             case RHS.types.Value :
                 return this.getJSValue();
             default:
@@ -61,6 +61,10 @@ class RHS {
 
     getJSConceptAnswerNames() {
         return _.map(this.answerConceptNames, ac => `"${ac}"`).toString();
+    }
+
+    getJSConceptAnswerUUIDs() {
+        return _.map(this.answerConceptUuids, ac => `"${ac}"`).toString();
     }
 
     getRuleSummary() {

@@ -10,8 +10,14 @@ class Action {
         'ValidationError': 'validationError',
     };
 
+    static formElementGroupActionTypes = {
+        'ShowFormElementGroup': 'showFormElementGroup',
+        'HideFormElementGroup': 'hideFormElementGroup',
+    };
+
     static actionTypes = {
-        ...Action.formElementActionTypes
+        ...Action.formElementActionTypes,
+        ...Action.formElementGroupActionTypes,
     };
 
     constructor() {
@@ -22,6 +28,7 @@ class Action {
         action.actionType = json.actionType;
         action.value = json.value;
         action.answersToSkip = json.answersToSkip;
+        action.answerUuidsToSkip = json.answerUuidsToSkip;
         action.validationError = json.validationError;
         return action;
     }
@@ -42,6 +49,11 @@ class Action {
         this.answersToSkip = [...value];
     }
 
+    setAnswerUUIDsToSkip(...value) {
+        assertTrue(this.actionType === Action.actionTypes.SkipAnswers, 'Action type must be SkipAnswers');
+        this.answerUuidsToSkip = [...value];
+    }
+
     setValidationError(error) {
         assertTrue(this.actionType === Action.actionTypes.ValidationError, 'Action type must be ValidationError');
         this.validationError = error;
@@ -55,11 +67,16 @@ class Action {
         return _.map(this.answersToSkip, ac => `"${ac}"`).toString();
     }
 
+    getJsAnswerUUIDsToSkip() {
+        return _.map(this.answerUuidsToSkip, ac => `"${ac}"`).toString();
+    }
+
     clone() {
         const action = new Action();
         action.actionType = this.actionType;
         action.value = this.value;
         action.answersToSkip = this.answersToSkip;
+        action.answerUuidsToSkip = this.answerUuidsToSkip;
         action.validationError = this.validationError;
         return action;
     }
@@ -68,6 +85,8 @@ class Action {
         switch (this.actionType) {
             case Action.actionTypes.ShowFormElement:
             case Action.actionTypes.HideFormElement:
+            case Action.actionTypes.ShowFormElementGroup:
+            case Action.actionTypes.HideFormElementGroup:
                 return `${_.startCase(this.actionType)}.`;
             case Action.actionTypes.Value:
                 return `Display value ${this.value}.`;
