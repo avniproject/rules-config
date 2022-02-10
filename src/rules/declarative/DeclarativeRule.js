@@ -43,8 +43,8 @@ class DeclarativeRule {
         this.actions.push(action);
     }
 
-    containActionType(type) {
-        return _.some(this.actions, ({actionType}) => actionType === type);
+    containActionType(...type) {
+        return _.some(this.actions, ({actionType}) => _.includes(type, actionType));
     }
 
     clone() {
@@ -88,39 +88,43 @@ class DeclarativeRule {
         const baseRuleCondition = `new imports.rulesConfig.RuleCondition({${entityName}, formElement}).$RULE_CONDITION`;
         const constructOtherCondition = (condition, action) => `if(${condition}) ${action} \n  `;
         let ruleConditions = '';
-        let visibilityConditions = [];
-        let otherConditions = '';
+        let matchesConditions = [];
+        let actionConditions = '';
         _.forEach(this.conditions, ({compoundRule, conjunction}, index) => {
             const conditionName = `condition${index + 1}${conditionAppender}`;
             const operator = (index + 1) < _.size(this.conditions) ? DeclarativeRule.conjunctionToBooleanOperator[conjunction] : '';
-            visibilityConditions.push(`${conditionName} ${operator}`);
+            matchesConditions.push(`${conditionName} ${operator}`);
             const ruleCondition = baseRuleCondition.replace('$RULE_CONDITION', compoundRule.getJSCode());
             ruleConditions += `const ${conditionName} = ${ruleCondition};\n  `;
         });
         _.forEach(this.actions, (action) => {
             const actionTypes = Action.actionTypes;
-            const visibilityCondition = visibilityConditions.join(' ');
+            const matchesCondition = matchesConditions.join(' ');
             switch (action.actionType) {
                 case actionTypes.ShowFormElement:
                 case actionTypes.ShowFormElementGroup:
-                    otherConditions += `visibility = ${visibilityCondition};\n  `;
+                    actionConditions += `visibility = ${matchesCondition};\n  `;
                     break;
                 case actionTypes.HideFormElement:
                 case actionTypes.HideFormElementGroup:
-                    otherConditions += `visibility = !(${visibilityCondition});\n  `;
+                    actionConditions += `visibility = !(${matchesCondition});\n  `;
                     break;
                 case actionTypes.Value:
-                    otherConditions += constructOtherCondition(visibilityCondition, `value = ${action.getJsValue()};`);
+                    actionConditions += constructOtherCondition(matchesCondition, `value = ${action.getJsValue()};`);
                     break;
                 case actionTypes.SkipAnswers:
-                    otherConditions += constructSkipAnsCondition(visibilityCondition, action.getJsAnswerUUIDsToSkip());
+                    actionConditions += constructSkipAnsCondition(matchesCondition, action.getJsAnswerUUIDsToSkip());
                     break;
                 case actionTypes.ValidationError:
-                    otherConditions += constructOtherCondition(visibilityCondition, `validationErrors.push("${action.validationError}");`);
+                    actionConditions += constructOtherCondition(matchesCondition, `validationErrors.push("${action.validationError}");`);
+                    break;
+                case actionTypes.ShowEncounterType:
+                case actionTypes.ShowProgram:
+                    actionConditions += `eligibility = ${matchesCondition};\n  `;
                     break;
             }
         });
-        return {ruleConditions, otherConditions};
+        return {ruleConditions, actionConditions};
     }
 
 }

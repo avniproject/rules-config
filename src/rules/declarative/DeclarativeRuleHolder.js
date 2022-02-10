@@ -1,37 +1,6 @@
 import _ from 'lodash';
 import {Action, DeclarativeRule} from "./index";
-
-const getViewFilterRuleTemplate = (entityName) =>
-    `'use strict';
-({params, imports}) => {
-  const ${entityName} = params.entity;
-  const formElement = params.formElement;
-  const _ = imports.lodash;
-  let visibility = true;
-  let value = null;
-  let answersToSkip = [];
-  let validationErrors = [];
-  $RULE_CONDITIONS
-  $OTHER_CONDITIONS
-  return new imports.rulesConfig.FormElementStatus(formElement.uuid, visibility, value, answersToSkip, validationErrors);
-};`;
-
-
-const getFormElementGroupRuleTemplate = (entityName) =>
-`'use strict';
-({params, imports}) => {
-    const ${entityName} = params.entity;
-    const formElementGroup = params.formElementGroup;
-    const _ = imports.lodash;
-    let visibility = true;
-    return formElementGroup.formElements.map((formElement) => {
-        $RULE_CONDITIONS
-        $OTHER_CONDITIONS
-        return new imports.rulesConfig.FormElementStatus(formElement.uuid, visibility, null);
-    });
-};
-
-`;
+import {getEligibilityRuleTemplate, getFormElementGroupRuleTemplate, getViewFilterRuleTemplate} from "./Util";
 
 class DeclarativeRuleHolder {
     constructor(declarativeRules = []) {
@@ -49,30 +18,38 @@ class DeclarativeRuleHolder {
     }
 
     generateViewFilterRule(entityName) {
-        const {ruleConditionArray, otherConditionArray} = this.getAllRuleConditions(entityName);
+        const {ruleConditionArray, actionConditionArray} = this.getAllRuleConditions(entityName);
         const viewFilterRuleTemplate = getViewFilterRuleTemplate(entityName);
         return viewFilterRuleTemplate
             .replace('$RULE_CONDITIONS', ruleConditionArray.join('  '))
-            .replace('$OTHER_CONDITIONS', otherConditionArray.join('  '));
+            .replace('$ACTION_CONDITIONS', actionConditionArray.join('  '));
     }
 
     generateFormElementGroupRule(entityName) {
-        const {ruleConditionArray, otherConditionArray} = this.getAllRuleConditions(entityName);
+        const {ruleConditionArray, actionConditionArray} = this.getAllRuleConditions(entityName);
         const formElementGroupRuleTemplate = getFormElementGroupRuleTemplate(entityName);
         return formElementGroupRuleTemplate
             .replace('$RULE_CONDITIONS', ruleConditionArray.join('  '))
-            .replace('$OTHER_CONDITIONS', otherConditionArray.join('  '));
+            .replace('$ACTION_CONDITIONS', actionConditionArray.join('  '));
+    }
+
+    generateEligibilityRule() {
+        const {ruleConditionArray, actionConditionArray} = this.getAllRuleConditions('individual');
+        const eligibilityRuleTemplate = getEligibilityRuleTemplate();
+        return eligibilityRuleTemplate
+            .replace('$RULE_CONDITIONS', ruleConditionArray.join('  '))
+            .replace('$ACTION_CONDITIONS', actionConditionArray.join('  '));
     }
 
     getAllRuleConditions(entityName) {
         const ruleConditionArray = [];
-        const otherConditionArray = [];
+        const actionConditionArray = [];
         _.forEach(this.declarativeRules, (declarativeRule, index) => {
-            const {ruleConditions, otherConditions} = declarativeRule.getRuleConditions(entityName, index + 1);
+            const {ruleConditions, actionConditions} = declarativeRule.getRuleConditions(entityName, index + 1);
             ruleConditionArray.push(ruleConditions);
-            otherConditionArray.push(otherConditions);
+            actionConditionArray.push(actionConditions);
         });
-        return {ruleConditionArray, otherConditionArray};
+        return {ruleConditionArray, actionConditionArray};
     }
 
     generateRuleSummary() {
@@ -137,14 +114,26 @@ class DeclarativeRuleHolder {
         const viewFilterTypes = Action.formElementActionTypes;
         const showFE = viewFilterTypes.ShowFormElement;
         const hideFE = viewFilterTypes.HideFormElement;
-        const isVisibilityDefined = _.some(this.declarativeRules, dr => dr.containActionType(showFE) || dr.containActionType(hideFE));
+        const isVisibilityDefined = _.some(this.declarativeRules, dr => dr.containActionType(showFE, hideFE));
         return isVisibilityDefined ? _.omitBy(viewFilterTypes, (v, k) => _.includes([showFE, hideFE], v)) : viewFilterTypes;
     }
 
-    getApplicableFromElementGroupRuleActions() {
-        const {ShowFormElementGroup, HideFormElementGroup} = Action.formElementGroupActionTypes;
-        const isVisibilityDefined = _.some(this.declarativeRules, dr => dr.containActionType(ShowFormElementGroup) || dr.containActionType(HideFormElementGroup));
-        return isVisibilityDefined ? {} : Action.formElementGroupActionTypes;
+    getApplicableFormElementGroupRuleActions() {
+        const {ShowFormElementGroup, HideFormElementGroup} = Action.actionTypes;
+        const isVisibilityDefined = _.some(this.declarativeRules, dr => dr.containActionType(ShowFormElementGroup, HideFormElementGroup));
+        return isVisibilityDefined ? {} : {ShowFormElementGroup, HideFormElementGroup};
+    }
+
+    getApplicableEncounterEligibilityActions() {
+        const {ShowEncounterType} = Action.actionTypes;
+        const isDefined = _.some(this.declarativeRules, dr => dr.containActionType(ShowEncounterType));
+        return isDefined ? {} : {ShowEncounterType};
+    }
+
+    getApplicableEnrolmentEligibilityActions() {
+        const {ShowProgram} = Action.actionTypes;
+        const isDefined = _.some(this.declarativeRules, dr => dr.containActionType(ShowProgram));
+        return isDefined ? {} : {ShowProgram};
     }
 }
 

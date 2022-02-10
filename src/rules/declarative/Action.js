@@ -10,14 +10,12 @@ class Action {
         'ValidationError': 'validationError',
     };
 
-    static formElementGroupActionTypes = {
-        'ShowFormElementGroup': 'showFormElementGroup',
-        'HideFormElementGroup': 'hideFormElementGroup',
-    };
-
     static actionTypes = {
         ...Action.formElementActionTypes,
-        ...Action.formElementGroupActionTypes,
+        'ShowFormElementGroup': 'showFormElementGroup',
+        'HideFormElementGroup': 'hideFormElementGroup',
+        'ShowProgram': 'showProgram',
+        'ShowEncounterType': 'showEncounterType',
     };
 
     constructor() {
@@ -83,17 +81,13 @@ class Action {
 
     getRuleSummary() {
         switch (this.actionType) {
-            case Action.actionTypes.ShowFormElement:
-            case Action.actionTypes.HideFormElement:
-            case Action.actionTypes.ShowFormElementGroup:
-            case Action.actionTypes.HideFormElementGroup:
-                return `${_.startCase(this.actionType)}.`;
             case Action.actionTypes.Value:
                 return `Display value ${this.value}.`;
             case Action.actionTypes.SkipAnswers:
                 return `Hide answers ${this.getJsAnswersToSkip()}.`;
             case Action.actionTypes.ValidationError:
-                return `Raise error "${this.validationError}".`
+                return `Raise error "${this.validationError}".`;
+            default: return `${_.startCase(this.actionType)}.`;
         }
     }
 
