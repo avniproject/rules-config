@@ -122,6 +122,8 @@ class DeclarativeRule {
                 case actionTypes.ShowProgram:
                     actionConditions += `eligibility = ${matchesCondition};\n  `;
                     break;
+                case actionTypes.FormValidationError:
+                    actionConditions += constructOtherCondition(matchesCondition, `validationResults.push(createValidationError("${action.validationError}"));`);
             }
         });
         return {ruleConditions, actionConditions};

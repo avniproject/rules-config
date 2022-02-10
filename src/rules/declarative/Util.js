@@ -40,3 +40,14 @@ export const getEligibilityRuleTemplate = () =>
   $RULE_CONDITIONS
   return $ACTION_CONDITIONS
 };`;
+
+export const getFormValidationErrorRuleTemplate = (entityName) =>
+`'use strict';
+({params, imports}) => {
+  const ${entityName} = params.entity;
+  const createValidationError = imports.common.createValidationError;
+  const validationResults = [];
+  $RULE_CONDITIONS
+  $ACTION_CONDITIONS
+  return validationResults;
+};`;

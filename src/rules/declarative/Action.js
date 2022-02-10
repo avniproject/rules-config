@@ -16,6 +16,7 @@ class Action {
         'HideFormElementGroup': 'hideFormElementGroup',
         'ShowProgram': 'showProgram',
         'ShowEncounterType': 'showEncounterType',
+        'FormValidationError': 'formValidationError',
     };
 
     constructor() {
@@ -53,7 +54,7 @@ class Action {
     }
 
     setValidationError(error) {
-        assertTrue(this.actionType === Action.actionTypes.ValidationError, 'Action type must be ValidationError');
+        assertTrue(_.includes([Action.actionTypes.ValidationError, Action.actionTypes.FormValidationError], this.actionType) , 'Action type must be ValidationError or FormValidationError');
         this.validationError = error;
     }
 
@@ -86,6 +87,7 @@ class Action {
             case Action.actionTypes.SkipAnswers:
                 return `Hide answers ${this.getJsAnswersToSkip()}.`;
             case Action.actionTypes.ValidationError:
+            case Action.actionTypes.FormValidationError:
                 return `Raise error "${this.validationError}".`;
             default: return `${_.startCase(this.actionType)}.`;
         }
@@ -95,7 +97,7 @@ class Action {
         assertTrue(!_.isNil(this.actionType), "Type in Action cannot be empty");
         if (_.isEqual(this.actionType, Action.actionTypes.Value))
             assertTrue(!_.isNil(this.value), "Value in Action cannot be empty");
-        if (_.isEqual(this.actionType, Action.actionTypes.ValidationError))
+        if (_.includes([Action.actionTypes.ValidationError, Action.actionTypes.FormValidationError], this.actionType))
             assertTrue(!_.isNil(this.validationError), "Validation error in Action cannot be empty");
         if (_.isEqual(this.actionType, Action.actionTypes.SkipAnswers))
             assertTrue(!_.isNil(this.answersToSkip), "Concept answers in Action cannot be empty");

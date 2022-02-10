@@ -1,6 +1,11 @@
 import _ from 'lodash';
 import {Action, DeclarativeRule} from "./index";
-import {getEligibilityRuleTemplate, getFormElementGroupRuleTemplate, getViewFilterRuleTemplate} from "./Util";
+import {
+    getEligibilityRuleTemplate,
+    getFormElementGroupRuleTemplate,
+    getFormValidationErrorRuleTemplate,
+    getViewFilterRuleTemplate
+} from "./Util";
 
 class DeclarativeRuleHolder {
     constructor(declarativeRules = []) {
@@ -37,6 +42,14 @@ class DeclarativeRuleHolder {
         const {ruleConditionArray, actionConditionArray} = this.getAllRuleConditions('individual');
         const eligibilityRuleTemplate = getEligibilityRuleTemplate();
         return eligibilityRuleTemplate
+            .replace('$RULE_CONDITIONS', ruleConditionArray.join('  '))
+            .replace('$ACTION_CONDITIONS', actionConditionArray.join('  '));
+    }
+
+    generateFormValidationRule(entityName) {
+        const {ruleConditionArray, actionConditionArray} = this.getAllRuleConditions(entityName);
+        const formValidationErrorRuleTemplate = getFormValidationErrorRuleTemplate(entityName);
+        return formValidationErrorRuleTemplate
             .replace('$RULE_CONDITIONS', ruleConditionArray.join('  '))
             .replace('$ACTION_CONDITIONS', actionConditionArray.join('  '));
     }
@@ -134,6 +147,10 @@ class DeclarativeRuleHolder {
         const {ShowProgram} = Action.actionTypes;
         const isDefined = _.some(this.declarativeRules, dr => dr.containActionType(ShowProgram));
         return isDefined ? {} : {ShowProgram};
+    }
+
+    getApplicableFormValidationRuleActions() {
+        return _.pick(Action.actionTypes, ['FormValidationError']);
     }
 }
 
