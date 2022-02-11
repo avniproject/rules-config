@@ -1,8 +1,8 @@
 import _ from 'lodash';
-import {Condition, Rule, Action, CompoundRule} from "./index";
+import {Condition, Rule, Action, CompoundRule, VisitScheduleActionDetails} from "./index";
 
 const constructSkipAnsCondition = (condition, ...answers) =>
-`if(${condition}) {
+    `if(${condition}) {
     _.forEach([${answers}], (answer) => {
         const answerToSkip = formElement.getAnswerWithConceptUuid(answer);
         if (answerToSkip) answersToSkip.push(answerToSkip);
@@ -87,7 +87,7 @@ class DeclarativeRule {
     getRuleConditions(entityName, conditionAppender = '', ignoreFormElementInContext) {
         const context = ignoreFormElementInContext ? `{${entityName}}` : `{${entityName}, formElement}`;
         const baseRuleCondition = `new imports.rulesConfig.RuleCondition(${context}).$RULE_CONDITION`;
-        const constructOtherCondition = (condition, action) => `if(${condition}) ${action} \n  `;
+        const constructOtherCondition = (condition, action) => `if(${condition}){\n    ${action}  \n}\n  `;
         let ruleConditions = '';
         let matchesConditions = [];
         let actionConditions = '';
@@ -131,6 +131,9 @@ class DeclarativeRule {
                     actionConditions += constructOtherCondition(matchesCondition, `${actionDetails.scope}Decisions.push({name: "${actionDetails.conceptName}", value: ${actionDetails.getJsValue()}});`);
                     break;
                 }
+                case actionTypes.ScheduleVisit:
+                    actionConditions += constructOtherCondition(matchesCondition, VisitScheduleActionDetails.buildVisitScheduleAction(_.get(action, 'details'), entityName));
+                    break;
             }
         });
         return {ruleConditions, actionConditions};

@@ -5,7 +5,7 @@ import {
     getEligibilityRuleTemplate,
     getFormElementGroupRuleTemplate,
     getFormValidationErrorRuleTemplate,
-    getViewFilterRuleTemplate
+    getViewFilterRuleTemplate, getVisitScheduleRuleTemplate
 } from "./Util";
 
 class DeclarativeRuleHolder {
@@ -59,6 +59,14 @@ class DeclarativeRuleHolder {
         const {ruleConditionArray, actionConditionArray} = this.getAllRuleConditions(entityName, true);
         const decisionRuleTemplate = getDecisionRuleTemplate(entityName);
         return decisionRuleTemplate
+            .replace('$RULE_CONDITIONS', ruleConditionArray.join('  '))
+            .replace('$ACTION_CONDITIONS', actionConditionArray.join('  '));
+    }
+
+    generateVisitScheduleRule(entityName) {
+        const {ruleConditionArray, actionConditionArray} = this.getAllRuleConditions(entityName, true);
+        const visitScheduleRuleTemplate = getVisitScheduleRuleTemplate(entityName);
+        return visitScheduleRuleTemplate
             .replace('$RULE_CONDITIONS', ruleConditionArray.join('  '))
             .replace('$ACTION_CONDITIONS', actionConditionArray.join('  '));
     }
@@ -162,8 +170,12 @@ class DeclarativeRuleHolder {
         return _.pick(Action.actionTypes, ['FormValidationError']);
     }
 
-    getApplicableDecisionRulActions() {
+    getApplicableDecisionRuleActions() {
         return _.pick(Action.actionTypes, ['AddDecision']);
+    }
+
+    getApplicableVisitScheduleRuleActions() {
+        return _.pick(Action.actionTypes, ['ScheduleVisit']);
     }
 }
 

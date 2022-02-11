@@ -9,6 +9,7 @@ import DeclarativeRuleHolder from "./DeclarativeRuleHolder";
 import AddDecisionActionDetails from "./AddDecisionActionDetails";
 import FormValidationActionDetails from "./FormValidationActionDetails";
 import ViewFilterActionDetails from "./ViewFilterActionDetails";
+import VisitScheduleActionDetails from "./VisitScheduleActionDetails";
 
 export {
     Action,
@@ -21,5 +22,6 @@ export {
     DeclarativeRuleHolder,
     AddDecisionActionDetails,
     FormValidationActionDetails,
-    ViewFilterActionDetails
+    ViewFilterActionDetails,
+    VisitScheduleActionDetails
 }

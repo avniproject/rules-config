@@ -1,8 +1,11 @@
 import {assertTrue} from "./Util";
 import _ from "lodash";
-import ViewFilterActionDetails from "./ViewFilterActionDetails";
-import FormValidationActionDetails from "./FormValidationActionDetails";
-import AddDecisionActionDetails from "./AddDecisionActionDetails";
+import {
+    VisitScheduleActionDetails,
+    ViewFilterActionDetails,
+    AddDecisionActionDetails,
+    FormValidationActionDetails
+} from "./index";
 
 class Action {
     static formElementActionTypes = {
@@ -21,6 +24,7 @@ class Action {
         'ShowEncounterType': 'showEncounterType',
         'FormValidationError': 'formValidationError',
         'AddDecision': 'addDecision',
+        'ScheduleVisit': 'scheduleVisit',
     };
 
     constructor() {
@@ -37,6 +41,8 @@ class Action {
             action.details = FormValidationActionDetails.fromResource(actionDetails);
         } else if (json.actionType === Action.actionTypes.AddDecision) {
             action.details = AddDecisionActionDetails.fromResource(actionDetails);
+        } else if (json.actionType === Action.actionTypes.ScheduleVisit) {
+            action.details = VisitScheduleActionDetails.fromResource(actionDetails);
         }
         return action;
     }
@@ -51,6 +57,8 @@ class Action {
             this.details = new FormValidationActionDetails();
         } else if (this.isAddDecisionAction()) {
             this.details = new AddDecisionActionDetails();
+        } else if (this.isVisitScheduleAction()) {
+            this.details = new VisitScheduleActionDetails();
         }
     }
 
@@ -69,6 +77,10 @@ class Action {
 
     isAddDecisionAction() {
         return this.actionType === Action.actionTypes.AddDecision;
+    }
+
+    isVisitScheduleAction() {
+        return this.actionType === Action.actionTypes.ScheduleVisit;
     }
 
     clone() {
@@ -106,6 +118,8 @@ class Action {
                 return `Raise error "${this.details.validationError}".`;
             case Action.actionTypes.AddDecision:
                 return `Add Decision "${this.details.conceptName} : ${this.details.getSummaryValue()}" in ${_.startCase(this.details.scope)}`;
+            case Action.actionTypes.ScheduleVisit:
+                return `Schedule visit "${this.details.encounterType}" using "${_.startCase(this.details.dateField)}" on (${_.startCase(this.details.dateField)} + ${this.details.daysToSchedule} days)`;
             default:
                 return `${_.startCase(this.actionType)}.`;
         }
@@ -113,7 +127,7 @@ class Action {
 
     validate() {
         assertTrue(!_.isNil(this.actionType), "Type in Action cannot be empty");
-        if (this.isAddDecisionAction() || this.isFormValidationAction() || this.isViewFilterWithDetailsAction()) {
+        if (this.isAddDecisionAction() || this.isFormValidationAction() || this.isViewFilterWithDetailsAction() || this.isVisitScheduleAction()) {
             this.details.validate(this.actionType);
         }
     }

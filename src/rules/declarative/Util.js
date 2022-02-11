@@ -67,3 +67,15 @@ export const getDecisionRuleTemplate = (entityName) =>
     decisions.registrationDecisions.push(...registrationDecisions);
     return decisions;
 };`;
+
+
+export const getVisitScheduleRuleTemplate = (entityName) =>
+`"use strict";
+({ params, imports }) => {
+  const ${entityName} = params.entity;
+  const moment = imports.moment;
+  const scheduleBuilder = new imports.rulesConfig.VisitScheduleBuilder({${entityName}});
+  $RULE_CONDITIONS
+  $ACTION_CONDITIONS
+  return scheduleBuilder.getAll();
+};`;
