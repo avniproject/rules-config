@@ -51,3 +51,19 @@ export const getFormValidationErrorRuleTemplate = (entityName) =>
   $ACTION_CONDITIONS
   return validationResults;
 };`;
+
+export const getDecisionRuleTemplate = (entityName) =>
+`"use strict";
+({params, imports}) => {
+    const ${entityName} = params.entity;
+    const decisions = params.decisions;
+    const enrolmentDecisions = [];
+    const encounterDecisions = [];
+    const registrationDecisions = [];
+    $RULE_CONDITIONS
+    $ACTION_CONDITIONS
+    decisions.enrolmentDecisions.push(...enrolmentDecisions);
+    decisions.encounterDecisions.push(...encounterDecisions);
+    decisions.registrationDecisions.push(...registrationDecisions);
+    return decisions;
+};`;

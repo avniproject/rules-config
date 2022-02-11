@@ -1,5 +1,8 @@
 import {assertTrue} from "./Util";
 import _ from "lodash";
+import ViewFilterActionDetails from "./ViewFilterActionDetails";
+import FormValidationActionDetails from "./FormValidationActionDetails";
+import AddDecisionActionDetails from "./AddDecisionActionDetails";
 
 class Action {
     static formElementActionTypes = {
@@ -17,6 +20,7 @@ class Action {
         'ShowProgram': 'showProgram',
         'ShowEncounterType': 'showEncounterType',
         'FormValidationError': 'formValidationError',
+        'AddDecision': 'addDecision',
     };
 
     constructor() {
@@ -25,10 +29,15 @@ class Action {
     static fromResource(json) {
         const action = new Action();
         action.actionType = json.actionType;
-        action.value = json.value;
-        action.answersToSkip = json.answersToSkip;
-        action.answerUuidsToSkip = json.answerUuidsToSkip;
-        action.validationError = json.validationError;
+        const viewFilterActionTypes = ['value', 'skipAnswers', 'validationError'];
+        const actionDetails = _.get(json, 'details', {});
+        if (_.includes(viewFilterActionTypes, json.actionType)) {
+            action.details = ViewFilterActionDetails.fromResource(actionDetails);
+        } else if (json.actionType === Action.actionTypes.FormValidationError) {
+            action.details = FormValidationActionDetails.fromResource(actionDetails);
+        } else if (json.actionType === Action.actionTypes.AddDecision) {
+            action.details = AddDecisionActionDetails.fromResource(actionDetails);
+        }
         return action;
     }
 
@@ -36,71 +45,77 @@ class Action {
         const actionTypes = _.values(Action.actionTypes);
         assertTrue(_.includes(actionTypes, actionType), `Action type must be one of the ${actionTypes}`);
         this.actionType = actionType;
+        if (this.isViewFilterWithDetailsAction()) {
+            this.details = new ViewFilterActionDetails();
+        } else if (this.isFormValidationAction()) {
+            this.details = new FormValidationActionDetails();
+        } else if (this.isAddDecisionAction()) {
+            this.details = new AddDecisionActionDetails();
+        }
     }
 
-    setValue(value) {
-        assertTrue(this.actionType === Action.actionTypes.Value, 'Action type must be Value');
-        this.value = value;
+    addDetails(detailName, value) {
+        this.details[detailName] = value;
     }
 
-    setAnswersToSkip(...value) {
-        assertTrue(this.actionType === Action.actionTypes.SkipAnswers, 'Action type must be SkipAnswers');
-        this.answersToSkip = [...value];
+    isViewFilterWithDetailsAction() {
+        const viewFilterActionTypes = ['value', 'skipAnswers', 'validationError'];
+        return _.includes(viewFilterActionTypes, this.actionType);
     }
 
-    setAnswerUUIDsToSkip(...value) {
-        assertTrue(this.actionType === Action.actionTypes.SkipAnswers, 'Action type must be SkipAnswers');
-        this.answerUuidsToSkip = [...value];
+    isFormValidationAction() {
+        return this.actionType === Action.actionTypes.FormValidationError;
     }
 
-    setValidationError(error) {
-        assertTrue(_.includes([Action.actionTypes.ValidationError, Action.actionTypes.FormValidationError], this.actionType) , 'Action type must be ValidationError or FormValidationError');
-        this.validationError = error;
-    }
-
-    getJsValue() {
-        return typeof this.value === 'number' ? this.value : `"${this.value}"`
-    }
-
-    getJsAnswersToSkip() {
-        return _.map(this.answersToSkip, ac => `"${ac}"`).toString();
-    }
-
-    getJsAnswerUUIDsToSkip() {
-        return _.map(this.answerUuidsToSkip, ac => `"${ac}"`).toString();
+    isAddDecisionAction() {
+        return this.actionType === Action.actionTypes.AddDecision;
     }
 
     clone() {
         const action = new Action();
         action.actionType = this.actionType;
-        action.value = this.value;
-        action.answersToSkip = this.answersToSkip;
-        action.answerUuidsToSkip = this.answerUuidsToSkip;
-        action.validationError = this.validationError;
+        if (this.details) {
+            action.details = this.details.clone();
+        }
         return action;
+    }
+
+    getJsValue() {
+        const value = _.get(this.details, 'value');
+        return typeof value === 'number' ? value : `"${value}"`
+    }
+
+    getJsAnswersToSkip() {
+        const answerToSkip = _.get(this.details, 'answersToSkip');
+        return _.map(answerToSkip, ac => `"${ac}"`).toString();
+    }
+
+    getJsAnswerUUIDsToSkip() {
+        const answerUuidsToSkip = _.get(this.details, 'answerUuidsToSkip');
+        return _.map(answerUuidsToSkip, ac => `"${ac}"`).toString();
     }
 
     getRuleSummary() {
         switch (this.actionType) {
             case Action.actionTypes.Value:
-                return `Display value ${this.value}.`;
+                return `Display value ${this.details.value}.`;
             case Action.actionTypes.SkipAnswers:
                 return `Hide answers ${this.getJsAnswersToSkip()}.`;
             case Action.actionTypes.ValidationError:
             case Action.actionTypes.FormValidationError:
-                return `Raise error "${this.validationError}".`;
-            default: return `${_.startCase(this.actionType)}.`;
+                return `Raise error "${this.details.validationError}".`;
+            case Action.actionTypes.AddDecision:
+                return `Add Decision "${this.details.conceptName} : ${this.details.getSummaryValue()}" in ${_.startCase(this.details.scope)}`;
+            default:
+                return `${_.startCase(this.actionType)}.`;
         }
     }
 
     validate() {
         assertTrue(!_.isNil(this.actionType), "Type in Action cannot be empty");
-        if (_.isEqual(this.actionType, Action.actionTypes.Value))
-            assertTrue(!_.isNil(this.value), "Value in Action cannot be empty");
-        if (_.includes([Action.actionTypes.ValidationError, Action.actionTypes.FormValidationError], this.actionType))
-            assertTrue(!_.isNil(this.validationError), "Validation error in Action cannot be empty");
-        if (_.isEqual(this.actionType, Action.actionTypes.SkipAnswers))
-            assertTrue(!_.isNil(this.answersToSkip), "Concept answers in Action cannot be empty");
+        if (this.isAddDecisionAction() || this.isFormValidationAction() || this.isViewFilterWithDetailsAction()) {
+            this.details.validate(this.actionType);
+        }
     }
 
 }

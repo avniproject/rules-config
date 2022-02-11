@@ -6,5 +6,20 @@ import LHS from "./LHS";
 import RHS from "./RHS";
 import Rule from "./Rule";
 import DeclarativeRuleHolder from "./DeclarativeRuleHolder";
+import AddDecisionActionDetails from "./AddDecisionActionDetails";
+import FormValidationActionDetails from "./FormValidationActionDetails";
+import ViewFilterActionDetails from "./ViewFilterActionDetails";
 
-export {Action, CompoundRule, Condition, DeclarativeRule, LHS, RHS, Rule, DeclarativeRuleHolder}
+export {
+    Action,
+    CompoundRule,
+    Condition,
+    DeclarativeRule,
+    LHS,
+    RHS,
+    Rule,
+    DeclarativeRuleHolder,
+    AddDecisionActionDetails,
+    FormValidationActionDetails,
+    ViewFilterActionDetails
+}

@@ -84,8 +84,9 @@ class DeclarativeRule {
         return {actionSummary, ruleSummary, conjunctions};
     }
 
-    getRuleConditions(entityName, conditionAppender = '') {
-        const baseRuleCondition = `new imports.rulesConfig.RuleCondition({${entityName}, formElement}).$RULE_CONDITION`;
+    getRuleConditions(entityName, conditionAppender = '', ignoreFormElementInContext) {
+        const context = ignoreFormElementInContext ? `{${entityName}}` : `{${entityName}, formElement}`;
+        const baseRuleCondition = `new imports.rulesConfig.RuleCondition(${context}).$RULE_CONDITION`;
         const constructOtherCondition = (condition, action) => `if(${condition}) ${action} \n  `;
         let ruleConditions = '';
         let matchesConditions = [];
@@ -116,14 +117,20 @@ class DeclarativeRule {
                     actionConditions += constructSkipAnsCondition(matchesCondition, action.getJsAnswerUUIDsToSkip());
                     break;
                 case actionTypes.ValidationError:
-                    actionConditions += constructOtherCondition(matchesCondition, `validationErrors.push("${action.validationError}");`);
+                    actionConditions += constructOtherCondition(matchesCondition, `validationErrors.push("${_.get(action, 'details.validationError')}");`);
                     break;
                 case actionTypes.ShowEncounterType:
                 case actionTypes.ShowProgram:
                     actionConditions += `eligibility = ${matchesCondition};\n  `;
                     break;
                 case actionTypes.FormValidationError:
-                    actionConditions += constructOtherCondition(matchesCondition, `validationResults.push(createValidationError("${action.validationError}"));`);
+                    actionConditions += constructOtherCondition(matchesCondition, `validationResults.push(createValidationError("${_.get(action, 'details.validationError')}"));`);
+                    break;
+                case actionTypes.AddDecision: {
+                    const actionDetails = _.get(action, 'details');
+                    actionConditions += constructOtherCondition(matchesCondition, `${actionDetails.scope}Decisions.push({name: "${actionDetails.conceptName}", value: ${actionDetails.getJsValue()}});`);
+                    break;
+                }
             }
         });
         return {ruleConditions, actionConditions};

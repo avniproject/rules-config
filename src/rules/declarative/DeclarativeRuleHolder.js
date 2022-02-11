@@ -1,6 +1,7 @@
 import _ from 'lodash';
 import {Action, DeclarativeRule} from "./index";
 import {
+    getDecisionRuleTemplate,
     getEligibilityRuleTemplate,
     getFormElementGroupRuleTemplate,
     getFormValidationErrorRuleTemplate,
@@ -39,7 +40,7 @@ class DeclarativeRuleHolder {
     }
 
     generateEligibilityRule() {
-        const {ruleConditionArray, actionConditionArray} = this.getAllRuleConditions('individual');
+        const {ruleConditionArray, actionConditionArray} = this.getAllRuleConditions('individual', true);
         const eligibilityRuleTemplate = getEligibilityRuleTemplate();
         return eligibilityRuleTemplate
             .replace('$RULE_CONDITIONS', ruleConditionArray.join('  '))
@@ -47,18 +48,26 @@ class DeclarativeRuleHolder {
     }
 
     generateFormValidationRule(entityName) {
-        const {ruleConditionArray, actionConditionArray} = this.getAllRuleConditions(entityName);
+        const {ruleConditionArray, actionConditionArray} = this.getAllRuleConditions(entityName, true);
         const formValidationErrorRuleTemplate = getFormValidationErrorRuleTemplate(entityName);
         return formValidationErrorRuleTemplate
             .replace('$RULE_CONDITIONS', ruleConditionArray.join('  '))
             .replace('$ACTION_CONDITIONS', actionConditionArray.join('  '));
     }
 
-    getAllRuleConditions(entityName) {
+    generateDecisionRule(entityName) {
+        const {ruleConditionArray, actionConditionArray} = this.getAllRuleConditions(entityName, true);
+        const decisionRuleTemplate = getDecisionRuleTemplate(entityName);
+        return decisionRuleTemplate
+            .replace('$RULE_CONDITIONS', ruleConditionArray.join('  '))
+            .replace('$ACTION_CONDITIONS', actionConditionArray.join('  '));
+    }
+
+    getAllRuleConditions(entityName, ignoreFormElementInContext) {
         const ruleConditionArray = [];
         const actionConditionArray = [];
         _.forEach(this.declarativeRules, (declarativeRule, index) => {
-            const {ruleConditions, actionConditions} = declarativeRule.getRuleConditions(entityName, index + 1);
+            const {ruleConditions, actionConditions} = declarativeRule.getRuleConditions(entityName, index + 1, ignoreFormElementInContext);
             ruleConditionArray.push(ruleConditions);
             actionConditionArray.push(actionConditions);
         });
@@ -151,6 +160,10 @@ class DeclarativeRuleHolder {
 
     getApplicableFormValidationRuleActions() {
         return _.pick(Action.actionTypes, ['FormValidationError']);
+    }
+
+    getApplicableDecisionRulActions() {
+        return _.pick(Action.actionTypes, ['AddDecision']);
     }
 }
 
