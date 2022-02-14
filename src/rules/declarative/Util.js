@@ -37,15 +37,16 @@ export const getEligibilityRuleTemplate = () =>
 `'use strict';
 ({params, imports}) => {
   const individual = params.entity;
+  let eligibility = true;
   $RULE_CONDITIONS
-  return $ACTION_CONDITIONS
+  $ACTION_CONDITIONS
+  return eligibility;
 };`;
 
 export const getFormValidationErrorRuleTemplate = (entityName) =>
 `'use strict';
 ({params, imports}) => {
   const ${entityName} = params.entity;
-  const createValidationError = imports.common.createValidationError;
   const validationResults = [];
   $RULE_CONDITIONS
   $ACTION_CONDITIONS

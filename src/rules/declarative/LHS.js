@@ -29,8 +29,8 @@ class LHS {
     static formTypeToScopeMap = {
         IndividualProfile: {'ThisRegistration': 'thisRegistration', 'ThisDecisions': 'thisDecisions',},
         IndividualEncounterCancellation: {
-            'ThisRegistration': 'thisRegistration',
             'ThisEncounter': 'thisEncounter',
+            'ThisRegistration': 'thisRegistration',
             'LatestInAllVisits': 'latestInAllVisits',
             'LatestInPreviousVisits': 'latestInPreviousVisits',
             'LastVisit': 'lastVisit',
@@ -38,8 +38,8 @@ class LHS {
             'ThisDecisions': 'thisDecisions',
         },
         Encounter: {
-            'ThisRegistration': 'thisRegistration',
             'ThisEncounter': 'thisEncounter',
+            'ThisRegistration': 'thisRegistration',
             'LatestInAllVisits': 'latestInAllVisits',
             'LatestInPreviousVisits': 'latestInPreviousVisits',
             'LastVisit': 'lastVisit',
@@ -58,18 +58,21 @@ class LHS {
             'ThisDecisions': 'thisDecisions',
         },
         ProgramEncounter: {
-            'LatestInEntireEnrolment': 'latestInEntireEnrolment',
-            'LatestInAllVisits': 'latestInAllVisits',
-            'ThisDecisions': 'thisDecisions',
-        },
-        ProgramEncounterCancellation: {
             'ThisRegistration': 'thisRegistration',
             'ThisEncounter': 'thisEncounter',
             'LatestInEntireEnrolment': 'latestInEntireEnrolment',
             'LatestInAllVisits': 'latestInAllVisits',
             'LatestInPreviousVisits': 'latestInPreviousVisits',
             'LastVisit': 'lastVisit',
+            'ThisDecisions': 'thisDecisions',
+        },
+        ProgramEncounterCancellation: {
             'ThisCancelEncounter': 'thisCancelEncounter',
+            'ThisRegistration': 'thisRegistration',
+            'LatestInEntireEnrolment': 'latestInEntireEnrolment',
+            'LatestInAllVisits': 'latestInAllVisits',
+            'LatestInPreviousVisits': 'latestInPreviousVisits',
+            'LastVisit': 'lastVisit',
             'ThisDecisions': 'thisDecisions',
         },
         ChecklistItem: {

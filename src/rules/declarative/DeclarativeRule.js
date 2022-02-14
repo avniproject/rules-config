@@ -124,7 +124,7 @@ class DeclarativeRule {
                     actionConditions += `eligibility = ${matchesCondition};\n  `;
                     break;
                 case actionTypes.FormValidationError:
-                    actionConditions += constructOtherCondition(matchesCondition, `validationResults.push(createValidationError("${_.get(action, 'details.validationError')}"));`);
+                    actionConditions += constructOtherCondition(matchesCondition, `validationResults.push(imports.common.createValidationError("${_.get(action, 'details.validationError')}"));`);
                     break;
                 case actionTypes.AddDecision: {
                     const actionDetails = _.get(action, 'details');
