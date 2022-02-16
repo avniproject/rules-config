@@ -61,6 +61,11 @@ class DeclarativeRule {
             .value();
     }
 
+    addNewAction() {
+        this.actions = _.reject(this.actions, ({actionType}) => _.isEmpty(actionType));
+        this.addAction(new Action());
+    }
+
     validate() {
         _.forEach(this.conditions, condition => condition.validate());
         const actions = this.actions;
@@ -122,6 +127,10 @@ class DeclarativeRule {
                 case actionTypes.ShowEncounterType:
                 case actionTypes.ShowProgram:
                     actionConditions += `eligibility = ${matchesCondition};\n  `;
+                    break;
+                case actionTypes.HideEncounterType:
+                case actionTypes.HideProgram:
+                    actionConditions += `eligibility = !(${matchesCondition});\n  `;
                     break;
                 case actionTypes.FormValidationError:
                     actionConditions += constructOtherCondition(matchesCondition, `validationResults.push(imports.common.createValidationError("${_.get(action, 'details.validationError')}"));`);

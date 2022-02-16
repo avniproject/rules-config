@@ -155,15 +155,15 @@ class DeclarativeRuleHolder {
     }
 
     getApplicableEncounterEligibilityActions() {
-        const {ShowEncounterType} = Action.actionTypes;
-        const isDefined = _.some(this.declarativeRules, dr => dr.containActionType(ShowEncounterType));
-        return isDefined ? {} : {ShowEncounterType};
+        const {ShowEncounterType, HideEncounterType} = Action.actionTypes;
+        const isDefined = _.some(this.declarativeRules, dr => dr.containActionType(ShowEncounterType, HideEncounterType));
+        return isDefined ? {} : {ShowEncounterType, HideEncounterType};
     }
 
     getApplicableEnrolmentEligibilityActions() {
-        const {ShowProgram} = Action.actionTypes;
-        const isDefined = _.some(this.declarativeRules, dr => dr.containActionType(ShowProgram));
-        return isDefined ? {} : {ShowProgram};
+        const {ShowProgram, HideProgram} = Action.actionTypes;
+        const isDefined = _.some(this.declarativeRules, dr => dr.containActionType(ShowProgram, HideProgram));
+        return isDefined ? {} : {ShowProgram, HideProgram};
     }
 
     getApplicableFormValidationRuleActions() {

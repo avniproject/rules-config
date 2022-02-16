@@ -22,6 +22,8 @@ class Action {
         'HideFormElementGroup': 'hideFormElementGroup',
         'ShowProgram': 'showProgram',
         'ShowEncounterType': 'showEncounterType',
+        'HideProgram': 'hideProgram',
+        'HideEncounterType': 'hideEncounterType',
         'FormValidationError': 'formValidationError',
         'AddDecision': 'addDecision',
         'ScheduleVisit': 'scheduleVisit',
@@ -49,7 +51,8 @@ class Action {
 
     setActionType(actionType) {
         const actionTypes = _.values(Action.actionTypes);
-        assertTrue(_.includes(actionTypes, actionType), `Action type must be one of the ${actionTypes}`);
+        if (!_.isNil(actionType))
+            assertTrue(_.includes(actionTypes, actionType), `Action type must be one of the ${actionTypes}`);
         this.actionType = actionType;
         if (this.isViewFilterWithDetailsAction()) {
             this.details = new ViewFilterActionDetails();
