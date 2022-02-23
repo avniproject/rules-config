@@ -122,7 +122,7 @@ class Action {
             case Action.actionTypes.AddDecision:
                 return `Add Decision "${this.details.conceptName} : ${this.details.getSummaryValue()}" in ${_.startCase(this.details.scope)}`;
             case Action.actionTypes.ScheduleVisit:
-                return `Schedule visit "${this.details.encounterType}" using "${_.startCase(this.details.dateField)}" on (${_.startCase(this.details.dateField)} + ${this.details.daysToSchedule} days)`;
+                return `Schedule visit "${this.details.encounterName}" using "${_.startCase(this.details.dateField)}" on (${_.startCase(this.details.dateField)} + ${this.details.daysToSchedule} days)`;
             default:
                 return `${_.startCase(this.actionType)}.`;
         }

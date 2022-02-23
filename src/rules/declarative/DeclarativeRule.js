@@ -1,5 +1,5 @@
 import _ from 'lodash';
-import {Condition, Rule, Action, CompoundRule, VisitScheduleActionDetails} from "./index";
+import {Action, Condition, VisitScheduleActionDetails} from "./index";
 
 const constructSkipAnsCondition = (condition, ...answers) =>
     `if(${condition}) {
@@ -64,6 +64,15 @@ class DeclarativeRule {
     addNewAction() {
         this.actions = _.reject(this.actions, ({actionType}) => _.isEmpty(actionType));
         this.addAction(new Action());
+    }
+
+    deleteConditionAtIndex(index) {
+        if (_.size(this.conditions) === 1) {
+            const condition = new Condition().getInitialCondition();
+            return this.conditions = [condition];
+        } else {
+            this.conditions.splice(index, 1)
+        }
     }
 
     validate() {

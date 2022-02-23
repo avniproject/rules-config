@@ -19,6 +19,7 @@ class VisitScheduleActionDetails {
     static fromResource(json) {
         const actionDetails = new VisitScheduleActionDetails();
         actionDetails.encounterType = json.encounterType;
+        actionDetails.encounterName = json.encounterName;
         actionDetails.dateField = json.dateField;
         actionDetails.dateFieldUuid = json.dateFieldUuid;
         actionDetails.daysToSchedule = json.daysToSchedule;
@@ -62,12 +63,13 @@ class VisitScheduleActionDetails {
         const dateToConsider = !_.isEmpty(actionDetails.dateFieldUuid) ? `${entityName}.getObservationReadableValue('${actionDetails.dateFieldUuid}')` : getDateFieldPath();
         return `const earliestDate = moment(${dateToConsider}).add(${actionDetails.daysToSchedule}, 'days').toDate();\n    `
             .concat(`const maxDate = moment(${dateToConsider}).add(${actionDetails.daysToOverdue}, 'days').toDate();\n    `)
-            .concat(`scheduleBuilder.add({name: "${actionDetails.encounterType}", encounterType: "${actionDetails.encounterType}", earliestDate, maxDate});`)
+            .concat(`scheduleBuilder.add({name: "${actionDetails.encounterName}", encounterType: "${actionDetails.encounterType}", earliestDate, maxDate});`)
     }
 
     clone() {
         const details = new VisitScheduleActionDetails();
         details.encounterType = this.encounterType;
+        details.encounterName = this.encounterName;
         details.dateField = this.dateField;
         details.dateFieldUuid = this.dateFieldUuid;
         details.daysToSchedule = this.daysToSchedule;
@@ -77,6 +79,7 @@ class VisitScheduleActionDetails {
 
     validate() {
         assertTrue(!_.isEmpty(this.encounterType), "Visit schedule encounter type cannot be empty");
+        assertTrue(!_.isEmpty(this.encounterName), "Visit schedule encounter name cannot be empty");
         assertTrue(!_.isEmpty(this.dateField), "Visit schedule date field cannot be empty");
         assertTrue(!_.isEmpty(this.daysToSchedule), "Visit schedule days to schedule cannot be empty");
         assertTrue(!_.isEmpty(this.daysToOverdue), "Visit schedule days to overdue cannot be empty");

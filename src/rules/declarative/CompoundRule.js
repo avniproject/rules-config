@@ -1,6 +1,6 @@
 import {assertTrue} from "./Util";
 import _ from "lodash";
-import Rule from "./Rule";
+import {LHS, Rule} from "./index";
 
 class CompoundRule {
     static conjunctions = {
@@ -52,6 +52,33 @@ class CompoundRule {
 
     validate() {
         _.forEach(this.rules, rule => rule.validate());
+    }
+
+    deleteRuleAtIndex(index) {
+        if (_.size(this.rules) === 1) {
+            return this.rules = [new Rule()];
+        } else {
+            this.rules.splice(index, 1)
+        }
+    }
+
+    updateRuleAtIndex(index, name, uuid, dataType, formType) {
+        const newRule = new Rule();
+        if (uuid && dataType) {
+            newRule.lhs.type = LHS.types.Concept;
+            newRule.lhs.conceptName = name;
+            newRule.lhs.conceptUuid = uuid;
+            newRule.lhs.conceptDataType = dataType;
+            if (newRule.lhs.isCodedConcept()) {
+                const applicableScopes = LHS.getScopeByFormType(formType);
+                newRule.lhs.scope = _.head(_.values(applicableScopes));
+            }
+        } else {
+            newRule.lhs.type = name;
+        }
+        newRule.operator = _.head(_.values(newRule.getApplicableOperators()));
+        newRule.rhs.type = _.head(_.values(newRule.getApplicableRHSTypes()));
+        this.rules.splice(index, 1, newRule);
     }
 }
 

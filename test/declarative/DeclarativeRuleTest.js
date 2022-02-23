@@ -13,14 +13,14 @@ function getRule1() {
     lhs.setType(LHS.types.Concept);
     lhs.setConceptName("Demo");
     lhs.setConceptUuid("Demo");
-    lhs.setScope(LHS.scopes.ThisEncounter);
+    lhs.setScope(LHS.scopes.Encounter);
     const rhs = new RHS();
     rhs.setType(RHS.types.AnswerConcept);
     rhs.setAnswerConceptNames('a', 'b');
     rhs.setAnswerConceptUuids('a', 'b');
     const rule = new Rule();
     rule.setLHS(lhs);
-    rule.setOperator(Rule.operators.ContainsAnyAnswerConceptName);
+    rule.setOperator(Rule.operators.HasAnyOneAnswer);
     rule.setRHS(rhs);
     return rule;
 }
@@ -52,7 +52,7 @@ function getRuleCondition() {
 
 describe('Declarative Rule tests', () => {
     it('should create a proper json', function () {
-        const NameIsTestRuleJSON = '{"conditions":[{"compoundRule":{"rules":[{"lhs":{"type":"concept","conceptName":"Demo","conceptUuid":"Demo","scope":"thisEncounter"},"rhs":{"type":"answerConcept","answerConceptNames":["a","b"],"answerConceptUuids":["a","b"]},"operator":"containsAnyAnswerConceptName"}]}}],"actions":[{"actionType":"showFormElement"}]}';
+        const NameIsTestRuleJSON = '{"conditions":[{"compoundRule":{"rules":[{"lhs":{"type":"concept","conceptName":"Demo","conceptUuid":"Demo","scope":"encounter"},"rhs":{"type":"answerConcept","answerConceptNames":["a","b"],"answerConceptUuids":["a","b"]},"operator":"containsAnyAnswerConceptName"}]}}],"actions":[{"actionType":"showFormElement"}]}';
         const condition = getRuleCondition();
         const action = new Action();
         action.setActionType(Action.actionTypes.ShowFormElement);

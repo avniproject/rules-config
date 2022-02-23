@@ -101,10 +101,11 @@ class DeclarativeRuleHolder {
     }
 
     deleteAtIndex(index) {
-        const declarativeRuleHolder = new DeclarativeRuleHolder();
-        this.declarativeRules.splice(index, 1);
-        declarativeRuleHolder.declarativeRules = this.declarativeRules;
-        return declarativeRuleHolder;
+        if(_.size(this.declarativeRules) === 1) {
+            return this.declarativeRules = DeclarativeRuleHolder.fromResource().declarativeRules;
+        } else {
+            this.declarativeRules.splice(index, 1);
+        }
     }
 
     updateAtIndex(index, declarativeRule) {

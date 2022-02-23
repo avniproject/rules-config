@@ -5,9 +5,9 @@ import RHS from './RHS';
 
 class Rule {
     static codedOperators = {
-        'ContainsAnyAnswerConceptName': 'containsAnyAnswerConceptName',
-        'ContainsAnswerConceptNameOtherThan': 'containsAnswerConceptNameOtherThan',
-        'ContainsAnswerConceptName': 'containsAnswerConceptName',
+        'HasAnswer': 'containsAnswerConceptName',
+        'HasAnyOneAnswer': 'containsAnyAnswerConceptName',
+        'HasAnswerOtherThan': 'containsAnswerConceptNameOtherThan',
     };
 
     static numericOperators = {
@@ -19,8 +19,8 @@ class Rule {
     };
 
     static noRHSOperators = {
-        'NotDefined': 'notDefined',
-        'Defined': 'defined'
+        'Present': 'defined',
+        'NotPresent': 'notDefined'
     };
 
     static operators = {...Rule.codedOperators, ...Rule.numericOperators, ...Rule.noRHSOperators};
@@ -73,7 +73,11 @@ class Rule {
     }
 
     isRhsRequired() {
-        return !_.includes(_.values(Rule.noRHSOperators), this.operator);
+        return !_.isEmpty(this.operator) && !_.includes(_.values(Rule.noRHSOperators), this.operator);
+    }
+
+    isOperatorRequired() {
+        return this.lhs.isConcept() ? !_.isEmpty(this.lhs.scope) : !_.isEmpty(this.lhs.type);
     }
 
     getRhsValueType() {

@@ -27,88 +27,80 @@ class LHS {
     };
 
     static formTypeToScopeMap = {
-        IndividualProfile: {'ThisRegistration': 'thisRegistration', 'ThisDecisions': 'thisDecisions',},
+        IndividualProfile: {'ThisRegistration': 'registration'},
         IndividualEncounterCancellation: {
-            'ThisEncounter': 'thisEncounter',
-            'ThisRegistration': 'thisRegistration',
-            'LatestInAllVisits': 'latestInAllVisits',
-            'LatestInPreviousVisits': 'latestInPreviousVisits',
-            'LastVisit': 'lastVisit',
-            'ThisCancelEncounter': 'thisCancelEncounter',
-            'ThisDecisions': 'thisDecisions',
+            'ThisCancelEncounter': 'cancelEncounter',
+            'LastEncounter': 'lastEncounter',
+            'LatestInAllEncounters': 'latestInAllEncounters',
+            'LatestInPreviousEncounters': 'latestInPreviousEncounters',
+            'Registration': 'registration',
         },
         Encounter: {
-            'ThisEncounter': 'thisEncounter',
-            'ThisRegistration': 'thisRegistration',
-            'LatestInAllVisits': 'latestInAllVisits',
-            'LatestInPreviousVisits': 'latestInPreviousVisits',
-            'LastVisit': 'lastVisit',
-            'ThisDecisions': 'thisDecisions',
+            'ThisEncounter': 'encounter',
+            'LastEncounter': 'lastEncounter',
+            'LatestInAllEncounters': 'latestInAllEncounters',
+            'LatestInPreviousEncounters': 'latestInPreviousEncounters',
+            'Registration': 'registration',
         },
         ProgramEnrolment: {
-            'ThisEnrolment': 'thisEnrolment',
-            'ThisRegistration': 'thisRegistration',
+            'ThisEnrolment': 'enrolment',
             'EntireEnrolment': 'entireEnrolment',
-            'ThisDecisions': 'thisDecisions',
+            'Registration': 'registration',
         },
         ProgramExit: {
-            'ThisExit': 'thisExit', 'ThisEnrolment': 'thisEnrolment',
-            'ThisRegistration': 'thisRegistration',
+            'ThisExit': 'exit',
             'EntireEnrolment': 'entireEnrolment',
-            'ThisDecisions': 'thisDecisions',
+            'Registration': 'registration',
         },
         ProgramEncounter: {
-            'ThisRegistration': 'thisRegistration',
-            'ThisEncounter': 'thisEncounter',
+            'ThisEncounter': 'encounter',
+            'LastEncounter': 'lastEncounter',
+            'LatestInAllEncounters': 'latestInAllEncounters',
+            'LatestInPreviousEncounters': 'latestInPreviousEncounters',
             'LatestInEntireEnrolment': 'latestInEntireEnrolment',
-            'LatestInAllVisits': 'latestInAllVisits',
-            'LatestInPreviousVisits': 'latestInPreviousVisits',
-            'LastVisit': 'lastVisit',
-            'ThisDecisions': 'thisDecisions',
+            'Enrolment': 'enrolment',
+            'Registration': 'registration',
         },
         ProgramEncounterCancellation: {
-            'ThisCancelEncounter': 'thisCancelEncounter',
-            'ThisRegistration': 'thisRegistration',
+            'ThisCancelEncounter': 'cancelEncounter',
+            'LastEncounter': 'lastEncounter',
+            'LatestInAllEncounters': 'latestInAllEncounters',
+            'LatestInPreviousEncounters': 'latestInPreviousEncounters',
             'LatestInEntireEnrolment': 'latestInEntireEnrolment',
-            'LatestInAllVisits': 'latestInAllVisits',
-            'LatestInPreviousVisits': 'latestInPreviousVisits',
-            'LastVisit': 'lastVisit',
-            'ThisDecisions': 'thisDecisions',
+            'Enrolment': 'enrolment',
+            'Registration': 'registration',
         },
         ChecklistItem: {
-            'ThisChecklistItem': 'thisChecklistItem',
-            'ThisDecisions': 'thisDecisions',
+            'ThisChecklistItem': 'checklistItem',
         },
     };
 
     static scopes = {
+        'Registration': 'registration',
+        'Enrolment': 'enrolment',
+        'Encounter': 'encounter',
         'EntireEnrolment': 'entireEnrolment',
-        'LatestInAllVisits': 'latestInAllVisits',
+        'LatestInAllEncounters': 'latestInAllEncounters',
+        'LatestInPreviousEncounters': 'latestInPreviousEncounters',
+        'LastEncounter': 'lastEncounter',
         'LatestInEntireEnrolment': 'latestInEntireEnrolment',
-        'LatestInPreviousVisits': 'latestInPreviousVisits',
-        'LastVisit': 'lastVisit',
-        'ThisEnrolment': 'thisEnrolment',
-        'ThisExit': 'thisExit',
-        'ThisEncounter': 'thisEncounter',
-        'ThisDecisions': 'thisDecisions',
-        'ThisRegistration': 'thisRegistration',
-        'ThisCancelEncounter': 'thisCancelEncounter',
-        'ThisChecklistItem': 'thisChecklistItem'
+        'Exit': 'exit',
+        'CancelEncounter': 'cancelEncounter',
+        'ChecklistItem': 'checklistItem'
     };
 
     static scopeToRuleFunctionMap = {
         'entireEnrolment': 'valueInEntireEnrolment',
-        'latestInAllVisits': 'latestValueInAllEncounters',
+        'latestInAllEncounters': 'latestValueInAllEncounters',
         'latestInEntireEnrolment': 'latestValueInEntireEnrolment',
-        'latestInPreviousVisits': 'latestValueInPreviousEncounters',
-        'lastVisit': 'valueInLastEncounter',
-        'thisEnrolment': 'valueInEnrolment',
-        'thisExit': 'valueInExit',
-        'thisEncounter': 'valueInEncounter',
-        'thisDecisions': 'valueInDecisions',
-        'thisRegistration': 'valueInRegistration',
-        'thisCancelEncounter': 'valueInCancelEncounter',
-        'thisChecklistItem': 'valueInChecklistItem',
+        'latestInPreviousEncounters': 'latestValueInPreviousEncounters',
+        'lastEncounter': 'valueInLastEncounter',
+        'enrolment': 'valueInEnrolment',
+        'exit': 'valueInExit',
+        'encounter': 'valueInEncounter',
+        'registration': 'valueInRegistration',
+        'cancelEncounter': 'valueInCancelEncounter',
+        'checklistItem': 'valueInChecklistItem',
     };
 
     constructor() {
@@ -179,6 +171,14 @@ class LHS {
         return LHS.types.Gender === this.type;
     }
 
+    isAddressLevel() {
+        return LHS.types.LowestAddressLevel === this.type;
+    }
+
+    isAddressLevelType() {
+        return LHS.types.LowestAddressLevelType === this.type;
+    }
+
     isConcept() {
         return LHS.types.Concept === this.type
     }
@@ -194,6 +194,40 @@ class LHS {
         } else {
             return this.type;
         }
+    }
+
+    getDefaultTypeOptions(form, isPerson) {
+        const typeOptions = _.map(LHS.getTypesBySubjectType(isPerson), (v, k) => ({
+            label: _.startCase(k),
+            value: {name: v, uuid: null, dataType: null, toString: () => v}
+        }));
+        const conceptOptions = [];
+        _.forEach(form.formElementGroups, ({formElements}) => {
+            _.forEach(formElements, ({name, uuid, dataType}) => {
+                conceptOptions.push({
+                    label: name,
+                    value: {name, uuid, dataType, toString: () => uuid}
+                });
+            })
+        });
+        return [..._.filter(typeOptions, ({label}) => label !== 'Concept'), ...conceptOptions];
+    }
+
+    getTypeOptionValue() {
+        return _.isEmpty(this.type) ? null : (this.isConcept() ?
+            {
+                label: this.conceptName,
+                value: {
+                    name: this.conceptName,
+                    uuid: this.conceptUuid,
+                    dataType: this.conceptDataType,
+                    toString: () => this.conceptUuid
+                }
+            } :
+            {
+                label: _.startCase(this.type),
+                value: {name: this.type, uuid: null, dataType: null, toString: () => this.type}
+            });
     }
 
     getRuleSummary() {
