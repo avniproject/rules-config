@@ -203,7 +203,8 @@ class LHS {
         }));
         const conceptOptions = [];
         _.forEach(form.formElementGroups, ({formElements}) => {
-            _.forEach(formElements, ({name, uuid, dataType}) => {
+            _.forEach(formElements, ({concept}) => {
+                const {name, uuid, dataType} = concept;
                 conceptOptions.push({
                     label: name,
                     value: {name, uuid, dataType, toString: () => uuid}
