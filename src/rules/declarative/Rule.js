@@ -50,7 +50,7 @@ class Rule {
         if (this.lhs.isCodedConcept()) {
             return {...Rule.codedOperators, ...Rule.noRHSOperators};
         }
-        if (this.lhs.isNumeric()) {
+        if (this.lhs.isNumeric() || this.lhs.isDate()) {
             return {...Rule.numericOperators, ...Rule.noRHSOperators};
         } else {
             const equals = _.pickBy(Rule.numericOperators, (v, k) => v === Rule.numericOperators.Equals);
@@ -62,7 +62,7 @@ class Rule {
         if (this.lhs.isCodedConcept()) {
             return {'AnswerConcept': RHS.types.AnswerConcept};
         } else {
-            return {'Value': RHS.types.Value};
+            return {'Value': RHS.types.Value, 'Concept': RHS.types.Concept};
         }
     }
 
@@ -84,9 +84,10 @@ class Rule {
         return this.lhs.isNumeric() ? 'number' : 'text';
     }
 
-    getJSCode() {
-        const lhsAndOperator = `when.${this.lhs.getJSCode()}.${this.operator}`;
-        return this.isRhsRequired() ? `${lhsAndOperator}(${this.rhs.getJSCode()})` : lhsAndOperator;
+    getRuleCondition() {
+        const lhsAndOperator = `when.${this.lhs.getRuleCondition()}.${this.operator}`;
+        const getFunctionParams = () => this.lhs.isDate() ? `${this.rhs.getRuleCondition()}, 'ms'` : `${this.rhs.getRuleCondition()}`;
+        return this.isRhsRequired() ? `${lhsAndOperator}(${getFunctionParams()})` : lhsAndOperator;
     }
 
     getRuleSummary() {

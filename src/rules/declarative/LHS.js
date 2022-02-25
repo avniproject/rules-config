@@ -1,5 +1,6 @@
 import _ from 'lodash';
 import {assertTrue} from "./Util";
+import ConceptScope from "./ConceptScope";
 
 class LHS {
     static numericTypes = {
@@ -26,83 +27,6 @@ class LHS {
         'Concept': 'concept',
     };
 
-    static formTypeToScopeMap = {
-        IndividualProfile: {'ThisRegistration': 'registration'},
-        IndividualEncounterCancellation: {
-            'ThisCancelEncounter': 'cancelEncounter',
-            'LastEncounter': 'lastEncounter',
-            'LatestInAllEncounters': 'latestInAllEncounters',
-            'LatestInPreviousEncounters': 'latestInPreviousEncounters',
-            'Registration': 'registration',
-        },
-        Encounter: {
-            'ThisEncounter': 'encounter',
-            'LastEncounter': 'lastEncounter',
-            'LatestInAllEncounters': 'latestInAllEncounters',
-            'LatestInPreviousEncounters': 'latestInPreviousEncounters',
-            'Registration': 'registration',
-        },
-        ProgramEnrolment: {
-            'ThisEnrolment': 'enrolment',
-            'EntireEnrolment': 'entireEnrolment',
-            'Registration': 'registration',
-        },
-        ProgramExit: {
-            'ThisExit': 'exit',
-            'EntireEnrolment': 'entireEnrolment',
-            'Registration': 'registration',
-        },
-        ProgramEncounter: {
-            'ThisEncounter': 'encounter',
-            'LastEncounter': 'lastEncounter',
-            'LatestInAllEncounters': 'latestInAllEncounters',
-            'LatestInPreviousEncounters': 'latestInPreviousEncounters',
-            'LatestInEntireEnrolment': 'latestInEntireEnrolment',
-            'Enrolment': 'enrolment',
-            'Registration': 'registration',
-        },
-        ProgramEncounterCancellation: {
-            'ThisCancelEncounter': 'cancelEncounter',
-            'LastEncounter': 'lastEncounter',
-            'LatestInAllEncounters': 'latestInAllEncounters',
-            'LatestInPreviousEncounters': 'latestInPreviousEncounters',
-            'LatestInEntireEnrolment': 'latestInEntireEnrolment',
-            'Enrolment': 'enrolment',
-            'Registration': 'registration',
-        },
-        ChecklistItem: {
-            'ThisChecklistItem': 'checklistItem',
-        },
-    };
-
-    static scopes = {
-        'Registration': 'registration',
-        'Enrolment': 'enrolment',
-        'Encounter': 'encounter',
-        'EntireEnrolment': 'entireEnrolment',
-        'LatestInAllEncounters': 'latestInAllEncounters',
-        'LatestInPreviousEncounters': 'latestInPreviousEncounters',
-        'LastEncounter': 'lastEncounter',
-        'LatestInEntireEnrolment': 'latestInEntireEnrolment',
-        'Exit': 'exit',
-        'CancelEncounter': 'cancelEncounter',
-        'ChecklistItem': 'checklistItem'
-    };
-
-    static scopeToRuleFunctionMap = {
-        'entireEnrolment': 'valueInEntireEnrolment',
-        'latestInAllEncounters': 'latestValueInAllEncounters',
-        'latestInEntireEnrolment': 'latestValueInEntireEnrolment',
-        'latestInPreviousEncounters': 'latestValueInPreviousEncounters',
-        'lastEncounter': 'valueInLastEncounter',
-        'enrolment': 'valueInEnrolment',
-        'exit': 'valueInExit',
-        'encounter': 'valueInEncounter',
-        'registration': 'valueInRegistration',
-        'cancelEncounter': 'valueInCancelEncounter',
-        'checklistItem': 'valueInChecklistItem',
-    };
-
     constructor() {
     }
 
@@ -119,11 +43,6 @@ class LHS {
 
     static getTypesBySubjectType(isPerson) {
         return isPerson ? LHS.types : LHS.noPersonTypes;
-    }
-
-    static getScopeByFormType(formType) {
-        const formTypeScopes = LHS.formTypeToScopeMap[formType];
-        return _.isEmpty(formTypeScopes) ? LHS.scopes : formTypeScopes;
     }
 
     setType(type) {
@@ -149,7 +68,7 @@ class LHS {
     }
 
     setScope(scope) {
-        const scopes = _.values(LHS.scopes);
+        const scopes = _.values(ConceptScope.scopes);
         assertTrue(_.includes(scopes, scope), `Scopes must be one of the ${scopes}`);
         assertTrue(!_.isNil(this.conceptName), `Scope cannot be set without concept`);
         this.scope = scope;
@@ -161,6 +80,10 @@ class LHS {
 
     isNumeric() {
         return _.includes(_.values(LHS.numericTypes), this.type) || _.includes(['Numeric', 'Id'], this.conceptDataType)
+    }
+
+    isDate() {
+        return _.includes(['Date', 'DateTime'], this.conceptDataType)
     }
 
     isOther() {
@@ -187,9 +110,9 @@ class LHS {
         return this.isConcept() && this.conceptDataType === 'Coded';
     }
 
-    getJSCode() {
+    getRuleCondition() {
         if (this.scope) {
-            const functionMap = LHS.scopeToRuleFunctionMap;
+            const functionMap = ConceptScope.scopeToRuleFunctionMap;
             return `${functionMap[this.scope]}("${this.conceptUuid}")`;
         } else {
             return this.type;

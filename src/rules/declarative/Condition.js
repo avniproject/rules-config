@@ -30,8 +30,14 @@ class Condition {
         this.compoundRule = compoundRule;
     }
 
-    getJSCode() {
-        return this.compoundRule.getJSCode();
+    getRuleCondition() {
+        return this.compoundRule.getRuleCondition();
+    }
+
+    getRHSScopeCode(entityName) {
+        const rhsScopeSet = new Set();
+        _.forEach(this.compoundRule.rules, rule => rhsScopeSet.add(rule.rhs.getScopeCode(entityName)));
+        return _.reject([...rhsScopeSet], _.isEmpty).join("\n");
     }
 
     clone() {

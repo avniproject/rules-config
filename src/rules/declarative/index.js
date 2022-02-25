@@ -10,6 +10,7 @@ import AddDecisionActionDetails from "./AddDecisionActionDetails";
 import FormValidationActionDetails from "./FormValidationActionDetails";
 import ViewFilterActionDetails from "./ViewFilterActionDetails";
 import VisitScheduleActionDetails from "./VisitScheduleActionDetails";
+import ConceptScope from "./ConceptScope";
 
 export {
     Action,
@@ -23,5 +24,6 @@ export {
     AddDecisionActionDetails,
     FormValidationActionDetails,
     ViewFilterActionDetails,
-    VisitScheduleActionDetails
+    VisitScheduleActionDetails,
+    ConceptScope
 }

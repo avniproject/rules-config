@@ -105,11 +105,14 @@ class DeclarativeRule {
         let ruleConditions = '';
         let matchesConditions = [];
         let actionConditions = '';
-        _.forEach(this.conditions, ({compoundRule, conjunction}, index) => {
+        _.forEach(this.conditions, (condition, index) => {
+            const {compoundRule, conjunction} = condition;
             const conditionName = `condition${index + 1}${conditionAppender}`;
             const operator = (index + 1) < _.size(this.conditions) ? DeclarativeRule.conjunctionToBooleanOperator[conjunction] : '';
             matchesConditions.push(`${conditionName} ${operator}`);
-            const ruleCondition = baseRuleCondition.replace('$RULE_CONDITION', compoundRule.getJSCode());
+            const rhsScopeCode = condition.getRHSScopeCode(entityName);
+            const ruleCondition = baseRuleCondition.replace('$RULE_CONDITION', compoundRule.getRuleCondition());
+            ruleConditions += `${rhsScopeCode}\n  `;
             ruleConditions += `const ${conditionName} = ${ruleCondition};\n  `;
         });
         _.forEach(this.actions, (action) => {

@@ -397,8 +397,13 @@ class RuleCondition {
     }
 
 
-    equals(value) {
+    equals(value, unitIfDate) {
         return this._addToChain((next, context) => {
+            if (unitIfDate) {
+                context.matches = moment(context.valueToBeChecked).isSame(moment(value), unitIfDate);
+                return next(context);
+            }
+
             context.matches = context.valueToBeChecked === value;
             return next(context);
         });
@@ -442,7 +447,7 @@ class RuleCondition {
     lessThan(value, unitIfDate) {
         return this._addToChain((next, context) => {
             if (unitIfDate) {
-                context.matches = moment.duration(context.valueToBeChecked) < moment.duration(value, unitIfDate);
+                context.matches = moment(context.valueToBeChecked).isBefore(moment(value), unitIfDate);
                 return next(context);
             }
 
@@ -454,7 +459,7 @@ class RuleCondition {
     lessThanOrEqualTo(value, unitIfDate) {
         return this._addToChain((next, context) => {
             if (unitIfDate) {
-                context.matches = moment.duration(context.valueToBeChecked) <= moment.duration(value, unitIfDate);
+                context.matches = moment(context.valueToBeChecked).isSameOrBefore(moment(value), unitIfDate);
                 return next(context);
             }
 
@@ -466,7 +471,7 @@ class RuleCondition {
     greaterThan(value, unitIfDate) {
         return this._addToChain((next, context) => {
             if (unitIfDate) {
-                context.matches = moment.duration(context.valueToBeChecked) > moment.duration(value, unitIfDate);
+                context.matches = moment(context.valueToBeChecked).isAfter(moment(value), unitIfDate);
                 return next(context);
             }
 
@@ -478,7 +483,7 @@ class RuleCondition {
     greaterThanOrEqualTo(value, unitIfDate) {
         return this._addToChain((next, context) => {
             if (unitIfDate) {
-                context.matches = moment.duration(context.valueToBeChecked) >= moment.duration(value, unitIfDate);
+                context.matches = moment(context.valueToBeChecked).isSameOrAfter(moment(value), unitIfDate);
                 return next(context);
             }
 

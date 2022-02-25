@@ -8,6 +8,7 @@ export const getViewFilterRuleTemplate = (entityName) =>
 `'use strict';
 ({params, imports}) => {
   const ${entityName} = params.entity;
+  const moment = imports.moment;
   const formElement = params.formElement;
   const _ = imports.lodash;
   let visibility = true;
@@ -23,6 +24,7 @@ export const getFormElementGroupRuleTemplate = (entityName) =>
 `'use strict';
 ({params, imports}) => {
     const ${entityName} = params.entity;
+    const moment = imports.moment;
     const formElementGroup = params.formElementGroup;
     const _ = imports.lodash;
     let visibility = true;
@@ -37,6 +39,7 @@ export const getEligibilityRuleTemplate = () =>
 `'use strict';
 ({params, imports}) => {
   const individual = params.entity;
+  const moment = imports.moment;
   let eligibility = true;
   $RULE_CONDITIONS
   $ACTION_CONDITIONS
@@ -47,6 +50,7 @@ export const getFormValidationErrorRuleTemplate = (entityName) =>
 `'use strict';
 ({params, imports}) => {
   const ${entityName} = params.entity;
+  const moment = imports.moment;
   const validationResults = [];
   $RULE_CONDITIONS
   $ACTION_CONDITIONS
@@ -57,6 +61,7 @@ export const getDecisionRuleTemplate = (entityName) =>
 `"use strict";
 ({params, imports}) => {
     const ${entityName} = params.entity;
+    const moment = imports.moment;
     const decisions = params.decisions;
     const enrolmentDecisions = [];
     const encounterDecisions = [];

@@ -1,6 +1,7 @@
 import {assertTrue} from "./Util";
 import _ from "lodash";
 import {LHS, Rule} from "./index";
+import ConceptScope from "./ConceptScope";
 
 class CompoundRule {
     static conjunctions = {
@@ -35,8 +36,8 @@ class CompoundRule {
         this.rules.push(rule);
     }
 
-    getJSCode() {
-        return _.map(this.rules, rule => rule.getJSCode()).join(`.${this.conjunction}.`).concat('.matches()');
+    getRuleCondition() {
+        return _.map(this.rules, rule => rule.getRuleCondition()).join(`.${this.conjunction}.`).concat('.matches()');
     }
 
     getRuleSummary() {
@@ -65,14 +66,12 @@ class CompoundRule {
     updateRuleAtIndex(index, name, uuid, dataType, formType) {
         const newRule = new Rule();
         if (uuid && dataType) {
+            const applicableScopes = ConceptScope.getScopeByFormType(formType);
             newRule.lhs.type = LHS.types.Concept;
             newRule.lhs.conceptName = name;
             newRule.lhs.conceptUuid = uuid;
             newRule.lhs.conceptDataType = dataType;
-            if (newRule.lhs.isCodedConcept()) {
-                const applicableScopes = LHS.getScopeByFormType(formType);
-                newRule.lhs.scope = _.head(_.values(applicableScopes));
-            }
+            newRule.lhs.scope = _.head(_.values(applicableScopes));
         } else {
             newRule.lhs.type = name;
         }

@@ -7,13 +7,14 @@ import Rule from '../../src/rules/declarative/Rule';
 import LHS from '../../src/rules/declarative/LHS';
 import RHS from '../../src/rules/declarative/RHS'
 import _ from 'lodash';
+import ConceptScope from "../../src/rules/declarative/ConceptScope";
 
 function getRule1() {
     const lhs = new LHS();
     lhs.setType(LHS.types.Concept);
     lhs.setConceptName("Demo");
     lhs.setConceptUuid("Demo");
-    lhs.setScope(LHS.scopes.Encounter);
+    lhs.setScope(ConceptScope.scopes.Encounter);
     const rhs = new RHS();
     rhs.setType(RHS.types.AnswerConcept);
     rhs.setAnswerConceptNames('a', 'b');
@@ -30,7 +31,7 @@ function getRule2() {
     lhs.setType(LHS.types.Concept);
     lhs.setConceptName("Numeric");
     lhs.setConceptUuid("Numeric");
-    lhs.setScope(LHS.scopes.EntireEnrolment);
+    lhs.setScope(ConceptScope.scopes.EntireEnrolment);
     const rhs = new RHS();
     rhs.setType(RHS.types.Value);
     rhs.setValue(2);

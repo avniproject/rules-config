@@ -1,10 +1,12 @@
 import _ from "lodash";
 import {assertTrue} from "./Util";
+import ConceptScope from "./ConceptScope";
 
 class RHS {
     static types = {
         'AnswerConcept': 'answerConcept',
         'Value': 'value',
+        'Concept': 'concept',
     };
 
     static genderOptions = [
@@ -22,6 +24,9 @@ class RHS {
         rhs.value = json.value;
         rhs.answerConceptNames = json.answerConceptNames;
         rhs.answerConceptUuids = json.answerConceptUuids;
+        rhs.conceptName = json.conceptName;
+        rhs.conceptUuid = json.conceptUuid;
+        rhs.scope = json.scope;
         return rhs;
     }
 
@@ -44,15 +49,38 @@ class RHS {
         this.value = value;
     }
 
-    getJSCode() {
+    getRuleCondition() {
         switch (this.type) {
             case RHS.types.AnswerConcept :
                 return this.getJSConceptAnswerUUIDs();
             case RHS.types.Value :
                 return this.getJSValue();
+            case RHS.types.Concept:
+                return `${_.camelCase(this.conceptName)}Value`;
             default:
                 return '';
         }
+    }
+
+    getScopeCode(entityName) {
+        if (!this.isConceptType()) return '';
+        const getEntityPathBasedOnScope = () => {
+            const scopes = ConceptScope.scopes;
+            switch (entityName) {
+                case 'individual':
+                    return `individual`;
+                case 'encounter':
+                    return this.scope === scopes.Registration ? 'encounter.individual' : 'encounter';
+                case 'programEnrolment':
+                    return this.scope === scopes.Registration ? 'programEnrolment.individual' : 'programEnrolment';
+                case 'programEncounter':
+                    return this.scope === scopes.Enrolment ? 'programEncounter.programEnrolment' : (this.scope === scopes.Registration ? 'programEncounter.programEnrolment.individual' : 'programEncounter');
+            }
+        };
+        const getSecondParam = () => ConceptScope.isCurrentEncounterRequired(this.scope) ? `, ${entityName}` : '';
+        const entityPath = getEntityPathBasedOnScope();
+        return `let ${_.camelCase(this.conceptName)}Observation = ${entityPath}.${ConceptScope.scopeToObservationFunctionMap[this.scope]}('${this.conceptUuid}'${getSecondParam()});\n  ` +
+            `let ${_.camelCase(this.conceptName)}Value = _.isEmpty(${_.camelCase(this.conceptName)}Observation) ? ${_.camelCase(this.conceptName)}Observation : ${_.camelCase(this.conceptName)}Observation.getReadableValue();`
     }
 
     getJSValue() {
@@ -67,9 +95,20 @@ class RHS {
         return _.map(this.answerConceptUuids, ac => `"${ac}"`).toString();
     }
 
+    getScopeRuleSummary() {
+        return `${this.conceptName} in ${_.lowerCase(this.scope)}`;
+    }
+
     getRuleSummary() {
-        const value = this.value ? this.getJSValue() : this.getJSConceptAnswerNames();
-        return `${_.lowerCase(this.type)} ${value}`
+        if (this.isConceptType()) {
+            return `${_.lowerCase(this.type)} ${this.getScopeRuleSummary()}`
+        }
+        if (this.value) {
+            return `${_.lowerCase(this.type)} ${this.getJSValue()}`
+        }
+        if (!_.isEmpty(this.answerConceptNames)) {
+            return `${_.lowerCase(this.type)} ${this.getJSConceptAnswerNames()}`
+        }
     }
 
     clone() {
@@ -78,6 +117,9 @@ class RHS {
         rhs.value = this.value;
         rhs.answerConceptNames = this.answerConceptNames;
         rhs.answerConceptUuids = this.answerConceptUuids;
+        rhs.conceptName = this.conceptName;
+        rhs.conceptUuid = this.conceptUuid;
+        rhs.scope = this.scope;
         return rhs;
     }
 
@@ -87,6 +129,37 @@ class RHS {
             assertTrue(!_.isNil(this.value), "Value cannot be empty");
         if (_.isEqual(this.type, RHS.types.AnswerConcept))
             assertTrue(!_.isEmpty(this.answerConceptNames), "Concept answers cannot be empty");
+        if (this.isConceptType()) {
+            assertTrue(!_.isEmpty(this.conceptName), "Concept name cannot be empty");
+            assertTrue(!_.isEmpty(this.scope), "Concept scope cannot be empty");
+        }
+    }
+
+    isConceptType() {
+        return this.type === RHS.types.Concept;
+    }
+
+    isScopeRequired() {
+        return !_.isNil(this.type) && this.isConceptType();
+    }
+
+    getConceptOptionValue() {
+        return _.isEmpty(this.conceptName) || _.isEmpty(this.conceptUuid) ? null :
+            {
+                label: this.conceptName,
+                value: {
+                    name: this.conceptName,
+                    uuid: this.conceptUuid,
+                    toString: () => this.conceptUuid
+                }
+            }
+    }
+
+    changeConceptAndScope(name, uuid, formType) {
+        this.conceptUuid = uuid;
+        this.conceptName = name;
+        const applicableScopes = ConceptScope.getScopeByFormType(formType);
+        this.scope = _.head(_.values(applicableScopes));
     }
 }
 
