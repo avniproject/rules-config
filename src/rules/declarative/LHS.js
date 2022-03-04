@@ -125,15 +125,17 @@ class LHS {
             value: {name: v, uuid: null, dataType: null, toString: () => v}
         }));
         const conceptOptions = [];
-        _.forEach(form.formElementGroups, ({formElements}) => {
-            _.forEach(formElements, ({concept}) => {
-                const {name, uuid, dataType} = concept;
-                conceptOptions.push({
-                    label: name,
-                    value: {name, uuid, dataType, toString: () => uuid}
-                });
-            })
-        });
+        if(!_.isNil(form)){
+            _.forEach(form.formElementGroups, ({formElements}) => {
+                _.forEach(formElements, ({concept}) => {
+                    const {name, uuid, dataType} = concept;
+                    conceptOptions.push({
+                        label: name,
+                        value: {name, uuid, dataType, toString: () => uuid}
+                    });
+                })
+            });
+        }
         return [..._.filter(typeOptions, ({label}) => label !== 'Concept'), ...conceptOptions];
     }
 
