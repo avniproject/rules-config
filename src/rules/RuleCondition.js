@@ -24,12 +24,12 @@ class RuleCondition {
         });
     }
 
-    _obsFromEntireEnrolment(enrolment, conceptNameOrUuid) {
-        return enrolment.findObservationInEntireEnrolment(conceptNameOrUuid);
+    _obsFromEntireEnrolment(enrolment, conceptNameOrUuid, parentConceptNameOrUuid) {
+        return enrolment.findObservationInEntireEnrolment(conceptNameOrUuid, parentConceptNameOrUuid);
     }
 
-    _obsFromEnrolment(enrolment, conceptNameOrUuid) {
-        return enrolment.findObservation(conceptNameOrUuid);
+    _obsFromEnrolment(enrolment, conceptNameOrUuid, parentConceptNameOrUuid) {
+        return enrolment.findObservation(conceptNameOrUuid, parentConceptNameOrUuid);
     }
 
     _obsFromExit(enrolment, conceptNameOrUuid) {
@@ -135,59 +135,59 @@ class RuleCondition {
         })
     }
 
-    valueInEntireEnrolment(conceptNameOrUuid) {
+    valueInEntireEnrolment(conceptNameOrUuid, parentConceptNameOrUuid) {
         return this._addToChain((next, context) => {
-            const obs = this._obsFromEntireEnrolment(this._getEnrolment(context), conceptNameOrUuid);
+            const obs = this._obsFromEntireEnrolment(this._getEnrolment(context), conceptNameOrUuid, parentConceptNameOrUuid);
             context.obsToBeChecked = obs;
             context.valueToBeChecked = obs && obs.getValue();
             return next(context);
         });
     }
 
-    latestValueInAllEncounters(conceptNameOrUuid) {
+    latestValueInAllEncounters(conceptNameOrUuid, parentConceptNameOrUuid) {
         return this._addToChain((next, context) => {
             const obs = this._getIndividualOrEnrolment(context)
-                .findLatestObservationFromEncounters(conceptNameOrUuid, this._getEncounter(context));
+                .findLatestObservationFromEncounters(conceptNameOrUuid, this._getEncounter(context), false, parentConceptNameOrUuid);
             context.obsToBeChecked = obs;
             context.valueToBeChecked = obs && obs.getValue();
             return next(context);
         });
     }
 
-    latestValueInEntireEnrolment(conceptNameOrUuid) {
+    latestValueInEntireEnrolment(conceptNameOrUuid, parentConceptNameOrUuid) {
         return this._addToChain((next, context) => {
             const enrolment = this._getEnrolment(context);
-            const obs = enrolment.findLatestObservationFromEncounters(conceptNameOrUuid, context.programEncounter, true);
+            const obs = enrolment.findLatestObservationFromEncounters(conceptNameOrUuid, context.programEncounter, true, parentConceptNameOrUuid);
             context.obsToBeChecked = obs;
             context.valueToBeChecked = obs && obs.getValue();
             return next(context);
         });
     }
 
-    latestValueInPreviousEncounters(conceptNameOrUuid) {
+    latestValueInPreviousEncounters(conceptNameOrUuid, parentConceptNameOrUuid) {
         return this._addToChain((next, context) => {
             const obs = this._getIndividualOrEnrolment(context)
-                .findLatestObservationFromPreviousEncounters(conceptNameOrUuid, this._getEncounter(context));
+                .findLatestObservationFromPreviousEncounters(conceptNameOrUuid, this._getEncounter(context), parentConceptNameOrUuid);
             context.obsToBeChecked = obs;
             context.valueToBeChecked = obs && obs.getValue();
             return next(context);
         });
     }
 
-    valueInLastEncounter(conceptNameOrUuid, encounterTypes) {
+    valueInLastEncounter(conceptNameOrUuid, encounterTypes, parentConceptNameOrUuid) {
         return this._addToChain((next, context) => {
             const lastEncounter = this._getIndividualOrEnrolment(context)
                 .findLastEncounterOfType(this._getEncounter(context), encounterTypes);
-            const obs = _.defaultTo(lastEncounter, {findObservation: _.noop}).findObservation(conceptNameOrUuid);
+            const obs = _.defaultTo(lastEncounter, {findObservation: _.noop}).findObservation(conceptNameOrUuid, parentConceptNameOrUuid);
             context.obsToBeChecked = obs;
             context.valueToBeChecked = obs && obs.getValue();
             return next(context);
         });
     }
 
-    valueInEnrolment(conceptNameOrUuid) {
+    valueInEnrolment(conceptNameOrUuid, parentConceptNameOrUuid) {
         return this._addToChain((next, context) => {
-            const obs = this._obsFromEnrolment(this._getEnrolment(context), conceptNameOrUuid);
+            const obs = this._obsFromEnrolment(this._getEnrolment(context), conceptNameOrUuid, parentConceptNameOrUuid);
             context.obsToBeChecked = obs;
             context.valueToBeChecked = obs && obs.getValue();
             return next(context);
@@ -313,10 +313,10 @@ class RuleCondition {
         return this.containsAnswerConceptName("No");
     }
 
-    valueInEncounter(conceptNameOrUuid) {
+    valueInEncounter(conceptNameOrUuid, parentConceptNameOrUuid) {
         return this._addToChain((next, context) => {
             const encounter = this._getEncounter(context);
-            const obs = encounter && encounter.findObservation(conceptNameOrUuid);
+            const obs = encounter && encounter.findObservation(conceptNameOrUuid, parentConceptNameOrUuid);
             context.obsToBeChecked = obs;
             context.valueToBeChecked = obs && obs.getValue();
             return next(context);
@@ -332,9 +332,9 @@ class RuleCondition {
         });
     }
 
-    valueInRegistration(conceptNameOrUuid) {
+    valueInRegistration(conceptNameOrUuid, parentConceptNameOrUuid) {
         return this._addToChain((next, context) => {
-            const obs = this._getIndividual(context).findObservation(conceptNameOrUuid);
+            const obs = this._getIndividual(context).findObservation(conceptNameOrUuid, parentConceptNameOrUuid);
             context.obsToBeChecked = obs;
             context.valueToBeChecked = obs && obs.getValue();
             return next(context);
