@@ -63,7 +63,7 @@ class CompoundRule {
         }
     }
 
-    updateRuleAtIndex(index, name, uuid, dataType, formType) {
+    updateRuleAtIndex(index, name, uuid, dataType, formType, parentConceptUuid) {
         const newRule = new Rule();
         if (uuid && dataType) {
             const applicableScopes = ConceptScope.getScopeByFormType(formType);
@@ -71,6 +71,7 @@ class CompoundRule {
             newRule.lhs.conceptName = name;
             newRule.lhs.conceptUuid = uuid;
             newRule.lhs.conceptDataType = dataType;
+            newRule.lhs.parentConceptUuid = parentConceptUuid;
             newRule.lhs.scope = _.head(_.values(applicableScopes));
         } else {
             newRule.lhs.type = name;

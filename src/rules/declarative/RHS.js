@@ -108,6 +108,8 @@ class RHS {
         }
         if (!_.isEmpty(this.answerConceptNames)) {
             return `${_.lowerCase(this.type)} ${this.getJSConceptAnswerNames()}`
+        } else {
+            return '';
         }
     }
 

@@ -35,6 +35,7 @@ class LHS {
         lhs.type = json.type;
         lhs.conceptName = json.conceptName;
         lhs.conceptUuid = json.conceptUuid;
+        lhs.parentConceptUuid = json.parentConceptUuid;
         lhs.conceptDataType = json.conceptDataType;
         lhs.scope = json.scope;
         lhs.encounterTypes = json.encounterTypes;
@@ -113,7 +114,9 @@ class LHS {
     getRuleCondition() {
         if (this.scope) {
             const functionMap = ConceptScope.scopeToRuleFunctionMap;
-            return `${functionMap[this.scope]}("${this.conceptUuid}")`;
+            const secondParameter = ConceptScope.scopes.LastEncounter === this.scope ? `[], "${this.parentConceptUuid}"` : `"${this.parentConceptUuid}"`;
+            const parameters = this.parentConceptUuid ? `"${this.conceptUuid}", ${secondParameter}` : `"${this.conceptUuid}"`;
+            return `${functionMap[this.scope]}(${parameters})`;
         } else {
             return this.type;
         }
@@ -166,6 +169,7 @@ class LHS {
         lhs.type = this.type;
         lhs.conceptName = this.conceptName;
         lhs.conceptUuid = this.conceptUuid;
+        lhs.parentConceptUuid = this.parentConceptUuid;
         lhs.conceptDataType = this.conceptDataType;
         lhs.scope = this.scope;
         lhs.encounterTypes = this.encounterTypes;
