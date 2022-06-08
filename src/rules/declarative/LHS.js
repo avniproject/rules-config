@@ -114,8 +114,8 @@ class LHS {
     getRuleCondition() {
         if (this.scope) {
             const functionMap = ConceptScope.scopeToRuleFunctionMap;
-            const secondParameter = ConceptScope.scopes.LastEncounter === this.scope ? `[], "${this.parentConceptUuid}"` : `"${this.parentConceptUuid}"`;
-            const parameters = this.parentConceptUuid ? `"${this.conceptUuid}", ${secondParameter}` : `"${this.conceptUuid}"`;
+            const questionGroupParameters = ConceptScope.scopes.LastEncounter === this.scope ? `[], "${this.parentConceptUuid}", params.questionGroupIndex` : `"${this.parentConceptUuid}", params.questionGroupIndex`;
+            const parameters = this.parentConceptUuid ? `"${this.conceptUuid}", ${questionGroupParameters}` : `"${this.conceptUuid}"`;
             return `${functionMap[this.scope]}(${parameters})`;
         } else {
             return this.type;

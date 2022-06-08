@@ -2,7 +2,10 @@ import _ from "lodash";
 
 class ConceptScope {
     static formTypeToScopeMap = {
-        IndividualProfile: {'ThisRegistration': 'registration'},
+        IndividualProfile: {
+            'ThisRegistration': 'registration',
+            'ThisQuestionGroupRegistration': 'questionGroupRegistration'
+        },
         IndividualEncounterCancellation: {
             'ThisCancelEncounter': 'cancelEncounter',
             'LastEncounter': 'lastEncounter',
@@ -16,10 +19,12 @@ class ConceptScope {
             'LatestInAllEncounters': 'latestInAllEncounters',
             'LatestInPreviousEncounters': 'latestInPreviousEncounters',
             'Registration': 'registration',
+            'ThisQuestionGroupEncounter': 'questionGroupEncounter'
         },
         ProgramEnrolment: {
             'ThisEnrolment': 'enrolment',
             'Registration': 'registration',
+            'ThisQuestionGroupEnrolment': 'questionGroupEnrolment'
         },
         ProgramExit: {
             'ThisExit': 'exit',
@@ -34,6 +39,7 @@ class ConceptScope {
             'EntireEnrolment': 'entireEnrolment',
             'Enrolment': 'enrolment',
             'Registration': 'registration',
+            'ThisQuestionGroupEncounter': 'questionGroupEncounter'
         },
         ProgramEncounterCancellation: {
             'ThisCancelEncounter': 'cancelEncounter',
@@ -75,6 +81,9 @@ class ConceptScope {
         'registration': 'valueInRegistration',
         'cancelEncounter': 'valueInCancelEncounter',
         'checklistItem': 'valueInChecklistItem',
+        'questionGroupRegistration': 'questionGroupValueInRegistration',
+        'questionGroupEncounter': 'questionGroupValueInEncounter',
+        'questionGroupEnrolment': 'questionGroupValueInEnrolment',
     };
 
     static scopeToObservationFunctionMap = {

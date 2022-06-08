@@ -85,6 +85,18 @@ class RuleCondition {
         throw new Error(message);
     }
 
+    _processQuestionGroupObservations(groupObservations, index, childConceptNameOrUUID, context, next) {
+        const questionGroupObs = groupObservations && groupObservations.getValueWrapper();
+        if (!_.isNil(index)) {
+            const questionGroup = questionGroupObs && questionGroupObs.getGroupObservationAtIndex(index);
+            const obs = questionGroup && questionGroup.findObservationByConceptUUID(childConceptNameOrUUID);
+            context.obsToBeChecked = obs;
+            context.valueToBeChecked = obs && obs.getValue();
+            return next(context);
+        }
+        return next(context);
+    }
+
     get is() {
         return this._noop();
     }
@@ -320,6 +332,30 @@ class RuleCondition {
             context.obsToBeChecked = obs;
             context.valueToBeChecked = obs && obs.getValue();
             return next(context);
+        });
+    }
+
+    questionGroupValueInEncounter(childConceptNameOrUUID, questionGroupNameOrUUID, questionGroupIndex) {
+        return this._addToChain((next, context) => {
+            const encounter = this._getEncounter(context);
+            const groupObservations = encounter && encounter.findObservation(questionGroupNameOrUUID);
+            return this._processQuestionGroupObservations(groupObservations, questionGroupIndex, childConceptNameOrUUID, context, next);
+        });
+    }
+
+    questionGroupValueInRegistration(childConceptNameOrUUID, questionGroupNameOrUUID, questionGroupIndex) {
+        return this._addToChain((next, context) => {
+            const individual = this._getIndividual(context);
+            const groupObservations = individual && individual.findObservation(questionGroupNameOrUUID);
+            return this._processQuestionGroupObservations(groupObservations, questionGroupIndex, childConceptNameOrUUID, context, next);
+        });
+    }
+
+    questionGroupValueInEnrolment(childConceptNameOrUUID, questionGroupNameOrUUID, questionGroupIndex) {
+        return this._addToChain((next, context) => {
+            const enrolment = this._getEnrolment(context);
+            const groupObservations = enrolment && enrolment.findObservation(questionGroupNameOrUUID);
+            return this._processQuestionGroupObservations(groupObservations, questionGroupIndex, childConceptNameOrUUID, context, next);
         });
     }
 
