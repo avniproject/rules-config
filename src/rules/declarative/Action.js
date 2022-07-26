@@ -6,6 +6,7 @@ import {
     AddDecisionActionDetails,
     FormValidationActionDetails
 } from "./index";
+import TaskScheduleActionDetails from "./TaskScheduleActionDetails";
 
 class Action {
     static formElementActionTypes = {
@@ -27,6 +28,7 @@ class Action {
         'FormValidationError': 'formValidationError',
         'AddDecision': 'addDecision',
         'ScheduleVisit': 'scheduleVisit',
+        'ScheduleTask': 'scheduleTask'
     };
 
     constructor() {
@@ -45,6 +47,8 @@ class Action {
             action.details = AddDecisionActionDetails.fromResource(actionDetails);
         } else if (json.actionType === Action.actionTypes.ScheduleVisit) {
             action.details = VisitScheduleActionDetails.fromResource(actionDetails);
+        } else if (json.actionType === Action.actionTypes.ScheduleTask) {
+            action.details = TaskScheduleActionDetails.fromResource(actionDetails);
         }
         return action;
     }

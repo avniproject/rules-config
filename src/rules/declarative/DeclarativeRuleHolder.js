@@ -178,6 +178,10 @@ class DeclarativeRuleHolder {
     getApplicableVisitScheduleRuleActions() {
         return _.pick(Action.actionTypes, ['ScheduleVisit']);
     }
+
+    getApplicableTaskScheduleRuleActions() {
+        return _.pick(Action.actionTypes, ['ScheduleTask']);
+    }
 }
 
 

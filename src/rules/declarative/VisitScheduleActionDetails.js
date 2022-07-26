@@ -2,7 +2,6 @@ import {assertTrue} from "./Util";
 import _ from "lodash";
 
 class VisitScheduleActionDetails {
-
     static formTypeToDateFieldMap = {
         IndividualProfile: ['registrationDate'],
         IndividualEncounterCancellation: ['cancelDateTime', 'earliestVisitDateTime', 'registrationDate'],
