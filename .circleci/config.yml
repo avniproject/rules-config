@@ -1,6 +1,10 @@
 version: 2
 jobs:
   build:
+    filters:
+      branches:
+        ignore: build
+
     docker:
     - image: circleci/node:8.5.0
 
@@ -37,6 +41,3 @@ workflows:
   build_deploy:
     jobs:
     - build
-        filters:
-          branches:
-            ignore: build
