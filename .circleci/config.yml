@@ -37,6 +37,6 @@ workflows:
   build_deploy:
     jobs:
     - build
-      branches:
-        ignore:
-          - build
+        filters:
+          branches:
+            ignore: build
