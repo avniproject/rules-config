@@ -1,4 +1,7 @@
-build:
+set_node_version:
+	. ${NVM_DIR}/nvm.sh && nvm use
+
+build: set_node_version
 	rm -rf exports
 	npm run build
 
@@ -10,8 +13,11 @@ define _deploy
 	cp exports/infra.js exports/rules.js exports/package.json $1/
 endef
 
-deps:
+deps: set_node_version
 	npm install
 
-tests:
+tests: set_node_version build
 	npm run test
+
+clean:
+	rm -rf node_modules
