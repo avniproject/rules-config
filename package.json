@@ -45,7 +45,7 @@
     "babel-plugin-istanbul": "^5.1.0",
     "copy-webpack-plugin": "^4.5.1",
     "jest": "^24.8.0",
-    "openchs-models": "^0.2.25",
+    "openchs-models": "latest",
     "lodash": "^4.17.11",
     "moment": "^2.22.2"
   },
