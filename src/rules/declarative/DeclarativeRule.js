@@ -134,7 +134,8 @@ class DeclarativeRule {
                     actionConditions += constructSkipAnsCondition(matchesCondition, action.getJsAnswerUUIDsToSkip());
                     break;
                 case actionTypes.ValidationError:
-                    actionConditions += constructOtherCondition(matchesCondition, `validationErrors.push("${_.get(action, 'details.validationError')}");`);
+                    const validationError = _.get(action, 'details.validationError')?.replaceAll(/'|"/g, "\'")
+                    actionConditions += constructOtherCondition(matchesCondition, `validationErrors.push("${validationError}");`);
                     break;
                 case actionTypes.ShowEncounterType:
                 case actionTypes.ShowProgram:

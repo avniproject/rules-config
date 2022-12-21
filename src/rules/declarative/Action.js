@@ -122,7 +122,8 @@ class Action {
                 return `Hide answers ${this.getJsAnswersToSkip()}.`;
             case Action.actionTypes.ValidationError:
             case Action.actionTypes.FormValidationError:
-                return `Raise error "${this.details.validationError}".`;
+                const validationError = this.details.validationError?.replaceAll(/'|"/g, "\'")
+                return `Raise error ${validationError}.`;
             case Action.actionTypes.AddDecision:
                 return `Add Decision "${this.details.conceptName} : ${this.details.getSummaryValue()}" in ${_.startCase(this.details.scope)}`;
             case Action.actionTypes.ScheduleVisit:
