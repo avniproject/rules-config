@@ -3,15 +3,19 @@ export default () => ({
     /* Until we find a good way to share modules during rule evaluation, we use globals */
     /* ruleServiceLibraryInterfaceForSharingModules is globally available */
     get log() {
-        return ruleServiceLibraryInterfaceForSharingModules.log;
+        return this.ruleServiceLibraryInterfaceForSharingModules.log;
     },
     get C() {
-        return ruleServiceLibraryInterfaceForSharingModules.common;
+        return this.ruleServiceLibraryInterfaceForSharingModules.common;
     },
     get calculations() {
-        return ruleServiceLibraryInterfaceForSharingModules.motherCalculations;
+        return this.ruleServiceLibraryInterfaceForSharingModules.motherCalculations;
     },
     get models() {
-        return ruleServiceLibraryInterfaceForSharingModules.models;
+        return this.ruleServiceLibraryInterfaceForSharingModules.models;
+    },
+    get ruleServiceLibraryInterfaceForSharingModules() {
+        if (ruleServiceLibraryInterfaceForSharingModules) return ruleServiceLibraryInterfaceForSharingModules;
+        if (global) return global.ruleServiceLibraryInterfaceForSharingModules;
     }
 });

@@ -8,6 +8,11 @@ build: set_node_version
 deploy: build
 	$(if $(local),$(call _deploy,$(local)/node_modules/rules-config))
 
+deploy-to-avni-client-only:
+	$(call _deploy,../avni-client/packages/openchs-android/node_modules/rules-config)
+
+deploy-to-avni-client: build deploy-to-avni-client-only
+
 deploy-as-source:
 	$(if $(local),$(call _deploy_as_source,$(local)/node_modules/rules-config))
 

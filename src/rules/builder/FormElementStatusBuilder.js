@@ -31,6 +31,7 @@ class FormElementStatusBuilder {
         let answerSkipRule = {
             rule: new RuleCondition(this.context),
             answers: _.reject(_.map(answers, (answer) => {
+                //todo: vivek - When answer is not a string we should check whether answer is actually concept. don't know about the contract fully to make the change. will do this as part of rule service refactoring. when I passed an array of answers instead of answer then answers to skip becomes an array and it fails later on in the application - not caught by rule execution try catch.
                 const answerToSkip = _.isString(answer) ? this.context.formElement.getAnswerWithConceptName(answer) : answer;
                 if (answerToSkip) {
                     return answerToSkip;
