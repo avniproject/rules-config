@@ -1,7 +1,4 @@
-set_node_version:
-	. ${NVM_DIR}/nvm.sh && nvm use
-
-build: set_node_version
+build:
 	rm -rf exports
 	npm run build
 
@@ -30,10 +27,10 @@ endef
 check-model-version:
 	npm search openchs-models
 
-deps: set_node_version
+deps:
 	npm install
 
-tests: set_node_version build
+tests:
 	npm run test
 
 clean:
