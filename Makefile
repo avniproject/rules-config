@@ -10,6 +10,16 @@ deploy-to-avni-client-only:
 
 deploy-to-avni-client: build deploy-to-avni-client-only
 
+deploy-to-avni-webapp-only:
+	$(call _deploy,../avni-webapp/node_modules/rules-config)
+
+deploy-to-avni-webapp: build deploy-to-avni-webapp-only
+
+deploy-to-rules-server-only:
+	$(call _deploy,../rules-server/node_modules/rules-config)
+
+deploy-to-rules-server: build deploy-to-rules-server-only
+
 deploy-as-source:
 	$(if $(local),$(call _deploy_as_source,$(local)/node_modules/rules-config))
 
