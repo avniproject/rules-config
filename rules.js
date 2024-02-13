@@ -14,3 +14,4 @@ export * from './src/rules/additional/Rule';
 export * from './src/rules/additional/constants';
 export * from './src/rules/utils';
 export * from './src/rules/declarative'
+export EditFormRuleResponse from './src/rules/model/EditFormRuleResponse'
