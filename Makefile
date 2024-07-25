@@ -15,6 +15,15 @@ deploy-to-avni-webapp-only:
 
 deploy-to-avni-webapp: build deploy-to-avni-webapp-only
 
+deploy-to-project: build deploy-to-project-only
+
+deploy-to-project-only:
+ifndef project
+	@echo "Provde the project variable"
+	exit 1
+endif
+	$(call _deploy,../$(project)/node_modules/rules-config)
+
 deploy-to-rules-server-only:
 	$(call _deploy,../rules-server/node_modules/rules-config)
 
