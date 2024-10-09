@@ -36047,8 +36047,6 @@ var LHS = /*#__PURE__*/function () {
   }, {
     key: "validate",
     value: function validate() {
-      Object(__WEBPACK_IMPORTED_MODULE_1__Util__["a" /* assertTrue */])(!__WEBPACK_IMPORTED_MODULE_0_lodash___default.a.isNil(this.type), "Type cannot be empty");
-
       if (__WEBPACK_IMPORTED_MODULE_0_lodash___default.a.isEqual(this.type, LHS.types.Concept)) {
         Object(__WEBPACK_IMPORTED_MODULE_1__Util__["a" /* assertTrue */])(!__WEBPACK_IMPORTED_MODULE_0_lodash___default.a.isNil(this.conceptName), "Concept cannot be empty");
         Object(__WEBPACK_IMPORTED_MODULE_1__Util__["a" /* assertTrue */])(!__WEBPACK_IMPORTED_MODULE_0_lodash___default.a.isNil(this.scope), "Scope cannot be empty");
@@ -38705,7 +38703,7 @@ var DeclarativeRule = /*#__PURE__*/function () {
   }, {
     key: "isEmpty",
     value: function isEmpty() {
-      return __WEBPACK_IMPORTED_MODULE_0_lodash___default.a.chain(this).get('conditions[0].compoundRule.rules[0].lhs.type').isEmpty().value();
+      return false;
     }
   }, {
     key: "addNewAction",
@@ -38795,13 +38793,18 @@ var DeclarativeRule = /*#__PURE__*/function () {
       __WEBPACK_IMPORTED_MODULE_0_lodash___default.a.forEach(this.conditions, function (condition, index) {
         var compoundRule = condition.compoundRule,
             conjunction = condition.conjunction;
-        var conditionName = "condition".concat(index + 1).concat(conditionAppender);
-        var operator = index + 1 < __WEBPACK_IMPORTED_MODULE_0_lodash___default.a.size(_this2.conditions) ? DeclarativeRule.conjunctionToBooleanOperator[conjunction] : '';
-        matchesConditions.push("".concat(conditionName, " ").concat(operator));
-        var rhsScopeCode = condition.getRHSScopeCode(entityName);
-        var ruleCondition = baseRuleCondition.replace('$RULE_CONDITION', compoundRule.getRuleCondition());
-        ruleConditions += "".concat(rhsScopeCode, "\n  ");
-        ruleConditions += "const ".concat(conditionName, " = ").concat(ruleCondition, ";\n  ");
+
+        if (__WEBPACK_IMPORTED_MODULE_0_lodash___default.a.size(compoundRule.rules) === 1 && __WEBPACK_IMPORTED_MODULE_0_lodash___default.a.isNil(compoundRule.rules[0].lhs.type)) {
+          matchesConditions.push('true');
+        } else {
+          var conditionName = "condition".concat(index + 1).concat(conditionAppender);
+          var operator = index + 1 < __WEBPACK_IMPORTED_MODULE_0_lodash___default.a.size(_this2.conditions) ? DeclarativeRule.conjunctionToBooleanOperator[conjunction] : '';
+          matchesConditions.push("".concat(conditionName, " ").concat(operator));
+          var rhsScopeCode = condition.getRHSScopeCode(entityName);
+          var ruleCondition = baseRuleCondition.replace('$RULE_CONDITION', compoundRule.getRuleCondition());
+          ruleConditions += "".concat(rhsScopeCode, "\n  ");
+          ruleConditions += "const ".concat(conditionName, " = ").concat(ruleCondition, ";\n  ");
+        }
       });
 
       __WEBPACK_IMPORTED_MODULE_0_lodash___default.a.forEach(this.actions, function (action) {
@@ -39015,7 +39018,7 @@ var Rule = /*#__PURE__*/function () {
   }, {
     key: "getRuleSummary",
     value: function getRuleSummary() {
-      return "".concat(this.lhs.getRuleSummary(), " ").concat(__WEBPACK_IMPORTED_MODULE_1_lodash___default.a.lowerCase(this.operator), " ").concat(this.rhs.getRuleSummary());
+      return __WEBPACK_IMPORTED_MODULE_1_lodash___default.a.isNil(this.lhs.type) ? 'Always' : "".concat(this.lhs.getRuleSummary(), " ").concat(__WEBPACK_IMPORTED_MODULE_1_lodash___default.a.lowerCase(this.operator), " ").concat(this.rhs.getRuleSummary());
     }
   }, {
     key: "clone",
@@ -39030,7 +39033,7 @@ var Rule = /*#__PURE__*/function () {
     key: "validate",
     value: function validate() {
       this.lhs.validate();
-      Object(__WEBPACK_IMPORTED_MODULE_0__Util__["a" /* assertTrue */])(!__WEBPACK_IMPORTED_MODULE_1_lodash___default.a.isNil(this.operator), "Operator cannot be empty");
+      if (!__WEBPACK_IMPORTED_MODULE_1_lodash___default.a.isNil(this.lhs.type)) Object(__WEBPACK_IMPORTED_MODULE_0__Util__["a" /* assertTrue */])(!__WEBPACK_IMPORTED_MODULE_1_lodash___default.a.isNil(this.operator), "Operator cannot be empty");
       this.isRhsRequired() && this.rhs.validate();
     }
   }], [{
