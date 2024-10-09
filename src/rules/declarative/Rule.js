@@ -91,7 +91,7 @@ class Rule {
     }
 
     getRuleSummary() {
-        return `${this.lhs.getRuleSummary()} ${_.lowerCase(this.operator)} ${this.rhs.getRuleSummary()}`
+        return _.isNil(this.lhs.type) ? 'Always' : `${this.lhs.getRuleSummary()} ${_.lowerCase(this.operator)} ${this.rhs.getRuleSummary()}`
     }
 
     clone() {
@@ -104,7 +104,7 @@ class Rule {
 
     validate() {
         this.lhs.validate();
-        assertTrue(!_.isNil(this.operator), "Operator cannot be empty");
+        if(!_.isNil(this.lhs.type)) assertTrue(!_.isNil(this.operator), "Operator cannot be empty");
         this.isRhsRequired() && this.rhs.validate();
     }
 }

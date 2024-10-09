@@ -55,10 +55,7 @@ class DeclarativeRule {
     }
 
     isEmpty() {
-        return _.chain(this)
-            .get('conditions[0].compoundRule.rules[0].lhs.type')
-            .isEmpty()
-            .value();
+        return false;
     }
 
     addNewAction() {
@@ -107,13 +104,17 @@ class DeclarativeRule {
         let actionConditions = '';
         _.forEach(this.conditions, (condition, index) => {
             const {compoundRule, conjunction} = condition;
-            const conditionName = `condition${index + 1}${conditionAppender}`;
-            const operator = (index + 1) < _.size(this.conditions) ? DeclarativeRule.conjunctionToBooleanOperator[conjunction] : '';
-            matchesConditions.push(`${conditionName} ${operator}`);
-            const rhsScopeCode = condition.getRHSScopeCode(entityName);
-            const ruleCondition = baseRuleCondition.replace('$RULE_CONDITION', compoundRule.getRuleCondition());
-            ruleConditions += `${rhsScopeCode}\n  `;
-            ruleConditions += `const ${conditionName} = ${ruleCondition};\n  `;
+            if (_.size(compoundRule.rules) === 1 && _.isNil(compoundRule.rules[0].lhs.type)) {
+                matchesConditions.push('true')
+            } else {
+                const conditionName = `condition${index + 1}${conditionAppender}`;
+                const operator = (index + 1) < _.size(this.conditions) ? DeclarativeRule.conjunctionToBooleanOperator[conjunction] : '';
+                matchesConditions.push(`${conditionName} ${operator}`);
+                const rhsScopeCode = condition.getRHSScopeCode(entityName);
+                const ruleCondition = baseRuleCondition.replace('$RULE_CONDITION', compoundRule.getRuleCondition());
+                ruleConditions += `${rhsScopeCode}\n  `;
+                ruleConditions += `const ${conditionName} = ${ruleCondition};\n  `;
+            }
         });
         _.forEach(this.actions, (action) => {
             const actionTypes = Action.actionTypes;
