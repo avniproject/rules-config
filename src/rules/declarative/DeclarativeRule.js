@@ -55,7 +55,10 @@ class DeclarativeRule {
     }
 
     isEmpty() {
-        return false;
+        return _.chain(this)
+            .get('actions[0].actionType')
+            .isEmpty()
+            .value();
     }
 
     addNewAction() {
