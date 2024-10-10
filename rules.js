@@ -38703,7 +38703,7 @@ var DeclarativeRule = /*#__PURE__*/function () {
   }, {
     key: "isEmpty",
     value: function isEmpty() {
-      return false;
+      return __WEBPACK_IMPORTED_MODULE_0_lodash___default.a.chain(this).get('actions[0].actionType').isEmpty().value();
     }
   }, {
     key: "addNewAction",
