@@ -36401,8 +36401,8 @@ Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
 /* harmony namespace reexport (by provided) */ __webpack_require__.d(__webpack_exports__, "ViewFilterActionDetails", function() { return __WEBPACK_IMPORTED_MODULE_15__src_rules_declarative__["l"]; });
 /* harmony namespace reexport (by provided) */ __webpack_require__.d(__webpack_exports__, "VisitScheduleActionDetails", function() { return __WEBPACK_IMPORTED_MODULE_15__src_rules_declarative__["m"]; });
 /* harmony namespace reexport (by provided) */ __webpack_require__.d(__webpack_exports__, "ConceptScope", function() { return __WEBPACK_IMPORTED_MODULE_15__src_rules_declarative__["d"]; });
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_16__src_rules_model_EditFormRuleResponse__ = __webpack_require__(201);
-/* harmony reexport (binding) */ __webpack_require__.d(__webpack_exports__, "EditFormRuleResponse", function() { return __WEBPACK_IMPORTED_MODULE_16__src_rules_model_EditFormRuleResponse__["a"]; });
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_16__src_rules_model_ActionEligibilityResponse__ = __webpack_require__(201);
+/* harmony reexport (binding) */ __webpack_require__.d(__webpack_exports__, "ActionEligibilityResponse", function() { return __WEBPACK_IMPORTED_MODULE_16__src_rules_model_ActionEligibilityResponse__["a"]; });
 
 
 
@@ -39803,81 +39803,86 @@ function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _d
 function _defineProperty(obj, key, value) { if (key in obj) { Object.defineProperty(obj, key, { value: value, enumerable: true, configurable: true, writable: true }); } else { obj[key] = value; } return obj; }
 
 
+/**
+ * Generic eligibility response class that can be used by different types of rules like
+ * EditFormRule and MemberEligibilityCheckRule to determine if an action is allowed
+ */
 
-var EditFormRuleResponse = /*#__PURE__*/function () {
-  function EditFormRuleResponse() {
-    _classCallCheck(this, EditFormRuleResponse);
+var ActionEligibilityResponse = /*#__PURE__*/function () {
+  function ActionEligibilityResponse() {
+    _classCallCheck(this, ActionEligibilityResponse);
 
-    _defineProperty(this, "editable", void 0);
+    _defineProperty(this, "eligible", void 0);
   }
 
-  _createClass(EditFormRuleResponse, [{
-    key: "isEditAllowed",
-    value: function isEditAllowed() {
-      return this.editable.value;
+  _createClass(ActionEligibilityResponse, [{
+    key: "isAllowed",
+    value: function isAllowed() {
+      return this.eligible.value;
     }
   }, {
-    key: "isEditDisallowed",
-    value: function isEditDisallowed() {
-      return !this.isEditAllowed();
+    key: "isDisallowed",
+    value: function isDisallowed() {
+      return !this.isAllowed();
     }
   }, {
-    key: "getMessageKey",
-    value: function getMessageKey() {
-      return this.editable.messageKey;
+    key: "getMessage",
+    value: function getMessage() {
+      return this.eligible.message;
     }
   }], [{
-    key: "createEditAllowedResponse",
-    value: function createEditAllowedResponse() {
-      var editRuleResponse = new EditFormRuleResponse();
-      editRuleResponse.editable = EditFormRuleResponseEditable.createEditAllowedEditable();
-      return editRuleResponse;
+    key: "createAllowedResponse",
+    value: function createAllowedResponse() {
+      var ruleResponse = new ActionEligibilityResponse();
+      ruleResponse.eligible = EligiblityStatus.createAllowedStatus();
+      return ruleResponse;
     }
   }, {
-    key: "createEditRuleResponse",
-    value: function createEditRuleResponse(ruleResponse) {
-      var editRuleResponseEditableObject = __WEBPACK_IMPORTED_MODULE_0_lodash___default.a.get(ruleResponse, "editable");
+    key: "createRuleResponse",
+    value: function createRuleResponse(ruleResponse) {
+      //always check for both eligible and editable as editable is used for edit form rules   
+      var eligiblityObject = __WEBPACK_IMPORTED_MODULE_0_lodash___default.a.get(ruleResponse, "eligible") || __WEBPACK_IMPORTED_MODULE_0_lodash___default.a.get(ruleResponse, "editable");
 
-      if (__WEBPACK_IMPORTED_MODULE_0_lodash___default.a.isNil(editRuleResponseEditableObject)) return EditFormRuleResponse.createEditAllowedResponse();
-      var editRuleResponse = new EditFormRuleResponse();
-      editRuleResponse.editable = EditFormRuleResponseEditable.createEditRuleEditableFrom(editRuleResponseEditableObject);
-      return editRuleResponse;
+      if (__WEBPACK_IMPORTED_MODULE_0_lodash___default.a.isNil(eligiblityObject)) return ActionEligibilityResponse.createAllowedResponse();
+      var newRuleResponse = new ActionEligibilityResponse();
+      newRuleResponse.eligible = EligiblityStatus.createPermissionStatusFrom(eligiblityObject);
+      return newRuleResponse;
     }
   }]);
 
-  return EditFormRuleResponse;
+  return ActionEligibilityResponse;
 }();
 
-var EditFormRuleResponseEditable = /*#__PURE__*/function () {
-  function EditFormRuleResponseEditable() {
-    _classCallCheck(this, EditFormRuleResponseEditable);
+var EligiblityStatus = /*#__PURE__*/function () {
+  function EligiblityStatus() {
+    _classCallCheck(this, EligiblityStatus);
 
     _defineProperty(this, "value", void 0);
 
-    _defineProperty(this, "messageKey", void 0);
+    _defineProperty(this, "message", void 0);
   }
 
-  _createClass(EditFormRuleResponseEditable, null, [{
-    key: "createEditAllowedEditable",
-    value: function createEditAllowedEditable() {
-      var editRuleResponseEditable = new EditFormRuleResponseEditable();
-      editRuleResponseEditable.value = true;
-      return editRuleResponseEditable;
+  _createClass(EligiblityStatus, null, [{
+    key: "createAllowedStatus",
+    value: function createAllowedStatus() {
+      var eligiblityStatus = new EligiblityStatus();
+      eligiblityStatus.value = true;
+      return eligiblityStatus;
     }
   }, {
-    key: "createEditRuleEditableFrom",
-    value: function createEditRuleEditableFrom(ruleResponseEditableObject) {
-      var editRuleResponseEditable = new EditFormRuleResponseEditable();
-      editRuleResponseEditable.value = __WEBPACK_IMPORTED_MODULE_0_lodash___default.a.isBoolean(ruleResponseEditableObject.value) ? ruleResponseEditableObject.value : true;
-      editRuleResponseEditable.messageKey = ruleResponseEditableObject.messageKey;
-      return editRuleResponseEditable;
+    key: "createPermissionStatusFrom",
+    value: function createPermissionStatusFrom(eligibilityObject) {
+      var eligiblityStatus = new EligiblityStatus();
+      eligiblityStatus.value = __WEBPACK_IMPORTED_MODULE_0_lodash___default.a.isBoolean(eligibilityObject.value) ? eligibilityObject.value : true;
+      eligiblityStatus.message = eligibilityObject.message;
+      return eligiblityStatus;
     }
   }]);
 
-  return EditFormRuleResponseEditable;
+  return EligiblityStatus;
 }();
 
-/* harmony default export */ __webpack_exports__["a"] = (EditFormRuleResponse);
+/* harmony default export */ __webpack_exports__["a"] = (ActionEligibilityResponse);
 
 /***/ })
 /******/ ]);
