@@ -6,12 +6,30 @@ deploy: build
 	$(if $(local),$(call _deploy,$(local)/node_modules/rules-config))
 
 deploy-to-avni-client-only:
-	$(call _deploy,../avni-client/packages/openchs-android/node_modules/rules-config)
+	@if [ -d "../avni-client/packages/openchs-android/node_modules/rules-config" ]; then \
+		echo "Deploying to ../avni-client/packages/openchs-android/node_modules/rules-config"; \
+		rm -rf ../avni-client/packages/openchs-android/node_modules/rules-config/*; \
+		cp exports/infra.js exports/rules.js exports/package.json ../avni-client/packages/openchs-android/node_modules/rules-config/; \
+	elif [ -d "../avni-client/node_modules/rules-config" ]; then \
+		echo "Deploying to ../avni-client/node_modules/rules-config"; \
+		rm -rf ../avni-client/node_modules/rules-config/*; \
+		cp exports/infra.js exports/rules.js exports/package.json ../avni-client/node_modules/rules-config/; \
+	else \
+		echo "Error: Could not find avni-client node_modules path"; \
+		exit 1; \
+	fi
 
 deploy-to-avni-client: build deploy-to-avni-client-only
 
 deploy-to-avni-webapp-only:
-	$(call _deploy,../avni-webapp/node_modules/rules-config)
+	@if [ -d "../avni-webapp/node_modules/rules-config" ]; then \
+		echo "Deploying to ../avni-webapp/node_modules/rules-config"; \
+		rm -rf ../avni-webapp/node_modules/rules-config/*; \
+		cp exports/infra.js exports/rules.js exports/package.json ../avni-webapp/node_modules/rules-config/; \
+	else \
+		echo "Error: Could not find avni-webapp node_modules path"; \
+		exit 1; \
+	fi
 
 deploy-to-avni-webapp: build deploy-to-avni-webapp-only
 
@@ -19,13 +37,27 @@ deploy-to-project: build deploy-to-project-only
 
 deploy-to-project-only:
 ifndef project
-	@echo "Provde the project variable"
+	@echo "Provide the project variable"
 	exit 1
 endif
-	$(call _deploy,../$(project)/node_modules/rules-config)
+	@if [ -d "../$(project)/node_modules/rules-config" ]; then \
+		echo "Deploying to ../$(project)/node_modules/rules-config"; \
+		rm -rf ../$(project)/node_modules/rules-config/*; \
+		cp exports/infra.js exports/rules.js exports/package.json ../$(project)/node_modules/rules-config/; \
+	else \
+		echo "Error: Could not find $(project) node_modules path"; \
+		exit 1; \
+	fi
 
 deploy-to-rules-server-only:
-	$(call _deploy,../rules-server/node_modules/rules-config)
+	@if [ -d "../rules-server/node_modules/rules-config" ]; then \
+		echo "Deploying to ../rules-server/node_modules/rules-config"; \
+		rm -rf ../rules-server/node_modules/rules-config/*; \
+		cp exports/infra.js exports/rules.js exports/package.json ../rules-server/node_modules/rules-config/; \
+	else \
+		echo "Error: Could not find rules-server node_modules path"; \
+		exit 1; \
+	fi
 
 deploy-to-rules-server: build deploy-to-rules-server-only
 
