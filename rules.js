@@ -39845,7 +39845,7 @@ var ActionEligibilityResponse = /*#__PURE__*/function () {
 
       if (__WEBPACK_IMPORTED_MODULE_0_lodash___default.a.isNil(eligiblityObject)) return ActionEligibilityResponse.createAllowedResponse();
       var newRuleResponse = new ActionEligibilityResponse();
-      newRuleResponse.eligible = EligiblityStatus.createPermissionStatusFrom(eligiblityObject);
+      newRuleResponse.eligible = EligiblityStatus.createEligibilityStatusFrom(eligiblityObject);
       return newRuleResponse;
     }
   }]);
@@ -39870,11 +39870,11 @@ var EligiblityStatus = /*#__PURE__*/function () {
       return eligiblityStatus;
     }
   }, {
-    key: "createPermissionStatusFrom",
-    value: function createPermissionStatusFrom(eligibilityObject) {
+    key: "createEligibilityStatusFrom",
+    value: function createEligibilityStatusFrom(eligibilityObject) {
       var eligiblityStatus = new EligiblityStatus();
       eligiblityStatus.value = __WEBPACK_IMPORTED_MODULE_0_lodash___default.a.isBoolean(eligibilityObject.value) ? eligibilityObject.value : true;
-      eligiblityStatus.message = eligibilityObject.message;
+      eligiblityStatus.message = eligibilityObject.message || eligibilityObject.messageKey;
       return eligiblityStatus;
     }
   }]);
