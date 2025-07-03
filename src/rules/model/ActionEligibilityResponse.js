@@ -9,17 +9,17 @@ class ActionEligibilityResponse {
 
     static createAllowedResponse() {
         const ruleResponse = new ActionEligibilityResponse();
-        ruleResponse.eligible = EligiblityStatus.createAllowedStatus();
+        ruleResponse.eligible = EligibilityStatus.createAllowedStatus();
         return ruleResponse;
     }
 
     static createRuleResponse(ruleResponse) {
         //always check for both eligible and editable as editable is used for edit form rules   
-        const eligiblityObject = _.get(ruleResponse, "eligible") || _.get(ruleResponse, "editable");
-        if (_.isNil(eligiblityObject)) return ActionEligibilityResponse.createAllowedResponse();
+        const eligibilityObject = _.get(ruleResponse, "eligible") || _.get(ruleResponse, "editable");
+        if (_.isNil(eligibilityObject)) return ActionEligibilityResponse.createAllowedResponse();
 
         const newRuleResponse = new ActionEligibilityResponse();
-        newRuleResponse.eligible = EligiblityStatus.createEligibilityStatusFrom(eligiblityObject);
+        newRuleResponse.eligible = EligibilityStatus.createEligibilityStatusFrom(eligibilityObject);
         return newRuleResponse;
     }
 
@@ -36,21 +36,21 @@ class ActionEligibilityResponse {
     }
 }
 
-class EligiblityStatus {
+class EligibilityStatus {
     value;
     message;
 
     static createAllowedStatus() {
-        const eligiblityStatus = new EligiblityStatus();
-        eligiblityStatus.value = true;
-        return eligiblityStatus;
+        const eligibilityStatus = new EligibilityStatus();
+        eligibilityStatus.value = true;
+        return eligibilityStatus;
     }
 
     static createEligibilityStatusFrom(eligibilityObject) {
-        const eligiblityStatus = new EligiblityStatus();
-        eligiblityStatus.value = _.isBoolean(eligibilityObject.value) ? eligibilityObject.value : true;
-        eligiblityStatus.message = eligibilityObject.message || eligibilityObject.messageKey;
-        return eligiblityStatus;
+        const eligibilityStatus = new EligibilityStatus();
+        eligibilityStatus.value = _.isBoolean(eligibilityObject.value) ? eligibilityObject.value : true;
+        eligibilityStatus.message = eligibilityObject.message || eligibilityObject.messageKey;
+        return eligibilityStatus;
     }
 }
 
