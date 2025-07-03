@@ -13,10 +13,16 @@ class ActionEligibilityResponse {
         return ruleResponse;
     }
 
+    static createDisallowedResponse(message) {
+        const ruleResponse = new ActionEligibilityResponse();
+        ruleResponse.eligible = EligibilityStatus.createDisallowedStatus(message);
+        return ruleResponse;
+    }
+
     static createRuleResponse(ruleResponse) {
         //always check for both eligible and editable as editable is used for edit form rules   
         const eligibilityObject = _.get(ruleResponse, "eligible") || _.get(ruleResponse, "editable");
-        if (_.isNil(eligibilityObject)) return ActionEligibilityResponse.createAllowedResponse();
+        if (_.isNil(eligibilityObject)) return ActionEligibilityResponse.createDisallowedResponse();
 
         const newRuleResponse = new ActionEligibilityResponse();
         newRuleResponse.eligible = EligibilityStatus.createEligibilityStatusFrom(eligibilityObject);
@@ -46,9 +52,19 @@ class EligibilityStatus {
         return eligibilityStatus;
     }
 
-    static createEligibilityStatusFrom(eligibilityObject) {
+    static createDisallowedStatus(message) {
         const eligibilityStatus = new EligibilityStatus();
-        eligibilityStatus.value = _.isBoolean(eligibilityObject.value) ? eligibilityObject.value : true;
+        eligibilityStatus.value = false;
+        eligibilityStatus.message = message || "incorrectEligibilityRuleDefinedMessage";
+        return eligibilityStatus;
+    }
+
+    static createEligibilityStatusFrom(eligibilityObject) {
+        if (_.isNil(eligibilityObject) || _.isNil(eligibilityObject.value) || !_.isBoolean(eligibilityObject.value)) {
+            return EligibilityStatus.createDisallowedStatus();
+        }
+        const eligibilityStatus = new EligibilityStatus();
+        eligibilityStatus.value =  eligibilityObject.value;
         eligibilityStatus.message = eligibilityObject.message || eligibilityObject.messageKey;
         return eligibilityStatus;
     }
