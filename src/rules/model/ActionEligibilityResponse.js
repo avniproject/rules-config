@@ -19,7 +19,7 @@ class ActionEligibilityResponse {
         if (_.isNil(eligiblityObject)) return ActionEligibilityResponse.createAllowedResponse();
 
         const newRuleResponse = new ActionEligibilityResponse();
-        newRuleResponse.eligible = EligiblityStatus.createPermissionStatusFrom(eligiblityObject);
+        newRuleResponse.eligible = EligiblityStatus.createEligibilityStatusFrom(eligiblityObject);
         return newRuleResponse;
     }
 
@@ -46,10 +46,10 @@ class EligiblityStatus {
         return eligiblityStatus;
     }
 
-    static createPermissionStatusFrom(eligibilityObject) {
+    static createEligibilityStatusFrom(eligibilityObject) {
         const eligiblityStatus = new EligiblityStatus();
         eligiblityStatus.value = _.isBoolean(eligibilityObject.value) ? eligibilityObject.value : true;
-        eligiblityStatus.message = eligibilityObject.message;
+        eligiblityStatus.message = eligibilityObject.message || eligibilityObject.messageKey;
         return eligiblityStatus;
     }
 }
