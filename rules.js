@@ -39834,18 +39834,18 @@ var ActionEligibilityResponse = /*#__PURE__*/function () {
     key: "createAllowedResponse",
     value: function createAllowedResponse() {
       var ruleResponse = new ActionEligibilityResponse();
-      ruleResponse.eligible = EligiblityStatus.createAllowedStatus();
+      ruleResponse.eligible = EligibilityStatus.createAllowedStatus();
       return ruleResponse;
     }
   }, {
     key: "createRuleResponse",
     value: function createRuleResponse(ruleResponse) {
       //always check for both eligible and editable as editable is used for edit form rules   
-      var eligiblityObject = __WEBPACK_IMPORTED_MODULE_0_lodash___default.a.get(ruleResponse, "eligible") || __WEBPACK_IMPORTED_MODULE_0_lodash___default.a.get(ruleResponse, "editable");
+      var eligibilityObject = __WEBPACK_IMPORTED_MODULE_0_lodash___default.a.get(ruleResponse, "eligible") || __WEBPACK_IMPORTED_MODULE_0_lodash___default.a.get(ruleResponse, "editable");
 
-      if (__WEBPACK_IMPORTED_MODULE_0_lodash___default.a.isNil(eligiblityObject)) return ActionEligibilityResponse.createAllowedResponse();
+      if (__WEBPACK_IMPORTED_MODULE_0_lodash___default.a.isNil(eligibilityObject)) return ActionEligibilityResponse.createAllowedResponse();
       var newRuleResponse = new ActionEligibilityResponse();
-      newRuleResponse.eligible = EligiblityStatus.createEligibilityStatusFrom(eligiblityObject);
+      newRuleResponse.eligible = EligibilityStatus.createEligibilityStatusFrom(eligibilityObject);
       return newRuleResponse;
     }
   }]);
@@ -39853,33 +39853,33 @@ var ActionEligibilityResponse = /*#__PURE__*/function () {
   return ActionEligibilityResponse;
 }();
 
-var EligiblityStatus = /*#__PURE__*/function () {
-  function EligiblityStatus() {
-    _classCallCheck(this, EligiblityStatus);
+var EligibilityStatus = /*#__PURE__*/function () {
+  function EligibilityStatus() {
+    _classCallCheck(this, EligibilityStatus);
 
     _defineProperty(this, "value", void 0);
 
     _defineProperty(this, "message", void 0);
   }
 
-  _createClass(EligiblityStatus, null, [{
+  _createClass(EligibilityStatus, null, [{
     key: "createAllowedStatus",
     value: function createAllowedStatus() {
-      var eligiblityStatus = new EligiblityStatus();
-      eligiblityStatus.value = true;
-      return eligiblityStatus;
+      var eligibilityStatus = new EligibilityStatus();
+      eligibilityStatus.value = true;
+      return eligibilityStatus;
     }
   }, {
     key: "createEligibilityStatusFrom",
     value: function createEligibilityStatusFrom(eligibilityObject) {
-      var eligiblityStatus = new EligiblityStatus();
-      eligiblityStatus.value = __WEBPACK_IMPORTED_MODULE_0_lodash___default.a.isBoolean(eligibilityObject.value) ? eligibilityObject.value : true;
-      eligiblityStatus.message = eligibilityObject.message || eligibilityObject.messageKey;
-      return eligiblityStatus;
+      var eligibilityStatus = new EligibilityStatus();
+      eligibilityStatus.value = __WEBPACK_IMPORTED_MODULE_0_lodash___default.a.isBoolean(eligibilityObject.value) ? eligibilityObject.value : true;
+      eligibilityStatus.message = eligibilityObject.message || eligibilityObject.messageKey;
+      return eligibilityStatus;
     }
   }]);
 
-  return EligiblityStatus;
+  return EligibilityStatus;
 }();
 
 /* harmony default export */ __webpack_exports__["a"] = (ActionEligibilityResponse);
