@@ -39850,7 +39850,7 @@ var ActionEligibilityResponse = /*#__PURE__*/function () {
       //always check for both eligible and editable as editable is used for edit form rules   
       var eligibilityObject = __WEBPACK_IMPORTED_MODULE_0_lodash___default.a.get(ruleResponse, "eligible") || __WEBPACK_IMPORTED_MODULE_0_lodash___default.a.get(ruleResponse, "editable");
 
-      if (__WEBPACK_IMPORTED_MODULE_0_lodash___default.a.isNil(eligibilityObject)) return ActionEligibilityResponse.createDisallowedResponse();
+      if (__WEBPACK_IMPORTED_MODULE_0_lodash___default.a.isNil(eligibilityObject)) return ActionEligibilityResponse.createAllowedResponse();
       var newRuleResponse = new ActionEligibilityResponse();
       newRuleResponse.eligible = EligibilityStatus.createEligibilityStatusFrom(eligibilityObject);
       return newRuleResponse;
@@ -39881,14 +39881,14 @@ var EligibilityStatus = /*#__PURE__*/function () {
     value: function createDisallowedStatus(message) {
       var eligibilityStatus = new EligibilityStatus();
       eligibilityStatus.value = false;
-      eligibilityStatus.message = message || "incorrectEligibilityRuleDefinedMessage";
+      eligibilityStatus.message = message;
       return eligibilityStatus;
     }
   }, {
     key: "createEligibilityStatusFrom",
     value: function createEligibilityStatusFrom(eligibilityObject) {
       if (__WEBPACK_IMPORTED_MODULE_0_lodash___default.a.isNil(eligibilityObject) || __WEBPACK_IMPORTED_MODULE_0_lodash___default.a.isNil(eligibilityObject.value) || !__WEBPACK_IMPORTED_MODULE_0_lodash___default.a.isBoolean(eligibilityObject.value)) {
-        return EligibilityStatus.createDisallowedStatus();
+        return EligibilityStatus.createAllowedStatus();
       }
 
       var eligibilityStatus = new EligibilityStatus();
