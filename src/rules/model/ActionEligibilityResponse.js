@@ -22,7 +22,7 @@ class ActionEligibilityResponse {
     static createRuleResponse(ruleResponse) {
         //always check for both eligible and editable as editable is used for edit form rules   
         const eligibilityObject = _.get(ruleResponse, "eligible") || _.get(ruleResponse, "editable");
-        if (_.isNil(eligibilityObject)) return ActionEligibilityResponse.createDisallowedResponse();
+        if (_.isNil(eligibilityObject)) return ActionEligibilityResponse.createAllowedResponse();
 
         const newRuleResponse = new ActionEligibilityResponse();
         newRuleResponse.eligible = EligibilityStatus.createEligibilityStatusFrom(eligibilityObject);
@@ -55,13 +55,13 @@ class EligibilityStatus {
     static createDisallowedStatus(message) {
         const eligibilityStatus = new EligibilityStatus();
         eligibilityStatus.value = false;
-        eligibilityStatus.message = message || "incorrectEligibilityRuleDefinedMessage";
+        eligibilityStatus.message = message;
         return eligibilityStatus;
     }
 
     static createEligibilityStatusFrom(eligibilityObject) {
         if (_.isNil(eligibilityObject) || _.isNil(eligibilityObject.value) || !_.isBoolean(eligibilityObject.value)) {
-            return EligibilityStatus.createDisallowedStatus();
+            return EligibilityStatus.createAllowedStatus();
         }
         const eligibilityStatus = new EligibilityStatus();
         eligibilityStatus.value =  eligibilityObject.value;
