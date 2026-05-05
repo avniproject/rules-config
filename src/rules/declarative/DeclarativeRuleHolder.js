@@ -145,8 +145,19 @@ class DeclarativeRuleHolder {
         const viewFilterTypes = Action.formElementActionTypes;
         const showFE = viewFilterTypes.ShowFormElement;
         const hideFE = viewFilterTypes.HideFormElement;
-        const isVisibilityDefined = _.some(this.declarativeRules, dr => dr.containActionType(showFE, hideFE));
-        return isVisibilityDefined ? _.omitBy(viewFilterTypes, (v, k) => _.includes([showFE, hideFE], v)) : viewFilterTypes;
+        const skipAnswers = viewFilterTypes.SkipAnswers;
+        const showAnswers = viewFilterTypes.ShowAnswers;
+        const omitTypes = [];
+        if (_.some(this.declarativeRules, dr => dr.containActionType(showFE, hideFE))) {
+            omitTypes.push(showFE, hideFE);
+        }
+        if (_.some(this.declarativeRules, dr => dr.containActionType(skipAnswers))) {
+            omitTypes.push(showAnswers);
+        }
+        if (_.some(this.declarativeRules, dr => dr.containActionType(showAnswers))) {
+            omitTypes.push(skipAnswers);
+        }
+        return _.isEmpty(omitTypes) ? viewFilterTypes : _.omitBy(viewFilterTypes, (v) => _.includes(omitTypes, v));
     }
 
     getApplicableFormElementGroupRuleActions() {

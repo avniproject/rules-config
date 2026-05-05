@@ -2,6 +2,9 @@ import _ from "lodash";
 class FormElementStatus {
     constructor(uuid, visibility, value, answersToSkip = [], validationErrors = [], answersToShow = [],
                 resetValueIfNull = false) {
+        if (!_.isEmpty(answersToSkip) && !_.isEmpty(answersToShow)) {
+            throw Error(`FormElementStatus for FormElement '${uuid}' uses both answersToSkip and answersToShow.`);
+        }
         this.uuid = uuid;
         this.visibility = visibility;
         this.value = value;

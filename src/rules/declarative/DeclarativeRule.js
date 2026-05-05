@@ -1,13 +1,64 @@
 import _ from 'lodash';
 import {Action, Condition, VisitScheduleActionDetails} from "./index";
 
-const constructSkipAnsCondition = (condition, ...answers) =>
-    `if(${condition}) {
+const constructSkipAnsCondition = (condition, conceptDataType, answers) => {
+    if (conceptDataType === 'Subject') {
+        return `if(${condition}) {
+    _.forEach([${answers}], (answer) => {
+        answersToSkip.push(answer);
+    });
+};\n  `;
+    }
+    if (conceptDataType === 'Coded') {
+        return `if(${condition}) {
     _.forEach([${answers}], (answer) => {
         const answerToSkip = formElement.getAnswerWithConceptUuid(answer);
         if (answerToSkip) answersToSkip.push(answerToSkip);
     });
 };\n  `;
+    }
+    // Fallback: rules saved before conceptDataType was captured. Emit the
+    // runtime-branching body so the regenerated rule still works on either
+    // concept type until the user re-saves.
+    return `if(${condition}) {
+    _.forEach([${answers}], (answer) => {
+        if (formElement.concept.isSubjectConcept()) {
+            answersToSkip.push(answer);
+        } else {
+            const answerToSkip = formElement.getAnswerWithConceptUuid(answer);
+            if (answerToSkip) answersToSkip.push(answerToSkip);
+        }
+    });
+};\n  `;
+};
+
+const constructShowAnsCondition = (condition, conceptDataType, answers) => {
+    if (conceptDataType === 'Subject') {
+        return `if(${condition}) {
+    _.forEach([${answers}], (answer) => {
+        answersToShow.push(answer);
+    });
+};\n  `;
+    }
+    if (conceptDataType === 'Coded') {
+        return `if(${condition}) {
+    _.forEach([${answers}], (answer) => {
+        const answerToShow = formElement.getAnswerWithConceptUuid(answer);
+        if (answerToShow) answersToShow.push(answerToShow.concept.name);
+    });
+};\n  `;
+    }
+    return `if(${condition}) {
+    _.forEach([${answers}], (answer) => {
+        if (formElement.concept.isSubjectConcept()) {
+            answersToShow.push(answer);
+        } else {
+            const answerToShow = formElement.getAnswerWithConceptUuid(answer);
+            if (answerToShow) answersToShow.push(answerToShow.concept.name);
+        }
+    });
+};\n  `;
+};
 
 class DeclarativeRule {
     static conjunctionToBooleanOperator = {
@@ -135,7 +186,10 @@ class DeclarativeRule {
                     actionConditions += constructOtherCondition(matchesCondition, `value = ${action.getJsValue()};`);
                     break;
                 case actionTypes.SkipAnswers:
-                    actionConditions += constructSkipAnsCondition(matchesCondition, action.getJsAnswerUUIDsToSkip());
+                    actionConditions += constructSkipAnsCondition(matchesCondition, action.getConceptDataType(), action.getJsAnswerUUIDsToSkip());
+                    break;
+                case actionTypes.ShowAnswers:
+                    actionConditions += constructShowAnsCondition(matchesCondition, action.getConceptDataType(), action.getJsAnswerUUIDsToShow());
                     break;
                 case actionTypes.ValidationError:
                     const validationError = _.get(action, 'details.validationError')?.replaceAll(/'|"/g, "\'")

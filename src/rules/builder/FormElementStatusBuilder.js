@@ -28,15 +28,21 @@ class FormElementStatusBuilder {
     }
 
     skipAnswers(...answers) {
+        const concept = this.context.formElement.concept;
         let answerSkipRule = {
             rule: new RuleCondition(this.context),
             answers: _.reject(_.map(answers, (answer) => {
+                if (concept.isSubjectConcept()) {
+                    if (_.isString(answer)) return answer;
+                    lib().log(`[RulesConfig][Warn] Can't Skip Subject in '${concept.name}'. Subject answers must be passed as UUID strings.`);
+                    return undefined;
+                }
                 //todo: vivek - When answer is not a string we should check whether answer is actually concept. don't know about the contract fully to make the change. will do this as part of rule service refactoring. when I passed an array of answers instead of answer then answers to skip becomes an array and it fails later on in the application - not caught by rule execution try catch.
                 const answerToSkip = _.isString(answer) ? this.context.formElement.getAnswerWithConceptName(answer) : answer;
                 if (answerToSkip) {
                     return answerToSkip;
                 }
-                lib().log(`[RulesConfig][Warn] Can't Skip Answer '${answer}' in '${this.context.formElement.concept.name}'. Answer is either voided or not found.`);
+                lib().log(`[RulesConfig][Warn] Can't Skip Answer '${answer}' in '${concept.name}'. Answer is either voided or not found.`);
             }), _.isNil)
         };
         this.answerSkipRules.push(answerSkipRule);
@@ -44,11 +50,17 @@ class FormElementStatusBuilder {
     }
 
     showAnswers(...answers) {
+        const concept = this.context.formElement.concept;
         let answerShowRule = {
             rule: new RuleCondition(this.context),
-            answers: _.map(answers, (answer) => {
-              return answer;
-            })
+            answers: _.reject(_.map(answers, (answer) => {
+                if (concept.isSubjectConcept()) {
+                    if (_.isString(answer)) return answer;
+                    lib().log(`[RulesConfig][Warn] Can't Show Subject in '${concept.name}'. Subject answers must be passed as UUID strings.`);
+                    return undefined;
+                }
+                return answer;
+            }), _.isNil)
         };
         this.answersToShow.push(answerShowRule);
         return answerShowRule.rule;

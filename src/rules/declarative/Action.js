@@ -14,6 +14,7 @@ class Action {
         'HideFormElement': 'hideFormElement',
         'Value': 'value',
         'SkipAnswers': 'skipAnswers',
+        'ShowAnswers': 'showAnswers',
         'ValidationError': 'validationError',
     };
 
@@ -37,7 +38,7 @@ class Action {
     static fromResource(json) {
         const action = new Action();
         action.actionType = json.actionType;
-        const viewFilterActionTypes = ['value', 'skipAnswers', 'validationError'];
+        const viewFilterActionTypes = ['value', 'skipAnswers', 'showAnswers', 'validationError'];
         const actionDetails = _.get(json, 'details', {});
         if (_.includes(viewFilterActionTypes, json.actionType)) {
             action.details = ViewFilterActionDetails.fromResource(actionDetails);
@@ -74,7 +75,7 @@ class Action {
     }
 
     isViewFilterWithDetailsAction() {
-        const viewFilterActionTypes = ['value', 'skipAnswers', 'validationError'];
+        const viewFilterActionTypes = ['value', 'skipAnswers', 'showAnswers', 'validationError'];
         return _.includes(viewFilterActionTypes, this.actionType);
     }
 
@@ -114,12 +115,28 @@ class Action {
         return _.map(answerUuidsToSkip, ac => `"${ac}"`).toString();
     }
 
+    getJsAnswersToShow() {
+        const answersToShow = _.get(this.details, 'answersToShow');
+        return _.map(answersToShow, ac => `"${ac}"`).toString();
+    }
+
+    getJsAnswerUUIDsToShow() {
+        const answerUuidsToShow = _.get(this.details, 'answerUuidsToShow');
+        return _.map(answerUuidsToShow, ac => `"${ac}"`).toString();
+    }
+
+    getConceptDataType() {
+        return _.get(this.details, 'conceptDataType');
+    }
+
     getRuleSummary() {
         switch (this.actionType) {
             case Action.actionTypes.Value:
                 return `Display value ${this.details.value}.`;
             case Action.actionTypes.SkipAnswers:
                 return `Hide answers ${this.getJsAnswersToSkip()}.`;
+            case Action.actionTypes.ShowAnswers:
+                return `Show only answers ${this.getJsAnswersToShow()}.`;
             case Action.actionTypes.ValidationError:
             case Action.actionTypes.FormValidationError:
                 const validationError = this.details.validationError?.replaceAll(/'|"/g, "\'")

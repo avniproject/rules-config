@@ -14,10 +14,11 @@ export const getViewFilterRuleTemplate = (entityName) =>
   let visibility = true;
   let value = null;
   let answersToSkip = [];
+  let answersToShow = [];
   let validationErrors = [];
   $RULE_CONDITIONS
   $ACTION_CONDITIONS
-  return new imports.rulesConfig.FormElementStatus(formElement.uuid, visibility, value, answersToSkip, validationErrors);
+  return new imports.rulesConfig.FormElementStatus(formElement.uuid, visibility, value, answersToSkip, validationErrors, answersToShow);
 };`;
 
 export const getFormElementGroupRuleTemplate = (entityName) =>
