@@ -21719,7 +21719,7 @@ var assertTrue = function assertTrue(value, message) {
   }
 };
 var getViewFilterRuleTemplate = function getViewFilterRuleTemplate(entityName) {
-  return "'use strict';\n({params, imports}) => {\n  const ".concat(entityName, " = params.entity;\n  const moment = imports.moment;\n  const formElement = params.formElement;\n  const _ = imports.lodash;\n  let visibility = true;\n  let value = null;\n  let answersToSkip = [];\n  let validationErrors = [];\n  $RULE_CONDITIONS\n  $ACTION_CONDITIONS\n  return new imports.rulesConfig.FormElementStatus(formElement.uuid, visibility, value, answersToSkip, validationErrors);\n};");
+  return "'use strict';\n({params, imports}) => {\n  const ".concat(entityName, " = params.entity;\n  const moment = imports.moment;\n  const formElement = params.formElement;\n  const _ = imports.lodash;\n  let visibility = true;\n  let value = null;\n  let answersToSkip = [];\n  let answersToShow = [];\n  let validationErrors = [];\n  $RULE_CONDITIONS\n  $ACTION_CONDITIONS\n  return new imports.rulesConfig.FormElementStatus(formElement.uuid, visibility, value, answersToSkip, validationErrors, answersToShow);\n};");
 };
 var getFormElementGroupRuleTemplate = function getFormElementGroupRuleTemplate(entityName) {
   return "'use strict';\n({params, imports}) => {\n    const ".concat(entityName, " = params.entity;\n    const moment = imports.moment;\n    const formElementGroup = params.formElementGroup;\n    const _ = imports.lodash;\n    let visibility = true;\n    return formElementGroup.formElements.map((formElement) => {\n        $RULE_CONDITIONS\n        $ACTION_CONDITIONS\n        return new imports.rulesConfig.FormElementStatus(formElement.uuid, visibility, null);\n    });\n};");
@@ -22783,6 +22783,10 @@ var FormElementStatus = /*#__PURE__*/function () {
 
     _classCallCheck(this, FormElementStatus);
 
+    if (!__WEBPACK_IMPORTED_MODULE_0_lodash___default.a.isEmpty(answersToSkip) && !__WEBPACK_IMPORTED_MODULE_0_lodash___default.a.isEmpty(answersToShow)) {
+      throw Error("FormElementStatus for FormElement '".concat(uuid, "' uses both answersToSkip and answersToShow."));
+    }
+
     this.uuid = uuid;
     this.visibility = visibility;
     this.value = value;
@@ -22893,6 +22897,8 @@ var FormElementStatusBuilder = /*#__PURE__*/function () {
     value: function skipAnswers() {
       var _this = this;
 
+      var concept = this.context.formElement.concept;
+
       for (var _len = arguments.length, answers = new Array(_len), _key = 0; _key < _len; _key++) {
         answers[_key] = arguments[_key];
       }
@@ -22900,14 +22906,20 @@ var FormElementStatusBuilder = /*#__PURE__*/function () {
       var answerSkipRule = {
         rule: new __WEBPACK_IMPORTED_MODULE_0__RuleCondition__["a" /* default */](this.context),
         answers: __WEBPACK_IMPORTED_MODULE_2_lodash___default.a.reject(__WEBPACK_IMPORTED_MODULE_2_lodash___default.a.map(answers, function (answer) {
-          //todo: vivek - When answer is not a string we should check whether answer is actually concept. don't know about the contract fully to make the change. will do this as part of rule service refactoring. when I passed an array of answers instead of answer then answers to skip becomes an array and it fails later on in the application - not caught by rule execution try catch.
+          if (concept.isSubjectConcept()) {
+            if (__WEBPACK_IMPORTED_MODULE_2_lodash___default.a.isString(answer)) return answer;
+            Object(__WEBPACK_IMPORTED_MODULE_3__lib__["a" /* default */])().log("[RulesConfig][Warn] Can't Skip Subject in '".concat(concept.name, "'. Subject answers must be passed as UUID strings."));
+            return undefined;
+          } //todo: vivek - When answer is not a string we should check whether answer is actually concept. don't know about the contract fully to make the change. will do this as part of rule service refactoring. when I passed an array of answers instead of answer then answers to skip becomes an array and it fails later on in the application - not caught by rule execution try catch.
+
+
           var answerToSkip = __WEBPACK_IMPORTED_MODULE_2_lodash___default.a.isString(answer) ? _this.context.formElement.getAnswerWithConceptName(answer) : answer;
 
           if (answerToSkip) {
             return answerToSkip;
           }
 
-          Object(__WEBPACK_IMPORTED_MODULE_3__lib__["a" /* default */])().log("[RulesConfig][Warn] Can't Skip Answer '".concat(answer, "' in '").concat(_this.context.formElement.concept.name, "'. Answer is either voided or not found."));
+          Object(__WEBPACK_IMPORTED_MODULE_3__lib__["a" /* default */])().log("[RulesConfig][Warn] Can't Skip Answer '".concat(answer, "' in '").concat(concept.name, "'. Answer is either voided or not found."));
         }), __WEBPACK_IMPORTED_MODULE_2_lodash___default.a.isNil)
       };
       this.answerSkipRules.push(answerSkipRule);
@@ -22916,15 +22928,23 @@ var FormElementStatusBuilder = /*#__PURE__*/function () {
   }, {
     key: "showAnswers",
     value: function showAnswers() {
+      var concept = this.context.formElement.concept;
+
       for (var _len2 = arguments.length, answers = new Array(_len2), _key2 = 0; _key2 < _len2; _key2++) {
         answers[_key2] = arguments[_key2];
       }
 
       var answerShowRule = {
         rule: new __WEBPACK_IMPORTED_MODULE_0__RuleCondition__["a" /* default */](this.context),
-        answers: __WEBPACK_IMPORTED_MODULE_2_lodash___default.a.map(answers, function (answer) {
+        answers: __WEBPACK_IMPORTED_MODULE_2_lodash___default.a.reject(__WEBPACK_IMPORTED_MODULE_2_lodash___default.a.map(answers, function (answer) {
+          if (concept.isSubjectConcept()) {
+            if (__WEBPACK_IMPORTED_MODULE_2_lodash___default.a.isString(answer)) return answer;
+            Object(__WEBPACK_IMPORTED_MODULE_3__lib__["a" /* default */])().log("[RulesConfig][Warn] Can't Show Subject in '".concat(concept.name, "'. Subject answers must be passed as UUID strings."));
+            return undefined;
+          }
+
           return answer;
-        })
+        }), __WEBPACK_IMPORTED_MODULE_2_lodash___default.a.isNil)
       };
       this.answersToShow.push(answerShowRule);
       return answerShowRule.rule;
@@ -35539,7 +35559,7 @@ var Action = /*#__PURE__*/function () {
   }, {
     key: "isViewFilterWithDetailsAction",
     value: function isViewFilterWithDetailsAction() {
-      var viewFilterActionTypes = ['value', 'skipAnswers', 'validationError'];
+      var viewFilterActionTypes = ['value', 'skipAnswers', 'showAnswers', 'validationError'];
       return __WEBPACK_IMPORTED_MODULE_1_lodash___default.a.includes(viewFilterActionTypes, this.actionType);
     }
   }, {
@@ -35595,6 +35615,29 @@ var Action = /*#__PURE__*/function () {
       }).toString();
     }
   }, {
+    key: "getJsAnswersToShow",
+    value: function getJsAnswersToShow() {
+      var answersToShow = __WEBPACK_IMPORTED_MODULE_1_lodash___default.a.get(this.details, 'answersToShow');
+
+      return __WEBPACK_IMPORTED_MODULE_1_lodash___default.a.map(answersToShow, function (ac) {
+        return "\"".concat(ac, "\"");
+      }).toString();
+    }
+  }, {
+    key: "getJsAnswerUUIDsToShow",
+    value: function getJsAnswerUUIDsToShow() {
+      var answerUuidsToShow = __WEBPACK_IMPORTED_MODULE_1_lodash___default.a.get(this.details, 'answerUuidsToShow');
+
+      return __WEBPACK_IMPORTED_MODULE_1_lodash___default.a.map(answerUuidsToShow, function (ac) {
+        return "\"".concat(ac, "\"");
+      }).toString();
+    }
+  }, {
+    key: "getConceptDataType",
+    value: function getConceptDataType() {
+      return __WEBPACK_IMPORTED_MODULE_1_lodash___default.a.get(this.details, 'conceptDataType');
+    }
+  }, {
     key: "getRuleSummary",
     value: function getRuleSummary() {
       var _this$details$validat;
@@ -35605,6 +35648,9 @@ var Action = /*#__PURE__*/function () {
 
         case Action.actionTypes.SkipAnswers:
           return "Hide answers ".concat(this.getJsAnswersToSkip(), ".");
+
+        case Action.actionTypes.ShowAnswers:
+          return "Show only answers ".concat(this.getJsAnswersToShow(), ".");
 
         case Action.actionTypes.ValidationError:
         case Action.actionTypes.FormValidationError:
@@ -35635,7 +35681,7 @@ var Action = /*#__PURE__*/function () {
     value: function fromResource(json) {
       var action = new Action();
       action.actionType = json.actionType;
-      var viewFilterActionTypes = ['value', 'skipAnswers', 'validationError'];
+      var viewFilterActionTypes = ['value', 'skipAnswers', 'showAnswers', 'validationError'];
 
       var actionDetails = __WEBPACK_IMPORTED_MODULE_1_lodash___default.a.get(json, 'details', {});
 
@@ -35663,6 +35709,7 @@ _defineProperty(Action, "formElementActionTypes", {
   'HideFormElement': 'hideFormElement',
   'Value': 'value',
   'SkipAnswers': 'skipAnswers',
+  'ShowAnswers': 'showAnswers',
   'ValidationError': 'validationError'
 });
 
@@ -38650,12 +38697,31 @@ function _defineProperty(obj, key, value) { if (key in obj) { Object.definePrope
 
 
 
-var constructSkipAnsCondition = function constructSkipAnsCondition(condition) {
-  for (var _len = arguments.length, answers = new Array(_len > 1 ? _len - 1 : 0), _key = 1; _key < _len; _key++) {
-    answers[_key - 1] = arguments[_key];
+var constructSkipAnsCondition = function constructSkipAnsCondition(condition, conceptDataType, answers) {
+  if (conceptDataType === 'Subject') {
+    return "if(".concat(condition, ") {\n    _.forEach([").concat(answers, "], (answer) => {\n        answersToSkip.push(answer);\n    });\n};\n  ");
   }
 
-  return "if(".concat(condition, ") {\n    _.forEach([").concat(answers, "], (answer) => {\n        const answerToSkip = formElement.getAnswerWithConceptUuid(answer);\n        if (answerToSkip) answersToSkip.push(answerToSkip);\n    });\n};\n  ");
+  if (conceptDataType === 'Coded') {
+    return "if(".concat(condition, ") {\n    _.forEach([").concat(answers, "], (answer) => {\n        const answerToSkip = formElement.getAnswerWithConceptUuid(answer);\n        if (answerToSkip) answersToSkip.push(answerToSkip);\n    });\n};\n  ");
+  } // Fallback: rules saved before conceptDataType was captured. Emit the
+  // runtime-branching body so the regenerated rule still works on either
+  // concept type until the user re-saves.
+
+
+  return "if(".concat(condition, ") {\n    _.forEach([").concat(answers, "], (answer) => {\n        if (formElement.concept.isSubjectConcept()) {\n            answersToSkip.push(answer);\n        } else {\n            const answerToSkip = formElement.getAnswerWithConceptUuid(answer);\n            if (answerToSkip) answersToSkip.push(answerToSkip);\n        }\n    });\n};\n  ");
+};
+
+var constructShowAnsCondition = function constructShowAnsCondition(condition, conceptDataType, answers) {
+  if (conceptDataType === 'Subject') {
+    return "if(".concat(condition, ") {\n    _.forEach([").concat(answers, "], (answer) => {\n        answersToShow.push(answer);\n    });\n};\n  ");
+  }
+
+  if (conceptDataType === 'Coded') {
+    return "if(".concat(condition, ") {\n    _.forEach([").concat(answers, "], (answer) => {\n        const answerToShow = formElement.getAnswerWithConceptUuid(answer);\n        if (answerToShow) answersToShow.push(answerToShow.concept.name);\n    });\n};\n  ");
+  }
+
+  return "if(".concat(condition, ") {\n    _.forEach([").concat(answers, "], (answer) => {\n        if (formElement.concept.isSubjectConcept()) {\n            answersToShow.push(answer);\n        } else {\n            const answerToShow = formElement.getAnswerWithConceptUuid(answer);\n            if (answerToShow) answersToShow.push(answerToShow.concept.name);\n        }\n    });\n};\n  ");
 };
 
 var DeclarativeRule = /*#__PURE__*/function () {
@@ -38679,8 +38745,8 @@ var DeclarativeRule = /*#__PURE__*/function () {
   }, {
     key: "containActionType",
     value: function containActionType() {
-      for (var _len2 = arguments.length, type = new Array(_len2), _key2 = 0; _key2 < _len2; _key2++) {
-        type[_key2] = arguments[_key2];
+      for (var _len = arguments.length, type = new Array(_len), _key = 0; _key < _len; _key++) {
+        type[_key] = arguments[_key];
       }
 
       return __WEBPACK_IMPORTED_MODULE_0_lodash___default.a.some(this.actions, function (_ref) {
@@ -38829,7 +38895,11 @@ var DeclarativeRule = /*#__PURE__*/function () {
             break;
 
           case actionTypes.SkipAnswers:
-            actionConditions += constructSkipAnsCondition(matchesCondition, action.getJsAnswerUUIDsToSkip());
+            actionConditions += constructSkipAnsCondition(matchesCondition, action.getConceptDataType(), action.getJsAnswerUUIDsToSkip());
+            break;
+
+          case actionTypes.ShowAnswers:
+            actionConditions += constructShowAnsCondition(matchesCondition, action.getConceptDataType(), action.getJsAnswerUUIDsToShow());
             break;
 
           case actionTypes.ValidationError:
@@ -39280,14 +39350,31 @@ var DeclarativeRuleHolder = /*#__PURE__*/function () {
       var viewFilterTypes = __WEBPACK_IMPORTED_MODULE_1__index__["a" /* Action */].formElementActionTypes;
       var showFE = viewFilterTypes.ShowFormElement;
       var hideFE = viewFilterTypes.HideFormElement;
+      var skipAnswers = viewFilterTypes.SkipAnswers;
+      var showAnswers = viewFilterTypes.ShowAnswers;
+      var omitTypes = [];
 
-      var isVisibilityDefined = __WEBPACK_IMPORTED_MODULE_0_lodash___default.a.some(this.declarativeRules, function (dr) {
+      if (__WEBPACK_IMPORTED_MODULE_0_lodash___default.a.some(this.declarativeRules, function (dr) {
         return dr.containActionType(showFE, hideFE);
-      });
+      })) {
+        omitTypes.push(showFE, hideFE);
+      }
 
-      return isVisibilityDefined ? __WEBPACK_IMPORTED_MODULE_0_lodash___default.a.omitBy(viewFilterTypes, function (v, k) {
-        return __WEBPACK_IMPORTED_MODULE_0_lodash___default.a.includes([showFE, hideFE], v);
-      }) : viewFilterTypes;
+      if (__WEBPACK_IMPORTED_MODULE_0_lodash___default.a.some(this.declarativeRules, function (dr) {
+        return dr.containActionType(skipAnswers);
+      })) {
+        omitTypes.push(showAnswers);
+      }
+
+      if (__WEBPACK_IMPORTED_MODULE_0_lodash___default.a.some(this.declarativeRules, function (dr) {
+        return dr.containActionType(showAnswers);
+      })) {
+        omitTypes.push(skipAnswers);
+      }
+
+      return __WEBPACK_IMPORTED_MODULE_0_lodash___default.a.isEmpty(omitTypes) ? viewFilterTypes : __WEBPACK_IMPORTED_MODULE_0_lodash___default.a.omitBy(viewFilterTypes, function (v) {
+        return __WEBPACK_IMPORTED_MODULE_0_lodash___default.a.includes(omitTypes, v);
+      });
     }
   }, {
     key: "getApplicableFormElementGroupRuleActions",
@@ -39594,6 +39681,29 @@ var ViewFilterActionDetails = /*#__PURE__*/function () {
       this.answerUuidsToSkip = [].concat(value);
     }
   }, {
+    key: "setAnswersToShow",
+    value: function setAnswersToShow() {
+      for (var _len3 = arguments.length, value = new Array(_len3), _key3 = 0; _key3 < _len3; _key3++) {
+        value[_key3] = arguments[_key3];
+      }
+
+      this.answersToShow = [].concat(value);
+    }
+  }, {
+    key: "setAnswerUUIDsToShow",
+    value: function setAnswerUUIDsToShow() {
+      for (var _len4 = arguments.length, value = new Array(_len4), _key4 = 0; _key4 < _len4; _key4++) {
+        value[_key4] = arguments[_key4];
+      }
+
+      this.answerUuidsToShow = [].concat(value);
+    }
+  }, {
+    key: "setConceptDataType",
+    value: function setConceptDataType(dataType) {
+      this.conceptDataType = dataType;
+    }
+  }, {
     key: "setValidationError",
     value: function setValidationError(error) {
       this.validationError = error;
@@ -39605,6 +39715,9 @@ var ViewFilterActionDetails = /*#__PURE__*/function () {
       details.value = this.value;
       details.answersToSkip = this.answersToSkip;
       details.answerUuidsToSkip = this.answerUuidsToSkip;
+      details.answersToShow = this.answersToShow;
+      details.answerUuidsToShow = this.answerUuidsToShow;
+      details.conceptDataType = this.conceptDataType;
       details.validationError = this.validationError;
       return details;
     }
@@ -39618,6 +39731,11 @@ var ViewFilterActionDetails = /*#__PURE__*/function () {
         Object(__WEBPACK_IMPORTED_MODULE_0__Util__["a" /* assertTrue */])(!__WEBPACK_IMPORTED_MODULE_1_lodash___default.a.isEmpty(this.answersToSkip), "Concept answers in Action cannot be empty");
         Object(__WEBPACK_IMPORTED_MODULE_0__Util__["a" /* assertTrue */])(!__WEBPACK_IMPORTED_MODULE_1_lodash___default.a.isEmpty(this.answerUuidsToSkip), "Concept answer uuids in cannot be empty");
       }
+
+      if (__WEBPACK_IMPORTED_MODULE_1_lodash___default.a.isEqual(actionType, __WEBPACK_IMPORTED_MODULE_2__Action__["a" /* default */].actionTypes.ShowAnswers)) {
+        Object(__WEBPACK_IMPORTED_MODULE_0__Util__["a" /* assertTrue */])(!__WEBPACK_IMPORTED_MODULE_1_lodash___default.a.isEmpty(this.answersToShow), "Concept answers in Action cannot be empty");
+        Object(__WEBPACK_IMPORTED_MODULE_0__Util__["a" /* assertTrue */])(!__WEBPACK_IMPORTED_MODULE_1_lodash___default.a.isEmpty(this.answerUuidsToShow), "Concept answer uuids in cannot be empty");
+      }
     }
   }], [{
     key: "fromResource",
@@ -39626,6 +39744,9 @@ var ViewFilterActionDetails = /*#__PURE__*/function () {
       actionDetails.value = json.value;
       actionDetails.answersToSkip = json.answersToSkip;
       actionDetails.answerUuidsToSkip = json.answerUuidsToSkip;
+      actionDetails.answersToShow = json.answersToShow;
+      actionDetails.answerUuidsToShow = json.answerUuidsToShow;
+      actionDetails.conceptDataType = json.conceptDataType;
       actionDetails.validationError = json.validationError;
       return actionDetails;
     }
