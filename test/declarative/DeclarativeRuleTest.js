@@ -2,12 +2,33 @@ import {assert, expect} from "chai";
 import Action from '../../src/rules/declarative/Action';
 import Condition from '../../src/rules/declarative/Condition';
 import DeclarativeRule from '../../src/rules/declarative/DeclarativeRule';
+import DeclarativeRuleHolder from '../../src/rules/declarative/DeclarativeRuleHolder';
 import CompoundRule from '../../src/rules/declarative/CompoundRule';
 import Rule from '../../src/rules/declarative/Rule';
 import LHS from '../../src/rules/declarative/LHS';
 import RHS from '../../src/rules/declarative/RHS'
 import _ from 'lodash';
 import ConceptScope from "../../src/rules/declarative/ConceptScope";
+
+function getEmptyCondition() {
+    const condition = new Condition();
+    condition.setCompoundRule(new CompoundRule());
+    return condition;
+}
+
+function buildAction(actionType, details = {}) {
+    const action = new Action();
+    action.setActionType(actionType);
+    Object.assign(action.details, details);
+    return action;
+}
+
+function buildDeclarativeRule(actionType, details = {}) {
+    const dr = new DeclarativeRule();
+    dr.conditions = [getEmptyCondition()];
+    dr.actions = [buildAction(actionType, details)];
+    return dr;
+}
 
 function getRule1() {
     const lhs = new LHS();
@@ -111,6 +132,116 @@ describe('Declarative Rule tests', () => {
         expect(ruleConditions).to.contain(jsCondition1, jsCondition1);
         expect(ruleConditions).to.contain(jsCondition2, jsCondition2);
     });
+    describe('SkipAnswers code generation', () => {
+        it('emits subject-only body when conceptDataType is Subject', () => {
+            const dr = buildDeclarativeRule(Action.actionTypes.SkipAnswers, {
+                answersToSkip: ['Person A'],
+                answerUuidsToShow: undefined,
+                answerUuidsToSkip: ['uuid-a'],
+                conceptDataType: 'Subject',
+            });
+            const {actionConditions} = dr.getRuleConditions('individual');
+            expect(actionConditions).to.contain('answersToSkip.push(answer)');
+            expect(actionConditions).to.not.contain('getAnswerWithConceptUuid');
+            expect(actionConditions).to.not.contain('isSubjectConcept');
+        });
+
+        it('emits coded-only body when conceptDataType is Coded', () => {
+            const dr = buildDeclarativeRule(Action.actionTypes.SkipAnswers, {
+                answersToSkip: ['Yes'],
+                answerUuidsToSkip: ['uuid-yes'],
+                conceptDataType: 'Coded',
+            });
+            const {actionConditions} = dr.getRuleConditions('individual');
+            expect(actionConditions).to.contain('formElement.getAnswerWithConceptUuid(answer)');
+            expect(actionConditions).to.not.contain('isSubjectConcept');
+        });
+
+        it('falls back to runtime branching when conceptDataType is missing', () => {
+            const dr = buildDeclarativeRule(Action.actionTypes.SkipAnswers, {
+                answersToSkip: ['Yes'],
+                answerUuidsToSkip: ['uuid-yes'],
+            });
+            const {actionConditions} = dr.getRuleConditions('individual');
+            expect(actionConditions).to.contain('formElement.concept.isSubjectConcept()');
+            expect(actionConditions).to.contain('getAnswerWithConceptUuid');
+        });
+    });
+
+    describe('ShowAnswers code generation', () => {
+        it('emits subject-only body when conceptDataType is Subject', () => {
+            const dr = buildDeclarativeRule(Action.actionTypes.ShowAnswers, {
+                answersToShow: ['Person A'],
+                answerUuidsToShow: ['uuid-a'],
+                conceptDataType: 'Subject',
+            });
+            const {actionConditions} = dr.getRuleConditions('individual');
+            expect(actionConditions).to.contain('answersToShow.push(answer)');
+            expect(actionConditions).to.not.contain('getAnswerWithConceptUuid');
+            expect(actionConditions).to.not.contain('isSubjectConcept');
+        });
+
+        it('emits coded body that pushes the resolved concept name when conceptDataType is Coded', () => {
+            const dr = buildDeclarativeRule(Action.actionTypes.ShowAnswers, {
+                answersToShow: ['Yes'],
+                answerUuidsToShow: ['uuid-yes'],
+                conceptDataType: 'Coded',
+            });
+            const {actionConditions} = dr.getRuleConditions('individual');
+            expect(actionConditions).to.contain('formElement.getAnswerWithConceptUuid(answer)');
+            expect(actionConditions).to.contain('answersToShow.push(answerToShow.concept.name)');
+            expect(actionConditions).to.not.contain('isSubjectConcept');
+        });
+
+        it('falls back to runtime branching when conceptDataType is missing', () => {
+            const dr = buildDeclarativeRule(Action.actionTypes.ShowAnswers, {
+                answersToShow: ['Yes'],
+                answerUuidsToShow: ['uuid-yes'],
+            });
+            const {actionConditions} = dr.getRuleConditions('individual');
+            expect(actionConditions).to.contain('formElement.concept.isSubjectConcept()');
+            expect(actionConditions).to.contain('answersToShow.push(answerToShow.concept.name)');
+        });
+    });
+
+    describe('DeclarativeRuleHolder.getApplicableViewFilterActions', () => {
+        const buildHolderWithAction = (actionType, details = {}) => {
+            const holder = new DeclarativeRuleHolder();
+            holder.declarativeRules = [buildDeclarativeRule(actionType, details)];
+            return holder;
+        };
+
+        it('omits ShowAnswers when a rule already has SkipAnswers', () => {
+            const holder = buildHolderWithAction(Action.actionTypes.SkipAnswers, {
+                answersToSkip: ['Yes'],
+                answerUuidsToSkip: ['uuid-yes'],
+                conceptDataType: 'Coded',
+            });
+            const applicable = holder.getApplicableViewFilterActions();
+            assert.notInclude(_.values(applicable), Action.actionTypes.ShowAnswers);
+            assert.include(_.values(applicable), Action.actionTypes.SkipAnswers);
+        });
+
+        it('omits SkipAnswers when a rule already has ShowAnswers', () => {
+            const holder = buildHolderWithAction(Action.actionTypes.ShowAnswers, {
+                answersToShow: ['Yes'],
+                answerUuidsToShow: ['uuid-yes'],
+                conceptDataType: 'Coded',
+            });
+            const applicable = holder.getApplicableViewFilterActions();
+            assert.notInclude(_.values(applicable), Action.actionTypes.SkipAnswers);
+            assert.include(_.values(applicable), Action.actionTypes.ShowAnswers);
+        });
+
+        it('returns both when neither is configured', () => {
+            const holder = new DeclarativeRuleHolder();
+            holder.declarativeRules = [];
+            const applicable = holder.getApplicableViewFilterActions();
+            assert.include(_.values(applicable), Action.actionTypes.SkipAnswers);
+            assert.include(_.values(applicable), Action.actionTypes.ShowAnswers);
+        });
+    });
+
     it('should support multiple conditions', function () {
         const rule1 = getRule1();
         const rule2 = getRule2();
