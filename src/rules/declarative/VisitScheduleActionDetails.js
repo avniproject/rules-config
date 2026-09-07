@@ -9,7 +9,11 @@ class VisitScheduleActionDetails {
         ProgramEnrolment: ['enrolmentDateTime', 'registrationDate'],
         ProgramExit: ['programExitDateTime', 'registrationDate'],
         ProgramEncounter: ['encounterDateTime', 'earliestVisitDateTime', 'enrolmentDateTime', 'registrationDate'],
-        ProgramEncounterCancellation: ['cancelDateTime', 'earliestVisitDateTime', 'enrolmentDateTime', 'registrationDate']
+        ProgramEncounterCancellation: ['cancelDateTime', 'earliestVisitDateTime', 'enrolmentDateTime', 'registrationDate'],
+        // Empty on purpose. A visit would have to be scheduled against the enrolment or subject
+        // the approval refers to, which the approval does not own.
+        Approval: [],
+        Rejection: []
     };
 
     constructor() {

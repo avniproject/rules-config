@@ -53,6 +53,18 @@ class ConceptScope {
         ChecklistItem: {
             'ThisChecklistItem': 'checklistItem',
         },
+        // Approval and Rejection forms attach to four different mapping shapes (subject
+        // registration, enrolment, encounter, checklist item), and formTypeToScopeMap is keyed
+        // by form type alone. Only the intersection is offered: a scope such as lastEncounter
+        // is valid on an encounter mapping but resolves to nothing on a registration one.
+        Approval: {
+            'ThisApprovalStatus': 'entityApprovalStatus',
+            'Registration': 'registration',
+        },
+        Rejection: {
+            'ThisApprovalStatus': 'entityApprovalStatus',
+            'Registration': 'registration',
+        },
     };
 
     static scopes = {
@@ -69,6 +81,17 @@ class ConceptScope {
         'ChecklistItem': 'checklistItem'
     };
 
+    // Deliberately kept out of `scopes`: that map doubles as the fallback list for form types
+    // absent from formTypeToScopeMap, so adding it there would start offering the approval
+    // status scope on unrelated forms such as SubjectEnrolmentEligibility.
+    static approvalScopes = {
+        'ThisApprovalStatus': 'entityApprovalStatus'
+    };
+
+    static getAllScopes() {
+        return {...ConceptScope.scopes, ...ConceptScope.approvalScopes};
+    }
+
     static scopeToRuleFunctionMap = {
         'entireEnrolment': 'valueInEntireEnrolment',
         'latestInAllEncounters': 'latestValueInAllEncounters',
@@ -84,6 +107,7 @@ class ConceptScope {
         'questionGroupRegistration': 'questionGroupValueInRegistration',
         'questionGroupEncounter': 'questionGroupValueInEncounter',
         'questionGroupEnrolment': 'questionGroupValueInEnrolment',
+        'entityApprovalStatus': 'valueInEntityApprovalStatus',
     };
 
     static scopeToObservationFunctionMap = {
@@ -98,6 +122,7 @@ class ConceptScope {
         'registration': 'findObservation',
         'cancelEncounter': 'findObservation',
         'checklistItem': 'findObservation',
+        'entityApprovalStatus': 'findObservation',
     };
 
     static isCurrentEncounterRequired(scope) {

@@ -1,5 +1,6 @@
 import _ from 'lodash';
 import {Action, Condition, VisitScheduleActionDetails} from "./index";
+import {APPROVAL_STATUS_ENTITY_NAME} from "./Util";
 
 const constructSkipAnsCondition = (condition, conceptDataType, answers) => {
     if (conceptDataType === 'Subject') {
@@ -150,7 +151,10 @@ class DeclarativeRule {
     }
 
     getRuleConditions(entityName, conditionAppender = '', ignoreFormElementInContext) {
-        const context = ignoreFormElementInContext ? `{${entityName}}` : `{${entityName}, formElement}`;
+        // On approval forms the subject is bound separately by the template and has to be handed
+        // to the rule condition too, otherwise the registration scope has nothing to resolve from.
+        const contextEntities = entityName === APPROVAL_STATUS_ENTITY_NAME ? `${entityName}, individual` : entityName;
+        const context = ignoreFormElementInContext ? `{${contextEntities}}` : `{${contextEntities}, formElement}`;
         const baseRuleCondition = `new imports.rulesConfig.RuleCondition(${context}).$RULE_CONDITION`;
         const constructOtherCondition = (condition, action) => `if(${condition}){\n    ${action}  \n}\n  `;
         let ruleConditions = '';

@@ -1,5 +1,5 @@
 import _ from "lodash";
-import {assertTrue} from "./Util";
+import {APPROVAL_STATUS_ENTITY_NAME, assertTrue} from "./Util";
 import ConceptScope from "./ConceptScope";
 
 class RHS {
@@ -75,6 +75,8 @@ class RHS {
                     return this.scope === scopes.Registration ? 'programEnrolment.individual' : 'programEnrolment';
                 case 'programEncounter':
                     return this.scope === scopes.Enrolment ? 'programEncounter.programEnrolment' : (this.scope === scopes.Registration ? 'programEncounter.programEnrolment.individual' : 'programEncounter');
+                case APPROVAL_STATUS_ENTITY_NAME:
+                    return this.scope === scopes.Registration ? 'individual' : APPROVAL_STATUS_ENTITY_NAME;
             }
         };
         const getSecondParam = () => ConceptScope.isCurrentEncounterRequired(this.scope) ? `, ${entityName}` : '';

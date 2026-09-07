@@ -48,7 +48,7 @@ class RuleCondition {
         return context.individual
             || _.get(context, 'programEncounter.individual')
             || _.get(context, 'encounter.individual')
-            || this._getEnrolment(context).individual;
+            || _.get(this._getEnrolment(context), 'individual');
     }
 
     _getEncounter(context) {
@@ -370,7 +370,18 @@ class RuleCondition {
 
     valueInRegistration(conceptNameOrUuid, parentConceptNameOrUuid) {
         return this._addToChain((next, context) => {
-            const obs = this._getIndividual(context).findObservation(conceptNameOrUuid, parentConceptNameOrUuid);
+            const individual = this._getIndividual(context);
+            const obs = individual && individual.findObservation(conceptNameOrUuid, parentConceptNameOrUuid);
+            context.obsToBeChecked = obs;
+            context.valueToBeChecked = obs && obs.getValue();
+            return next(context);
+        });
+    }
+
+    valueInEntityApprovalStatus(conceptNameOrUuid, parentConceptNameOrUuid) {
+        return this._addToChain((next, context) => {
+            const entityApprovalStatus = context.entityApprovalStatus;
+            const obs = entityApprovalStatus && entityApprovalStatus.findObservation(conceptNameOrUuid, parentConceptNameOrUuid);
             context.obsToBeChecked = obs;
             context.valueToBeChecked = obs && obs.getValue();
             return next(context);

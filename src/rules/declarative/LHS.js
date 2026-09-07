@@ -69,7 +69,7 @@ class LHS {
     }
 
     setScope(scope) {
-        const scopes = _.values(ConceptScope.scopes);
+        const scopes = _.values(ConceptScope.getAllScopes());
         assertTrue(_.includes(scopes, scope), `Scopes must be one of the ${scopes}`);
         assertTrue(!_.isNil(this.conceptName), `Scope cannot be set without concept`);
         this.scope = scope;

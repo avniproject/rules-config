@@ -10,7 +10,11 @@ class AddDecisionActionDetails {
         ProgramEnrolment: ['enrolment', 'registration'],
         ProgramExit: ['enrolment', 'registration'],
         ProgramEncounter: ['encounter', 'enrolment', 'registration'],
-        ProgramEncounterCancellation: ['encounter', 'enrolment', 'registration']
+        ProgramEncounterCancellation: ['encounter', 'enrolment', 'registration'],
+        // Empty on purpose. A decision would have to be written to the subject, enrolment or
+        // encounter the approval refers to, none of which the approval owns.
+        Approval: [],
+        Rejection: []
     };
 
     constructor() {
