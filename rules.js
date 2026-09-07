@@ -21706,29 +21706,43 @@ return /******/ (function(modules) { // webpackBootstrap
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
-/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "a", function() { return assertTrue; });
-/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "f", function() { return getViewFilterRuleTemplate; });
-/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "d", function() { return getFormElementGroupRuleTemplate; });
-/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "c", function() { return getEligibilityRuleTemplate; });
-/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "e", function() { return getFormValidationErrorRuleTemplate; });
-/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "b", function() { return getDecisionRuleTemplate; });
-/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "g", function() { return getVisitScheduleRuleTemplate; });
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "b", function() { return assertTrue; });
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "a", function() { return APPROVAL_STATUS_ENTITY_NAME; });
+/* unused harmony export getApprovedSubjectDeclaration */
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "g", function() { return getViewFilterRuleTemplate; });
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "e", function() { return getFormElementGroupRuleTemplate; });
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "d", function() { return getEligibilityRuleTemplate; });
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "f", function() { return getFormValidationErrorRuleTemplate; });
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "c", function() { return getDecisionRuleTemplate; });
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "h", function() { return getVisitScheduleRuleTemplate; });
 var assertTrue = function assertTrue(value, message) {
   if (!value) {
     throw new Error(message);
   }
+}; // The rule variable Approval and Rejection forms run against, matching the ruleVariableName
+// App Designer registers for those form types.
+
+var APPROVAL_STATUS_ENTITY_NAME = 'entityApprovalStatus'; // An EntityApprovalStatus holds only the UUID and type of the record being approved, so the
+// subject cannot be reached from it by navigation the way it can from an encounter or an
+// enrolment. The client passes the subject alongside in entityContext instead; binding it here
+// is what lets the registration scope resolve on these forms. Emitted only for approval form
+// types — anywhere else `individual` is either already the entity or reachable from it, and a
+// second declaration would be a syntax error.
+
+var getApprovedSubjectDeclaration = function getApprovedSubjectDeclaration(entityName) {
+  return entityName === APPROVAL_STATUS_ENTITY_NAME ? "\n  const individual = params.entityContext && params.entityContext.individual;" : '';
 };
 var getViewFilterRuleTemplate = function getViewFilterRuleTemplate(entityName) {
-  return "'use strict';\n({params, imports}) => {\n  const ".concat(entityName, " = params.entity;\n  const moment = imports.moment;\n  const formElement = params.formElement;\n  const _ = imports.lodash;\n  let visibility = true;\n  let value = null;\n  let answersToSkip = [];\n  let answersToShow = [];\n  let validationErrors = [];\n  $RULE_CONDITIONS\n  $ACTION_CONDITIONS\n  return new imports.rulesConfig.FormElementStatus(formElement.uuid, visibility, value, answersToSkip, validationErrors, answersToShow);\n};");
+  return "'use strict';\n({params, imports}) => {\n  const ".concat(entityName, " = params.entity;").concat(getApprovedSubjectDeclaration(entityName), "\n  const moment = imports.moment;\n  const formElement = params.formElement;\n  const _ = imports.lodash;\n  let visibility = true;\n  let value = null;\n  let answersToSkip = [];\n  let answersToShow = [];\n  let validationErrors = [];\n  $RULE_CONDITIONS\n  $ACTION_CONDITIONS\n  return new imports.rulesConfig.FormElementStatus(formElement.uuid, visibility, value, answersToSkip, validationErrors, answersToShow);\n};");
 };
 var getFormElementGroupRuleTemplate = function getFormElementGroupRuleTemplate(entityName) {
-  return "'use strict';\n({params, imports}) => {\n    const ".concat(entityName, " = params.entity;\n    const moment = imports.moment;\n    const formElementGroup = params.formElementGroup;\n    const _ = imports.lodash;\n    let visibility = true;\n    return formElementGroup.formElements.map((formElement) => {\n        $RULE_CONDITIONS\n        $ACTION_CONDITIONS\n        return new imports.rulesConfig.FormElementStatus(formElement.uuid, visibility, null);\n    });\n};");
+  return "'use strict';\n({params, imports}) => {\n    const ".concat(entityName, " = params.entity;").concat(getApprovedSubjectDeclaration(entityName), "\n    const moment = imports.moment;\n    const formElementGroup = params.formElementGroup;\n    const _ = imports.lodash;\n    let visibility = true;\n    return formElementGroup.formElements.map((formElement) => {\n        $RULE_CONDITIONS\n        $ACTION_CONDITIONS\n        return new imports.rulesConfig.FormElementStatus(formElement.uuid, visibility, null);\n    });\n};");
 };
 var getEligibilityRuleTemplate = function getEligibilityRuleTemplate() {
   return "'use strict';\n({params, imports}) => {\n  const individual = params.entity;\n  const moment = imports.moment;\n  let eligibility = true;\n  $RULE_CONDITIONS\n  $ACTION_CONDITIONS\n  return eligibility;\n};";
 };
 var getFormValidationErrorRuleTemplate = function getFormValidationErrorRuleTemplate(entityName) {
-  return "'use strict';\n({params, imports}) => {\n  const ".concat(entityName, " = params.entity;\n  const moment = imports.moment;\n  const validationResults = [];\n  $RULE_CONDITIONS\n  $ACTION_CONDITIONS\n  return validationResults;\n};");
+  return "'use strict';\n({params, imports}) => {\n  const ".concat(entityName, " = params.entity;").concat(getApprovedSubjectDeclaration(entityName), "\n  const moment = imports.moment;\n  const validationResults = [];\n  $RULE_CONDITIONS\n  $ACTION_CONDITIONS\n  return validationResults;\n};");
 };
 var getDecisionRuleTemplate = function getDecisionRuleTemplate(entityName) {
   return "\"use strict\";\n({params, imports}) => {\n    const ".concat(entityName, " = params.entity;\n    const moment = imports.moment;\n    const decisions = params.decisions;\n    const enrolmentDecisions = [];\n    const encounterDecisions = [];\n    const registrationDecisions = [];\n    $RULE_CONDITIONS\n    $ACTION_CONDITIONS\n    decisions.enrolmentDecisions.push(...enrolmentDecisions);\n    decisions.encounterDecisions.push(...encounterDecisions);\n    decisions.registrationDecisions.push(...registrationDecisions);\n    return decisions;\n};");
@@ -21861,7 +21875,7 @@ var RuleCondition = /*#__PURE__*/function () {
   }, {
     key: "_getIndividual",
     value: function _getIndividual(context) {
-      return context.individual || __WEBPACK_IMPORTED_MODULE_1_lodash___default.a.get(context, 'programEncounter.individual') || __WEBPACK_IMPORTED_MODULE_1_lodash___default.a.get(context, 'encounter.individual') || this._getEnrolment(context).individual;
+      return context.individual || __WEBPACK_IMPORTED_MODULE_1_lodash___default.a.get(context, 'programEncounter.individual') || __WEBPACK_IMPORTED_MODULE_1_lodash___default.a.get(context, 'encounter.individual') || __WEBPACK_IMPORTED_MODULE_1_lodash___default.a.get(this._getEnrolment(context), 'individual');
     }
   }, {
     key: "_getEncounter",
@@ -22300,8 +22314,20 @@ var RuleCondition = /*#__PURE__*/function () {
       var _this26 = this;
 
       return this._addToChain(function (next, context) {
-        var obs = _this26._getIndividual(context).findObservation(conceptNameOrUuid, parentConceptNameOrUuid);
+        var individual = _this26._getIndividual(context);
 
+        var obs = individual && individual.findObservation(conceptNameOrUuid, parentConceptNameOrUuid);
+        context.obsToBeChecked = obs;
+        context.valueToBeChecked = obs && obs.getValue();
+        return next(context);
+      });
+    }
+  }, {
+    key: "valueInEntityApprovalStatus",
+    value: function valueInEntityApprovalStatus(conceptNameOrUuid, parentConceptNameOrUuid) {
+      return this._addToChain(function (next, context) {
+        var entityApprovalStatus = context.entityApprovalStatus;
+        var obs = entityApprovalStatus && entityApprovalStatus.findObservation(conceptNameOrUuid, parentConceptNameOrUuid);
         context.obsToBeChecked = obs;
         context.valueToBeChecked = obs && obs.getValue();
         return next(context);
@@ -22550,6 +22576,10 @@ module.exports = toString;
 "use strict";
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_0_lodash__ = __webpack_require__(1);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_0_lodash___default = __webpack_require__.n(__WEBPACK_IMPORTED_MODULE_0_lodash__);
+function ownKeys(object, enumerableOnly) { var keys = Object.keys(object); if (Object.getOwnPropertySymbols) { var symbols = Object.getOwnPropertySymbols(object); enumerableOnly && (symbols = symbols.filter(function (sym) { return Object.getOwnPropertyDescriptor(object, sym).enumerable; })), keys.push.apply(keys, symbols); } return keys; }
+
+function _objectSpread(target) { for (var i = 1; i < arguments.length; i++) { var source = null != arguments[i] ? arguments[i] : {}; i % 2 ? ownKeys(Object(source), !0).forEach(function (key) { _defineProperty(target, key, source[key]); }) : Object.getOwnPropertyDescriptors ? Object.defineProperties(target, Object.getOwnPropertyDescriptors(source)) : ownKeys(Object(source)).forEach(function (key) { Object.defineProperty(target, key, Object.getOwnPropertyDescriptor(source, key)); }); } return target; }
+
 function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
 
 function _defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } }
@@ -22566,6 +22596,14 @@ var ConceptScope = /*#__PURE__*/function () {
   }
 
   _createClass(ConceptScope, null, [{
+    key: "getAllScopes",
+    value: // Deliberately kept out of `scopes`: that map doubles as the fallback list for form types
+    // absent from formTypeToScopeMap, so adding it there would start offering the approval
+    // status scope on unrelated forms such as SubjectEnrolmentEligibility.
+    function getAllScopes() {
+      return _objectSpread(_objectSpread({}, ConceptScope.scopes), ConceptScope.approvalScopes);
+    }
+  }, {
     key: "isCurrentEncounterRequired",
     value: function isCurrentEncounterRequired(scope) {
       return __WEBPACK_IMPORTED_MODULE_0_lodash___default.a.includes(['entireEnrolment', 'latestInAllEncounters', 'latestInEntireEnrolment', 'latestInPreviousEncounters', 'lastEncounter'], scope);
@@ -22643,6 +22681,18 @@ _defineProperty(ConceptScope, "formTypeToScopeMap", {
   },
   ChecklistItem: {
     'ThisChecklistItem': 'checklistItem'
+  },
+  // Approval and Rejection forms attach to four different mapping shapes (subject
+  // registration, enrolment, encounter, checklist item), and formTypeToScopeMap is keyed
+  // by form type alone. Only the intersection is offered: a scope such as lastEncounter
+  // is valid on an encounter mapping but resolves to nothing on a registration one.
+  Approval: {
+    'ThisApprovalStatus': 'entityApprovalStatus',
+    'Registration': 'registration'
+  },
+  Rejection: {
+    'ThisApprovalStatus': 'entityApprovalStatus',
+    'Registration': 'registration'
   }
 });
 
@@ -22660,6 +22710,10 @@ _defineProperty(ConceptScope, "scopes", {
   'ChecklistItem': 'checklistItem'
 });
 
+_defineProperty(ConceptScope, "approvalScopes", {
+  'ThisApprovalStatus': 'entityApprovalStatus'
+});
+
 _defineProperty(ConceptScope, "scopeToRuleFunctionMap", {
   'entireEnrolment': 'valueInEntireEnrolment',
   'latestInAllEncounters': 'latestValueInAllEncounters',
@@ -22674,7 +22728,8 @@ _defineProperty(ConceptScope, "scopeToRuleFunctionMap", {
   'checklistItem': 'valueInChecklistItem',
   'questionGroupRegistration': 'questionGroupValueInRegistration',
   'questionGroupEncounter': 'questionGroupValueInEncounter',
-  'questionGroupEnrolment': 'questionGroupValueInEnrolment'
+  'questionGroupEnrolment': 'questionGroupValueInEnrolment',
+  'entityApprovalStatus': 'valueInEntityApprovalStatus'
 });
 
 _defineProperty(ConceptScope, "scopeToObservationFunctionMap", {
@@ -22688,7 +22743,8 @@ _defineProperty(ConceptScope, "scopeToObservationFunctionMap", {
   'encounter': 'findObservation',
   'registration': 'findObservation',
   'cancelEncounter': 'findObservation',
-  'checklistItem': 'findObservation'
+  'checklistItem': 'findObservation',
+  'entityApprovalStatus': 'findObservation'
 });
 
 /* harmony default export */ __webpack_exports__["a"] = (ConceptScope);
@@ -35538,7 +35594,7 @@ var Action = /*#__PURE__*/function () {
     value: function setActionType(actionType) {
       var actionTypes = __WEBPACK_IMPORTED_MODULE_1_lodash___default.a.values(Action.actionTypes);
 
-      if (!__WEBPACK_IMPORTED_MODULE_1_lodash___default.a.isNil(actionType)) Object(__WEBPACK_IMPORTED_MODULE_0__Util__["a" /* assertTrue */])(__WEBPACK_IMPORTED_MODULE_1_lodash___default.a.includes(actionTypes, actionType), "Action type must be one of the ".concat(actionTypes));
+      if (!__WEBPACK_IMPORTED_MODULE_1_lodash___default.a.isNil(actionType)) Object(__WEBPACK_IMPORTED_MODULE_0__Util__["b" /* assertTrue */])(__WEBPACK_IMPORTED_MODULE_1_lodash___default.a.includes(actionTypes, actionType), "Action type must be one of the ".concat(actionTypes));
       this.actionType = actionType;
 
       if (this.isViewFilterWithDetailsAction()) {
@@ -35670,7 +35726,7 @@ var Action = /*#__PURE__*/function () {
   }, {
     key: "validate",
     value: function validate() {
-      Object(__WEBPACK_IMPORTED_MODULE_0__Util__["a" /* assertTrue */])(!__WEBPACK_IMPORTED_MODULE_1_lodash___default.a.isNil(this.actionType), "Type in Action cannot be empty");
+      Object(__WEBPACK_IMPORTED_MODULE_0__Util__["b" /* assertTrue */])(!__WEBPACK_IMPORTED_MODULE_1_lodash___default.a.isNil(this.actionType), "Type in Action cannot be empty");
 
       if (this.isAddDecisionAction() || this.isFormValidationAction() || this.isViewFilterWithDetailsAction() || this.isVisitScheduleAction()) {
         this.details.validate(this.actionType);
@@ -35769,7 +35825,7 @@ var CompoundRule = /*#__PURE__*/function () {
     value: function setConjunction(conjunction) {
       var conjunctions = __WEBPACK_IMPORTED_MODULE_1_lodash___default.a.values(CompoundRule.conjunctions);
 
-      Object(__WEBPACK_IMPORTED_MODULE_0__Util__["a" /* assertTrue */])(__WEBPACK_IMPORTED_MODULE_1_lodash___default.a.includes(conjunctions, conjunction), "Conjunction must be one of the ".concat(conjunctions));
+      Object(__WEBPACK_IMPORTED_MODULE_0__Util__["b" /* assertTrue */])(__WEBPACK_IMPORTED_MODULE_1_lodash___default.a.includes(conjunctions, conjunction), "Conjunction must be one of the ".concat(conjunctions));
       this.conjunction = conjunction;
     }
   }, {
@@ -35908,7 +35964,7 @@ var LHS = /*#__PURE__*/function () {
     value: function setType(type) {
       var types = __WEBPACK_IMPORTED_MODULE_0_lodash___default.a.values(LHS.types);
 
-      Object(__WEBPACK_IMPORTED_MODULE_1__Util__["a" /* assertTrue */])(__WEBPACK_IMPORTED_MODULE_0_lodash___default.a.includes(types, type), "Types must be one of the ".concat(types));
+      Object(__WEBPACK_IMPORTED_MODULE_1__Util__["b" /* assertTrue */])(__WEBPACK_IMPORTED_MODULE_0_lodash___default.a.includes(types, type), "Types must be one of the ".concat(types));
       this.type = type;
     }
   }, {
@@ -35934,10 +35990,10 @@ var LHS = /*#__PURE__*/function () {
   }, {
     key: "setScope",
     value: function setScope(scope) {
-      var scopes = __WEBPACK_IMPORTED_MODULE_0_lodash___default.a.values(__WEBPACK_IMPORTED_MODULE_2__ConceptScope__["a" /* default */].scopes);
+      var scopes = __WEBPACK_IMPORTED_MODULE_0_lodash___default.a.values(__WEBPACK_IMPORTED_MODULE_2__ConceptScope__["a" /* default */].getAllScopes());
 
-      Object(__WEBPACK_IMPORTED_MODULE_1__Util__["a" /* assertTrue */])(__WEBPACK_IMPORTED_MODULE_0_lodash___default.a.includes(scopes, scope), "Scopes must be one of the ".concat(scopes));
-      Object(__WEBPACK_IMPORTED_MODULE_1__Util__["a" /* assertTrue */])(!__WEBPACK_IMPORTED_MODULE_0_lodash___default.a.isNil(this.conceptName), "Scope cannot be set without concept");
+      Object(__WEBPACK_IMPORTED_MODULE_1__Util__["b" /* assertTrue */])(__WEBPACK_IMPORTED_MODULE_0_lodash___default.a.includes(scopes, scope), "Scopes must be one of the ".concat(scopes));
+      Object(__WEBPACK_IMPORTED_MODULE_1__Util__["b" /* assertTrue */])(!__WEBPACK_IMPORTED_MODULE_0_lodash___default.a.isNil(this.conceptName), "Scope cannot be set without concept");
       this.scope = scope;
     }
   }, {
@@ -36095,8 +36151,8 @@ var LHS = /*#__PURE__*/function () {
     key: "validate",
     value: function validate() {
       if (__WEBPACK_IMPORTED_MODULE_0_lodash___default.a.isEqual(this.type, LHS.types.Concept)) {
-        Object(__WEBPACK_IMPORTED_MODULE_1__Util__["a" /* assertTrue */])(!__WEBPACK_IMPORTED_MODULE_0_lodash___default.a.isNil(this.conceptName), "Concept cannot be empty");
-        Object(__WEBPACK_IMPORTED_MODULE_1__Util__["a" /* assertTrue */])(!__WEBPACK_IMPORTED_MODULE_0_lodash___default.a.isNil(this.scope), "Scope cannot be empty");
+        Object(__WEBPACK_IMPORTED_MODULE_1__Util__["b" /* assertTrue */])(!__WEBPACK_IMPORTED_MODULE_0_lodash___default.a.isNil(this.conceptName), "Concept cannot be empty");
+        Object(__WEBPACK_IMPORTED_MODULE_1__Util__["b" /* assertTrue */])(!__WEBPACK_IMPORTED_MODULE_0_lodash___default.a.isNil(this.scope), "Scope cannot be empty");
       }
     }
   }], [{
@@ -36176,7 +36232,7 @@ var RHS = /*#__PURE__*/function () {
     value: function setType(type) {
       var types = __WEBPACK_IMPORTED_MODULE_0_lodash___default.a.values(RHS.types);
 
-      Object(__WEBPACK_IMPORTED_MODULE_1__Util__["a" /* assertTrue */])(__WEBPACK_IMPORTED_MODULE_0_lodash___default.a.includes(types, type), "Types must be one of the ".concat(types));
+      Object(__WEBPACK_IMPORTED_MODULE_1__Util__["b" /* assertTrue */])(__WEBPACK_IMPORTED_MODULE_0_lodash___default.a.includes(types, type), "Types must be one of the ".concat(types));
       this.type = type;
     }
   }, {
@@ -36200,7 +36256,7 @@ var RHS = /*#__PURE__*/function () {
   }, {
     key: "setValue",
     value: function setValue(value) {
-      Object(__WEBPACK_IMPORTED_MODULE_1__Util__["a" /* assertTrue */])(this.type === RHS.types.Value, "Type must be ".concat(RHS.types.Value));
+      Object(__WEBPACK_IMPORTED_MODULE_1__Util__["b" /* assertTrue */])(this.type === RHS.types.Value, "Type must be ".concat(RHS.types.Value));
       this.value = value;
     }
   }, {
@@ -36242,6 +36298,9 @@ var RHS = /*#__PURE__*/function () {
 
           case 'programEncounter':
             return _this.scope === scopes.Enrolment ? 'programEncounter.programEnrolment' : _this.scope === scopes.Registration ? 'programEncounter.programEnrolment.individual' : 'programEncounter';
+
+          case __WEBPACK_IMPORTED_MODULE_1__Util__["a" /* APPROVAL_STATUS_ENTITY_NAME */]:
+            return _this.scope === scopes.Registration ? 'individual' : __WEBPACK_IMPORTED_MODULE_1__Util__["a" /* APPROVAL_STATUS_ENTITY_NAME */];
         }
       };
 
@@ -36309,13 +36368,13 @@ var RHS = /*#__PURE__*/function () {
   }, {
     key: "validate",
     value: function validate() {
-      Object(__WEBPACK_IMPORTED_MODULE_1__Util__["a" /* assertTrue */])(!__WEBPACK_IMPORTED_MODULE_0_lodash___default.a.isNil(this.type), "Type cannot be empty");
-      if (__WEBPACK_IMPORTED_MODULE_0_lodash___default.a.isEqual(this.type, RHS.types.Value)) Object(__WEBPACK_IMPORTED_MODULE_1__Util__["a" /* assertTrue */])(!__WEBPACK_IMPORTED_MODULE_0_lodash___default.a.isNil(this.value), "Value cannot be empty");
-      if (__WEBPACK_IMPORTED_MODULE_0_lodash___default.a.isEqual(this.type, RHS.types.AnswerConcept)) Object(__WEBPACK_IMPORTED_MODULE_1__Util__["a" /* assertTrue */])(!__WEBPACK_IMPORTED_MODULE_0_lodash___default.a.isEmpty(this.answerConceptNames), "Concept answers cannot be empty");
+      Object(__WEBPACK_IMPORTED_MODULE_1__Util__["b" /* assertTrue */])(!__WEBPACK_IMPORTED_MODULE_0_lodash___default.a.isNil(this.type), "Type cannot be empty");
+      if (__WEBPACK_IMPORTED_MODULE_0_lodash___default.a.isEqual(this.type, RHS.types.Value)) Object(__WEBPACK_IMPORTED_MODULE_1__Util__["b" /* assertTrue */])(!__WEBPACK_IMPORTED_MODULE_0_lodash___default.a.isNil(this.value), "Value cannot be empty");
+      if (__WEBPACK_IMPORTED_MODULE_0_lodash___default.a.isEqual(this.type, RHS.types.AnswerConcept)) Object(__WEBPACK_IMPORTED_MODULE_1__Util__["b" /* assertTrue */])(!__WEBPACK_IMPORTED_MODULE_0_lodash___default.a.isEmpty(this.answerConceptNames), "Concept answers cannot be empty");
 
       if (this.isConceptType()) {
-        Object(__WEBPACK_IMPORTED_MODULE_1__Util__["a" /* assertTrue */])(!__WEBPACK_IMPORTED_MODULE_0_lodash___default.a.isEmpty(this.conceptName), "Concept name cannot be empty");
-        Object(__WEBPACK_IMPORTED_MODULE_1__Util__["a" /* assertTrue */])(!__WEBPACK_IMPORTED_MODULE_0_lodash___default.a.isEmpty(this.scope), "Concept scope cannot be empty");
+        Object(__WEBPACK_IMPORTED_MODULE_1__Util__["b" /* assertTrue */])(!__WEBPACK_IMPORTED_MODULE_0_lodash___default.a.isEmpty(this.conceptName), "Concept name cannot be empty");
+        Object(__WEBPACK_IMPORTED_MODULE_1__Util__["b" /* assertTrue */])(!__WEBPACK_IMPORTED_MODULE_0_lodash___default.a.isEmpty(this.scope), "Concept scope cannot be empty");
       }
     }
   }, {
@@ -38612,7 +38671,7 @@ var Condition = /*#__PURE__*/function () {
     value: function setConjunction(conjunction) {
       var conjunctions = __WEBPACK_IMPORTED_MODULE_0_lodash___default.a.values(Condition.conjunctions);
 
-      Object(__WEBPACK_IMPORTED_MODULE_1__Util__["a" /* assertTrue */])(__WEBPACK_IMPORTED_MODULE_0_lodash___default.a.includes(conjunctions, conjunction), "Conjunction must be one of the ".concat(conjunctions));
+      Object(__WEBPACK_IMPORTED_MODULE_1__Util__["b" /* assertTrue */])(__WEBPACK_IMPORTED_MODULE_0_lodash___default.a.includes(conjunctions, conjunction), "Conjunction must be one of the ".concat(conjunctions));
       this.conjunction = conjunction;
     }
   }, {
@@ -38686,6 +38745,7 @@ _defineProperty(Condition, "conjunctions", {
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_0_lodash__ = __webpack_require__(1);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_0_lodash___default = __webpack_require__.n(__WEBPACK_IMPORTED_MODULE_0_lodash__);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__index__ = __webpack_require__(3);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_2__Util__ = __webpack_require__(2);
 function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
 
 function _defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } }
@@ -38693,6 +38753,7 @@ function _defineProperties(target, props) { for (var i = 0; i < props.length; i+
 function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _defineProperties(Constructor.prototype, protoProps); if (staticProps) _defineProperties(Constructor, staticProps); Object.defineProperty(Constructor, "prototype", { writable: false }); return Constructor; }
 
 function _defineProperty(obj, key, value) { if (key in obj) { Object.defineProperty(obj, key, { value: value, enumerable: true, configurable: true, writable: true }); } else { obj[key] = value; } return obj; }
+
 
 
 
@@ -38845,7 +38906,10 @@ var DeclarativeRule = /*#__PURE__*/function () {
 
       var conditionAppender = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : '';
       var ignoreFormElementInContext = arguments.length > 2 ? arguments[2] : undefined;
-      var context = ignoreFormElementInContext ? "{".concat(entityName, "}") : "{".concat(entityName, ", formElement}");
+      // On approval forms the subject is bound separately by the template and has to be handed
+      // to the rule condition too, otherwise the registration scope has nothing to resolve from.
+      var contextEntities = entityName === __WEBPACK_IMPORTED_MODULE_2__Util__["a" /* APPROVAL_STATUS_ENTITY_NAME */] ? "".concat(entityName, ", individual") : entityName;
+      var context = ignoreFormElementInContext ? "{".concat(contextEntities, "}") : "{".concat(contextEntities, ", formElement}");
       var baseRuleCondition = "new imports.rulesConfig.RuleCondition(".concat(context, ").$RULE_CONDITION");
 
       var constructOtherCondition = function constructOtherCondition(condition, action) {
@@ -39054,7 +39118,7 @@ var Rule = /*#__PURE__*/function () {
     value: function setOperator(operator) {
       var operators = __WEBPACK_IMPORTED_MODULE_1_lodash___default.a.values(Rule.operators);
 
-      Object(__WEBPACK_IMPORTED_MODULE_0__Util__["a" /* assertTrue */])(__WEBPACK_IMPORTED_MODULE_1_lodash___default.a.includes(operators, operator), "Operator must be one of the ".concat(operators));
+      Object(__WEBPACK_IMPORTED_MODULE_0__Util__["b" /* assertTrue */])(__WEBPACK_IMPORTED_MODULE_1_lodash___default.a.includes(operators, operator), "Operator must be one of the ".concat(operators));
       this.operator = operator;
     }
   }, {
@@ -39103,7 +39167,7 @@ var Rule = /*#__PURE__*/function () {
     key: "validate",
     value: function validate() {
       this.lhs.validate();
-      if (!__WEBPACK_IMPORTED_MODULE_1_lodash___default.a.isNil(this.lhs.type)) Object(__WEBPACK_IMPORTED_MODULE_0__Util__["a" /* assertTrue */])(!__WEBPACK_IMPORTED_MODULE_1_lodash___default.a.isNil(this.operator), "Operator cannot be empty");
+      if (!__WEBPACK_IMPORTED_MODULE_1_lodash___default.a.isNil(this.lhs.type)) Object(__WEBPACK_IMPORTED_MODULE_0__Util__["b" /* assertTrue */])(!__WEBPACK_IMPORTED_MODULE_1_lodash___default.a.isNil(this.operator), "Operator cannot be empty");
       this.isRhsRequired() && this.rhs.validate();
     }
   }], [{
@@ -39190,7 +39254,7 @@ var DeclarativeRuleHolder = /*#__PURE__*/function () {
           ruleConditionArray = _this$getAllRuleCondi.ruleConditionArray,
           actionConditionArray = _this$getAllRuleCondi.actionConditionArray;
 
-      var viewFilterRuleTemplate = Object(__WEBPACK_IMPORTED_MODULE_2__Util__["f" /* getViewFilterRuleTemplate */])(entityName);
+      var viewFilterRuleTemplate = Object(__WEBPACK_IMPORTED_MODULE_2__Util__["g" /* getViewFilterRuleTemplate */])(entityName);
       return viewFilterRuleTemplate.replace('$RULE_CONDITIONS', ruleConditionArray.join('  ')).replace('$ACTION_CONDITIONS', actionConditionArray.join('  '));
     }
   }, {
@@ -39200,7 +39264,7 @@ var DeclarativeRuleHolder = /*#__PURE__*/function () {
           ruleConditionArray = _this$getAllRuleCondi2.ruleConditionArray,
           actionConditionArray = _this$getAllRuleCondi2.actionConditionArray;
 
-      var formElementGroupRuleTemplate = Object(__WEBPACK_IMPORTED_MODULE_2__Util__["d" /* getFormElementGroupRuleTemplate */])(entityName);
+      var formElementGroupRuleTemplate = Object(__WEBPACK_IMPORTED_MODULE_2__Util__["e" /* getFormElementGroupRuleTemplate */])(entityName);
       return formElementGroupRuleTemplate.replace('$RULE_CONDITIONS', ruleConditionArray.join('  ')).replace('$ACTION_CONDITIONS', actionConditionArray.join('  '));
     }
   }, {
@@ -39210,7 +39274,7 @@ var DeclarativeRuleHolder = /*#__PURE__*/function () {
           ruleConditionArray = _this$getAllRuleCondi3.ruleConditionArray,
           actionConditionArray = _this$getAllRuleCondi3.actionConditionArray;
 
-      var eligibilityRuleTemplate = Object(__WEBPACK_IMPORTED_MODULE_2__Util__["c" /* getEligibilityRuleTemplate */])();
+      var eligibilityRuleTemplate = Object(__WEBPACK_IMPORTED_MODULE_2__Util__["d" /* getEligibilityRuleTemplate */])();
       return eligibilityRuleTemplate.replace('$RULE_CONDITIONS', ruleConditionArray.join('  ')).replace('$ACTION_CONDITIONS', actionConditionArray.join('  '));
     }
   }, {
@@ -39220,7 +39284,7 @@ var DeclarativeRuleHolder = /*#__PURE__*/function () {
           ruleConditionArray = _this$getAllRuleCondi4.ruleConditionArray,
           actionConditionArray = _this$getAllRuleCondi4.actionConditionArray;
 
-      var formValidationErrorRuleTemplate = Object(__WEBPACK_IMPORTED_MODULE_2__Util__["e" /* getFormValidationErrorRuleTemplate */])(entityName);
+      var formValidationErrorRuleTemplate = Object(__WEBPACK_IMPORTED_MODULE_2__Util__["f" /* getFormValidationErrorRuleTemplate */])(entityName);
       return formValidationErrorRuleTemplate.replace('$RULE_CONDITIONS', ruleConditionArray.join('  ')).replace('$ACTION_CONDITIONS', actionConditionArray.join('  '));
     }
   }, {
@@ -39230,7 +39294,7 @@ var DeclarativeRuleHolder = /*#__PURE__*/function () {
           ruleConditionArray = _this$getAllRuleCondi5.ruleConditionArray,
           actionConditionArray = _this$getAllRuleCondi5.actionConditionArray;
 
-      var decisionRuleTemplate = Object(__WEBPACK_IMPORTED_MODULE_2__Util__["b" /* getDecisionRuleTemplate */])(entityName);
+      var decisionRuleTemplate = Object(__WEBPACK_IMPORTED_MODULE_2__Util__["c" /* getDecisionRuleTemplate */])(entityName);
       return decisionRuleTemplate.replace('$RULE_CONDITIONS', ruleConditionArray.join('  ')).replace('$ACTION_CONDITIONS', actionConditionArray.join('  '));
     }
   }, {
@@ -39240,7 +39304,7 @@ var DeclarativeRuleHolder = /*#__PURE__*/function () {
           ruleConditionArray = _this$getAllRuleCondi6.ruleConditionArray,
           actionConditionArray = _this$getAllRuleCondi6.actionConditionArray;
 
-      var visitScheduleRuleTemplate = Object(__WEBPACK_IMPORTED_MODULE_2__Util__["g" /* getVisitScheduleRuleTemplate */])(entityName);
+      var visitScheduleRuleTemplate = Object(__WEBPACK_IMPORTED_MODULE_2__Util__["h" /* getVisitScheduleRuleTemplate */])(entityName);
       return visitScheduleRuleTemplate.replace('$RULE_CONDITIONS', ruleConditionArray.join('  ')).replace('$ACTION_CONDITIONS', actionConditionArray.join('  '));
     }
   }, {
@@ -39534,9 +39598,9 @@ var AddDecisionActionDetails = /*#__PURE__*/function () {
   }, {
     key: "validate",
     value: function validate() {
-      Object(__WEBPACK_IMPORTED_MODULE_0__Util__["a" /* assertTrue */])(!__WEBPACK_IMPORTED_MODULE_1_lodash___default.a.isEmpty(this.scope), "Decision scope cannot be empty");
-      Object(__WEBPACK_IMPORTED_MODULE_0__Util__["a" /* assertTrue */])(!__WEBPACK_IMPORTED_MODULE_1_lodash___default.a.isEmpty(this.conceptName), "Decision concept name cannot be empty");
-      Object(__WEBPACK_IMPORTED_MODULE_0__Util__["a" /* assertTrue */])(!__WEBPACK_IMPORTED_MODULE_1_lodash___default.a.isEmpty(this.value), "Decision value cannot be empty");
+      Object(__WEBPACK_IMPORTED_MODULE_0__Util__["b" /* assertTrue */])(!__WEBPACK_IMPORTED_MODULE_1_lodash___default.a.isEmpty(this.scope), "Decision scope cannot be empty");
+      Object(__WEBPACK_IMPORTED_MODULE_0__Util__["b" /* assertTrue */])(!__WEBPACK_IMPORTED_MODULE_1_lodash___default.a.isEmpty(this.conceptName), "Decision concept name cannot be empty");
+      Object(__WEBPACK_IMPORTED_MODULE_0__Util__["b" /* assertTrue */])(!__WEBPACK_IMPORTED_MODULE_1_lodash___default.a.isEmpty(this.value), "Decision value cannot be empty");
     }
   }, {
     key: "getJsValue",
@@ -39575,7 +39639,11 @@ _defineProperty(AddDecisionActionDetails, "formTypeToScopeMap", {
   ProgramEnrolment: ['enrolment', 'registration'],
   ProgramExit: ['enrolment', 'registration'],
   ProgramEncounter: ['encounter', 'enrolment', 'registration'],
-  ProgramEncounterCancellation: ['encounter', 'enrolment', 'registration']
+  ProgramEncounterCancellation: ['encounter', 'enrolment', 'registration'],
+  // Empty on purpose. A decision would have to be written to the subject, enrolment or
+  // encounter the approval refers to, none of which the approval owns.
+  Approval: [],
+  Rejection: []
 });
 
 /* harmony default export */ __webpack_exports__["a"] = (AddDecisionActionDetails);
@@ -39617,7 +39685,7 @@ var FormValidationActionDetails = /*#__PURE__*/function () {
   }, {
     key: "validate",
     value: function validate() {
-      Object(__WEBPACK_IMPORTED_MODULE_1__Util__["a" /* assertTrue */])(!__WEBPACK_IMPORTED_MODULE_0_lodash___default.a.isEmpty(this.validationError), "Validation error in Action cannot be empty");
+      Object(__WEBPACK_IMPORTED_MODULE_1__Util__["b" /* assertTrue */])(!__WEBPACK_IMPORTED_MODULE_0_lodash___default.a.isEmpty(this.validationError), "Validation error in Action cannot be empty");
     }
   }], [{
     key: "fromResource",
@@ -39724,17 +39792,17 @@ var ViewFilterActionDetails = /*#__PURE__*/function () {
   }, {
     key: "validate",
     value: function validate(actionType) {
-      if (__WEBPACK_IMPORTED_MODULE_1_lodash___default.a.isEqual(actionType, __WEBPACK_IMPORTED_MODULE_2__Action__["a" /* default */].actionTypes.Value)) Object(__WEBPACK_IMPORTED_MODULE_0__Util__["a" /* assertTrue */])(!__WEBPACK_IMPORTED_MODULE_1_lodash___default.a.isEmpty(this.value), "Value in Action cannot be empty");
-      if (__WEBPACK_IMPORTED_MODULE_1_lodash___default.a.isEqual(actionType, __WEBPACK_IMPORTED_MODULE_2__Action__["a" /* default */].actionTypes.ValidationError)) Object(__WEBPACK_IMPORTED_MODULE_0__Util__["a" /* assertTrue */])(!__WEBPACK_IMPORTED_MODULE_1_lodash___default.a.isEmpty(this.validationError), "Validation error in Action cannot be empty");
+      if (__WEBPACK_IMPORTED_MODULE_1_lodash___default.a.isEqual(actionType, __WEBPACK_IMPORTED_MODULE_2__Action__["a" /* default */].actionTypes.Value)) Object(__WEBPACK_IMPORTED_MODULE_0__Util__["b" /* assertTrue */])(!__WEBPACK_IMPORTED_MODULE_1_lodash___default.a.isEmpty(this.value), "Value in Action cannot be empty");
+      if (__WEBPACK_IMPORTED_MODULE_1_lodash___default.a.isEqual(actionType, __WEBPACK_IMPORTED_MODULE_2__Action__["a" /* default */].actionTypes.ValidationError)) Object(__WEBPACK_IMPORTED_MODULE_0__Util__["b" /* assertTrue */])(!__WEBPACK_IMPORTED_MODULE_1_lodash___default.a.isEmpty(this.validationError), "Validation error in Action cannot be empty");
 
       if (__WEBPACK_IMPORTED_MODULE_1_lodash___default.a.isEqual(actionType, __WEBPACK_IMPORTED_MODULE_2__Action__["a" /* default */].actionTypes.SkipAnswers)) {
-        Object(__WEBPACK_IMPORTED_MODULE_0__Util__["a" /* assertTrue */])(!__WEBPACK_IMPORTED_MODULE_1_lodash___default.a.isEmpty(this.answersToSkip), "Concept answers in Action cannot be empty");
-        Object(__WEBPACK_IMPORTED_MODULE_0__Util__["a" /* assertTrue */])(!__WEBPACK_IMPORTED_MODULE_1_lodash___default.a.isEmpty(this.answerUuidsToSkip), "Concept answer uuids in cannot be empty");
+        Object(__WEBPACK_IMPORTED_MODULE_0__Util__["b" /* assertTrue */])(!__WEBPACK_IMPORTED_MODULE_1_lodash___default.a.isEmpty(this.answersToSkip), "Concept answers in Action cannot be empty");
+        Object(__WEBPACK_IMPORTED_MODULE_0__Util__["b" /* assertTrue */])(!__WEBPACK_IMPORTED_MODULE_1_lodash___default.a.isEmpty(this.answerUuidsToSkip), "Concept answer uuids in cannot be empty");
       }
 
       if (__WEBPACK_IMPORTED_MODULE_1_lodash___default.a.isEqual(actionType, __WEBPACK_IMPORTED_MODULE_2__Action__["a" /* default */].actionTypes.ShowAnswers)) {
-        Object(__WEBPACK_IMPORTED_MODULE_0__Util__["a" /* assertTrue */])(!__WEBPACK_IMPORTED_MODULE_1_lodash___default.a.isEmpty(this.answersToShow), "Concept answers in Action cannot be empty");
-        Object(__WEBPACK_IMPORTED_MODULE_0__Util__["a" /* assertTrue */])(!__WEBPACK_IMPORTED_MODULE_1_lodash___default.a.isEmpty(this.answerUuidsToShow), "Concept answer uuids in cannot be empty");
+        Object(__WEBPACK_IMPORTED_MODULE_0__Util__["b" /* assertTrue */])(!__WEBPACK_IMPORTED_MODULE_1_lodash___default.a.isEmpty(this.answersToShow), "Concept answers in Action cannot be empty");
+        Object(__WEBPACK_IMPORTED_MODULE_0__Util__["b" /* assertTrue */])(!__WEBPACK_IMPORTED_MODULE_1_lodash___default.a.isEmpty(this.answerUuidsToShow), "Concept answer uuids in cannot be empty");
       }
     }
   }], [{
@@ -39808,11 +39876,11 @@ var VisitScheduleActionDetails = /*#__PURE__*/function () {
   }, {
     key: "validate",
     value: function validate() {
-      Object(__WEBPACK_IMPORTED_MODULE_0__Util__["a" /* assertTrue */])(!__WEBPACK_IMPORTED_MODULE_1_lodash___default.a.isEmpty(this.encounterType), "Visit schedule encounter type cannot be empty");
-      Object(__WEBPACK_IMPORTED_MODULE_0__Util__["a" /* assertTrue */])(!__WEBPACK_IMPORTED_MODULE_1_lodash___default.a.isEmpty(this.encounterName), "Visit schedule encounter name cannot be empty");
-      Object(__WEBPACK_IMPORTED_MODULE_0__Util__["a" /* assertTrue */])(!__WEBPACK_IMPORTED_MODULE_1_lodash___default.a.isEmpty(this.dateField), "Visit schedule date field cannot be empty");
-      Object(__WEBPACK_IMPORTED_MODULE_0__Util__["a" /* assertTrue */])(!__WEBPACK_IMPORTED_MODULE_1_lodash___default.a.isEmpty(this.daysToSchedule), "Visit schedule days to schedule cannot be empty");
-      Object(__WEBPACK_IMPORTED_MODULE_0__Util__["a" /* assertTrue */])(!__WEBPACK_IMPORTED_MODULE_1_lodash___default.a.isEmpty(this.daysToOverdue), "Visit schedule days to overdue cannot be empty");
+      Object(__WEBPACK_IMPORTED_MODULE_0__Util__["b" /* assertTrue */])(!__WEBPACK_IMPORTED_MODULE_1_lodash___default.a.isEmpty(this.encounterType), "Visit schedule encounter type cannot be empty");
+      Object(__WEBPACK_IMPORTED_MODULE_0__Util__["b" /* assertTrue */])(!__WEBPACK_IMPORTED_MODULE_1_lodash___default.a.isEmpty(this.encounterName), "Visit schedule encounter name cannot be empty");
+      Object(__WEBPACK_IMPORTED_MODULE_0__Util__["b" /* assertTrue */])(!__WEBPACK_IMPORTED_MODULE_1_lodash___default.a.isEmpty(this.dateField), "Visit schedule date field cannot be empty");
+      Object(__WEBPACK_IMPORTED_MODULE_0__Util__["b" /* assertTrue */])(!__WEBPACK_IMPORTED_MODULE_1_lodash___default.a.isEmpty(this.daysToSchedule), "Visit schedule days to schedule cannot be empty");
+      Object(__WEBPACK_IMPORTED_MODULE_0__Util__["b" /* assertTrue */])(!__WEBPACK_IMPORTED_MODULE_1_lodash___default.a.isEmpty(this.daysToOverdue), "Visit schedule days to overdue cannot be empty");
     }
   }], [{
     key: "fromResource",
@@ -39903,7 +39971,11 @@ _defineProperty(VisitScheduleActionDetails, "formTypeToDateFieldMap", {
   ProgramEnrolment: ['enrolmentDateTime', 'registrationDate'],
   ProgramExit: ['programExitDateTime', 'registrationDate'],
   ProgramEncounter: ['encounterDateTime', 'earliestVisitDateTime', 'enrolmentDateTime', 'registrationDate'],
-  ProgramEncounterCancellation: ['cancelDateTime', 'earliestVisitDateTime', 'enrolmentDateTime', 'registrationDate']
+  ProgramEncounterCancellation: ['cancelDateTime', 'earliestVisitDateTime', 'enrolmentDateTime', 'registrationDate'],
+  // Empty on purpose. A visit would have to be scheduled against the enrolment or subject
+  // the approval refers to, which the approval does not own.
+  Approval: [],
+  Rejection: []
 });
 
 /* harmony default export */ __webpack_exports__["a"] = (VisitScheduleActionDetails);
