@@ -52,4 +52,50 @@ describe('FormElementStatusTest', () => {
             assert.isTrue(combined.visibility);
         });
     });
+
+    describe('captureGuidance', () => {
+        const guidance = {
+            reckoner: '/Avni/guidance/aaa.png',
+            overlay: '/Avni/guidance/bbb.png',
+            label: '3 of 14 — Left buccal mucosa',
+            flash: 'on'
+        };
+
+        it('is settable through addCaptureGuidance, the way openchs-models exposes it', () => {
+            const status = new FormElementStatus('fe-uuid', true, null);
+            status.addCaptureGuidance(guidance);
+            assert.deepEqual(status.captureGuidance, guidance);
+        });
+
+        it('survives or(), so combining statuses cannot drop a guided row to an unguided one', () => {
+            const guided = new FormElementStatus('fe-uuid', true, null);
+            guided.addCaptureGuidance(guidance);
+            assert.deepEqual(guided.or(new FormElementStatus('fe-uuid', false, null)).captureGuidance, guidance);
+        });
+
+        it('survives and()', () => {
+            const guided = new FormElementStatus('fe-uuid', true, null);
+            guided.addCaptureGuidance(guidance);
+            assert.deepEqual(guided.and(new FormElementStatus('fe-uuid', true, null)).captureGuidance, guidance);
+        });
+
+        it('carries a block through the combinators, so a blocked row stays blocked', () => {
+            const blocked = new FormElementStatus('fe-uuid', true, null);
+            blocked.addCaptureGuidance({blockCapture: {reason: 'guidanceMissing'}});
+            const combined = blocked.or(new FormElementStatus('fe-uuid', true, null));
+            assert.deepEqual(combined.captureGuidance.blockCapture, {reason: 'guidanceMissing'});
+        });
+
+        it('is taken from the receiver only — matching questionGroupIndex and openchs-models', () => {
+            const plain = new FormElementStatus('fe-uuid', true, null);
+            const guided = new FormElementStatus('fe-uuid', true, null);
+            guided.addCaptureGuidance(guidance);
+            assert.isUndefined(plain.or(guided).captureGuidance);
+        });
+
+        it('stays undefined when no rule set it', () => {
+            const status = new FormElementStatus('fe-uuid', true, null);
+            assert.isUndefined(status.or(new FormElementStatus('fe-uuid', true, null)).captureGuidance);
+        });
+    });
 });
